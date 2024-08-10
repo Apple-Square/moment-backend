@@ -1,10 +1,8 @@
 package applesquare.moment.auth.filter;
 
-import applesquare.moment.auth.security.UserDetailsServiceImpl;
 import applesquare.moment.exception.TokenError;
 import applesquare.moment.exception.TokenException;
 import applesquare.moment.util.JwtUtil;
-import applesquare.moment.util.RequestUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
