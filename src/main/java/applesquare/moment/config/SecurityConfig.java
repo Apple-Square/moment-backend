@@ -5,6 +5,7 @@ import applesquare.moment.auth.filter.LoginFilter;
 import applesquare.moment.auth.handler.LoginFailureHandler;
 import applesquare.moment.auth.handler.LoginSuccessHandler;
 import applesquare.moment.auth.security.UserDetailsServiceImpl;
+import applesquare.moment.auth.service.TokenBlacklistService;
 import applesquare.moment.user.service.UserInfoService;
 import applesquare.moment.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ import java.util.Arrays;
 public class SecurityConfig {
     private final UserInfoService userInfoService;
     private final UserDetailsServiceImpl userDetailsService;
+    private final TokenBlacklistService tokenBlacklistService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
@@ -87,7 +89,7 @@ public class SecurityConfig {
 
 
         // JwtAuthenticationFilter 설정
-        JwtAuthenticationFilter jwtAuthenticationFilter=new JwtAuthenticationFilter(userDetailsService, jwtUtil);
+        JwtAuthenticationFilter jwtAuthenticationFilter=new JwtAuthenticationFilter(userDetailsService, tokenBlacklistService, jwtUtil);
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
 

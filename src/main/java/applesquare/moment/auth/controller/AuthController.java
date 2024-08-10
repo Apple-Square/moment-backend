@@ -2,6 +2,7 @@ package applesquare.moment.auth.controller;
 
 import applesquare.moment.auth.dto.UserCreateRequestDTO;
 import applesquare.moment.auth.service.AuthService;
+import applesquare.moment.auth.service.TokenBlacklistService;
 import applesquare.moment.exception.ResponseMap;
 import applesquare.moment.exception.TokenError;
 import applesquare.moment.exception.TokenException;
@@ -28,6 +29,7 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 public class AuthController {
     private final AuthService authService;
+    private final TokenBlacklistService tokenBlacklistService;
     private final JwtUtil jwtUtil;
 
 
@@ -75,26 +77,32 @@ public class AuthController {
 
             // Refresh 토큰이 유효하다면
             if(jwtUtil.validateToken(refreshToken)){
-                // 응답 구성
-                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                response.setStatus(HttpServletResponse.SC_OK);
+                // 블랙 리스트에 등록되었는지 확인
+                if(!tokenBlacklistService.exists(refreshToken)){
+                    // 응답 구성
+                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                    response.setStatus(HttpServletResponse.SC_OK);
 
-                // Access Token 재발급
-                String username = jwtUtil.getSubjectFromToken(refreshToken);
-                String accessToken = jwtUtil.generateAccessToken(username);
-                response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
+                    // Access Token 재발급
+                    String username = jwtUtil.getSubjectFromToken(refreshToken);
+                    String accessToken = jwtUtil.generateAccessToken(username);
+                    response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
 
-                // Refresh 쿠키 유효 시간이 얼마 안 남았으면, Refresh 쿠키도 재발급
-                if(jwtUtil.needNewRefreshToken(refreshToken)){
-                    ResponseCookie newRefreshTokenCookie= jwtUtil.generateRefreshCookie(username);
-                    response.addHeader(HttpHeaders.SET_COOKIE, newRefreshTokenCookie.toString());
+                    // Refresh 쿠키 유효 시간이 얼마 안 남았으면, Refresh 쿠키도 재발급
+                    if(jwtUtil.needNewRefreshToken(refreshToken)){
+                        ResponseCookie newRefreshTokenCookie= jwtUtil.generateRefreshCookie(username);
+                        response.addHeader(HttpHeaders.SET_COOKIE, newRefreshTokenCookie.toString());
+                    }
+
+                    // 응답 본문 구성
+                    ResponseMap responseMap=new ResponseMap();
+                    responseMap.put("message", "토큰 재발급에 성공했습니다.");
+
+                    response.getWriter().write(responseMap.toJson());
                 }
-
-                // 응답 본문 구성
-                ResponseMap responseMap=new ResponseMap();
-                responseMap.put("message", "토큰 재발급에 성공했습니다.");
-
-                response.getWriter().write(responseMap.toJson());
+                else{
+                    throw new TokenException(TokenError.BLACKLISTED);
+                }
             }
         }
         catch(TokenException e){

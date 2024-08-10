@@ -1,6 +1,7 @@
 package applesquare.moment.exception;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+@Log4j2
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     /**
@@ -109,6 +111,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String,Object>> handleException(Exception e){
+        log.error(e.getMessage());
+
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", "서버에서 예상치 못한 오류가 발생했습니다.");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap.getMap());

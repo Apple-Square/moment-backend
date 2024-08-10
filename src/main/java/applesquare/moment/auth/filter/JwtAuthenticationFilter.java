@@ -1,5 +1,6 @@
 package applesquare.moment.auth.filter;
 
+import applesquare.moment.auth.service.TokenBlacklistService;
 import applesquare.moment.exception.TokenError;
 import applesquare.moment.exception.TokenException;
 import applesquare.moment.util.JwtUtil;
@@ -24,6 +25,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
+    private final TokenBlacklistService tokenBlacklistService;
     private final JwtUtil jwtUtil;
 
     @Override
@@ -42,16 +44,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     // 토큰 유효성 검사
                     if(jwtUtil.validateToken(accessToken)){
-                        // Access 토큰의 Subject 값으로 UserDetails 조회
-                        String username=jwtUtil.getSubjectFromToken(accessToken);
-                        UserDetails userDetails=userDetailsService.loadUserByUsername(username);
+                        // 블랙 리스트에 등록되었는지 확인
+                        if(!tokenBlacklistService.exists(accessToken)){
+                            // Access 토큰의 Subject 값으로 UserDetails 조회
+                            String username=jwtUtil.getSubjectFromToken(accessToken);
+                            UserDetails userDetails=userDetailsService.loadUserByUsername(username);
 
-                        // authentication 생성
-                        UsernamePasswordAuthenticationToken authentication= new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                            // authentication 생성
+                            UsernamePasswordAuthenticationToken authentication= new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                        // ContextHolder에 authentication 등록
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                            // ContextHolder에 authentication 등록
+                            SecurityContextHolder.getContext().setAuthentication(authentication);
+                        }
+                        else{
+                            // 블랙 리스트에 등록되었다면 예외 처리
+                            throw new TokenException(TokenError.BLACKLISTED);
+                        }
                     }
                 }
                 else{

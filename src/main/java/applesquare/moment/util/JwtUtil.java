@@ -17,9 +17,10 @@ import java.util.Date;
 @Component
 public class JwtUtil {
     public static final String REFRESH_TOKEN_COOKIE="refresh_token";
-    private final long REFRESH_TOKEN_REISSUE_MS=1000*60*60*24*7;  //7일
-    private final int ACCESS_TOKEN_EXPIRATION_SEC=60*30;  //30분
-    private final int REFRESH_TOKEN_EXPIRATION_SEC=60*60*24*10;  //10일
+
+    private final int ACCESS_TOKEN_EXPIRATION_SEC=60*30;  // 30분
+    private final int REFRESH_TOKEN_EXPIRATION_SEC=60*60*24*7;  // 7일
+    private final long REFRESH_TOKEN_REISSUE_MS=1000*60*60*24*3;  // 3일
     @Value("${applesquare.jwt.secret}")
     private String jwtSecret;
 
@@ -126,9 +127,20 @@ public class JwtUtil {
      * @param token JWT 문자열
      * @return 만료 기한
      */
-    public Date getExpirationFromToken(String token){
-        return Jwts.parserBuilder().setSigningKey(key()).build()
-                .parseClaimsJws(token).getBody().getExpiration();
+    public long getRemainingMilliSecFromToken(String token){
+        // 만료일 추출
+        Date expirationDate=Jwts.parserBuilder()
+                 .setSigningKey(key())
+                 .build()
+                 .parseClaimsJws(token)
+                 .getBody()
+                 .getExpiration();
+
+        // 만료까지 남은 시간 계산 (ms)
+        long expTime= expirationDate.getTime();
+        long nowTime = System.currentTimeMillis();
+
+        return expTime - nowTime;
     }
 
     /**
@@ -137,11 +149,7 @@ public class JwtUtil {
      * @return 재발급이 필요한지 여부
      */
     public boolean needNewRefreshToken(String refreshToken){
-        // Refresh 토큰 만료까지 남은 시간 계산
-        long expTime= getExpirationFromToken(refreshToken).getTime();
-        long nowTime = System.currentTimeMillis();
-        long diff = expTime - nowTime;
-
-        return diff < REFRESH_TOKEN_REISSUE_MS;
+        long remainingMilliSec=getRemainingMilliSecFromToken(refreshToken);
+        return remainingMilliSec < REFRESH_TOKEN_REISSUE_MS;
     }
 }

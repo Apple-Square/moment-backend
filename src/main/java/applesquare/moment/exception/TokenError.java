@@ -11,7 +11,8 @@ public enum TokenError {
     MALFORM(HttpStatus.UNAUTHORIZED, "잘못된 형식의 토큰입니다."),
     EXPIRED(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
     BADSIGN(HttpStatus.UNAUTHORIZED, "토큰 시그니처가 잘못됐습니다."),
-    UNSUPPORTED(HttpStatus.UNAUTHORIZED, "지원하지 않는 토큰입니다.");
+    UNSUPPORTED(HttpStatus.UNAUTHORIZED, "지원하지 않는 토큰입니다."),
+    BLACKLISTED(HttpStatus.FORBIDDEN, "블랙리스트에 등록된 토큰입니다.");
 
     private final HttpStatus status;
     private final String message;
