@@ -16,7 +16,7 @@ import java.util.Collections;
 @AllArgsConstructor
 public class UserDetailsImpl implements UserDetails {
     private String id;  // 사용자 식별 아이디
-    private String username;  // 계정 아이디
+    private String username;  // 사용자 계정 아이디
     @JsonIgnore
     private String password;
     private String email;

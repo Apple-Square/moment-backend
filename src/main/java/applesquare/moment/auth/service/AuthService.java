@@ -1,6 +1,6 @@
 package applesquare.moment.auth.service;
 
-import applesquare.moment.auth.dto.SignupRequestDTO;
+import applesquare.moment.auth.dto.UserCreateRequestDTO;
 
 public interface AuthService {
     int MIN_USERNAME_LENGTH=8;
@@ -9,5 +9,5 @@ public interface AuthService {
     int MAX_PASSWORD_LENGTH=20;
 
 
-    void createUser(SignupRequestDTO signupRequestDTO);
+    void createUser(UserCreateRequestDTO userCreateRequestDTO);
 }

@@ -26,6 +26,6 @@ public class UserAccount extends BaseEntity {
     @Column(nullable = false, updatable = true)
     private String email;
     @OneToOne(cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
+    @JoinColumn(name="user_info_id", nullable = false, updatable = false)
     private UserInfo userInfo;
 }

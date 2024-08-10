@@ -20,15 +20,15 @@ import java.util.NoSuchElementException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     /**
-     * 입력값이 잘못되었을 때 발생하는 예외 처리
-     * @param e InvalidInputException
-     * @return 400 (Bad Request)
+     * 중복되는 데이터가 들어왔을 때 발생하는 예외 처리
+     * @param e DuplicateDataException
+     * @return 409 (Conflict)
      */
-    @ExceptionHandler(InvalidInputException.class)
-    public ResponseEntity<Map<String, Object>> handleInvalidInputException(InvalidInputException e){
+    @ExceptionHandler(DuplicateDataException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidInputException(DuplicateDataException e){
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap.getMap());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(responseMap.getMap());
     }
 
     /**
@@ -52,16 +52,12 @@ public class GlobalExceptionHandler {
 
     /**
      * 로직 처리에 필요한 데이터가 존재하지 않는 경우 발생하는 예외 처리
-     * @param e NoSuchElementException,
-     *          EntityNotFoundException,
-     *          EmptyResultDataAccessException,
+     * @param e EntityNotFoundException,
      *          UsernameNotFoundException
      * @return 404 (Not Found)
      */
     @ExceptionHandler({
-            NoSuchElementException.class,
             EntityNotFoundException.class,
-            EmptyResultDataAccessException.class,
             UsernameNotFoundException.class
     })
     public ResponseEntity<Map<String,Object>> handleNoSuchElementException(Exception e){

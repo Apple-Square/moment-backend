@@ -1,16 +1,15 @@
 package applesquare.moment.auth.service.impl;
 
-import applesquare.moment.auth.dto.SignupRequestDTO;
+import applesquare.moment.auth.dto.UserCreateRequestDTO;
 import applesquare.moment.auth.model.UserAccount;
 import applesquare.moment.auth.repository.UserAccountRepository;
 import applesquare.moment.auth.service.AuthService;
-import applesquare.moment.exception.InvalidInputException;
+import applesquare.moment.exception.DuplicateDataException;
 import applesquare.moment.user.model.UserInfo;
 import applesquare.moment.user.repository.UserInfoRepository;
 import applesquare.moment.user.service.UserInfoService;
 import applesquare.moment.util.StringUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,22 +25,22 @@ public class AuthServiceImpl implements AuthService {
 
     /**
      * 회원가입
-     * @param signupRequestDTO 회원가입 정보
+     * @param userCreateRequestDTO 회원가입 정보
      */
     @Override
-    public void createUser(SignupRequestDTO signupRequestDTO){
+    public void createUser(UserCreateRequestDTO userCreateRequestDTO){
         // 중복 검사
-        String nickname= signupRequestDTO.getNickname();
-        String username= signupRequestDTO.getUsername();
-        String email= signupRequestDTO.getEmail();
+        String nickname= userCreateRequestDTO.getNickname();
+        String username= userCreateRequestDTO.getUsername();
+        String email= userCreateRequestDTO.getEmail();
         if(userInfoRepository.existsByNickname(nickname)){
-            throw new InvalidInputException(HttpStatus.CONFLICT, "이미 존재하는 닉네임입니다. (nickname = "+nickname+")");
+            throw new DuplicateDataException("이미 존재하는 닉네임입니다. (nickname = "+nickname+")");
         }
         if(userAccountRepository.existsByUsername(username)){
-            throw new InvalidInputException(HttpStatus.CONFLICT , "이미 존재하는 아이디입니다. (id = "+username+")");
+            throw new DuplicateDataException("이미 존재하는 아이디입니다. (id = "+username+")");
         }
         if(userAccountRepository.existsByEmail(email)){
-            throw new InvalidInputException(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다. (email = "+email+")");
+            throw new DuplicateDataException("이미 사용 중인 이메일입니다. (email = "+email+")");
         }
 
         // 이메일 유효성 검사
@@ -65,14 +64,16 @@ public class AuthServiceImpl implements AuthService {
         UserInfo userInfo=UserInfo.builder()
                 .id(userId)
                 .nickname(nickname)
-                .birth(signupRequestDTO.getBirth())
-                .gender(signupRequestDTO.getGender())
-                .address(signupRequestDTO.getAddress())
+                .birth(userCreateRequestDTO.getBirth())
+                .gender(userCreateRequestDTO.getGender())
+                .address(userCreateRequestDTO.getAddress())
                 .build();
 
+        // 비밀번호 해시값 생성
+        String encodedPassword=encoder.encode(userCreateRequestDTO.getPassword());
         UserAccount userAccount=UserAccount.builder()
                 .username(username)
-                .password(encoder.encode(signupRequestDTO.getPassword()))
+                .password(encodedPassword)
                 .email(email)
                 .userInfo(userInfo)
                 .build();

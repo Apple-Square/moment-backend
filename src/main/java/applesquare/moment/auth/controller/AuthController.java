@@ -1,6 +1,6 @@
 package applesquare.moment.auth.controller;
 
-import applesquare.moment.auth.dto.SignupRequestDTO;
+import applesquare.moment.auth.dto.UserCreateRequestDTO;
 import applesquare.moment.auth.service.AuthService;
 import applesquare.moment.exception.ResponseMap;
 import jakarta.validation.Valid;
@@ -23,14 +23,14 @@ public class AuthController {
 
     /**
      * 회원가입 API
-     * @param signupRequestDTO 회원가입 정보
+     * @param userCreateRequestDTO 회원가입 정보
      * @return  (status) 201,
      *          (body) 회원가입 성공 메세지
      */
     @PostMapping(value="/signup", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> signup(@Valid @RequestBody SignupRequestDTO signupRequestDTO){
+    public ResponseEntity<Map<String, Object>> signup(@Valid @RequestBody UserCreateRequestDTO userCreateRequestDTO){
         // 사용자 계정 생성
-        authService.createUser(signupRequestDTO);
+        authService.createUser(userCreateRequestDTO);
 
         // 응답 생성
         ResponseMap responseMap =new ResponseMap();
