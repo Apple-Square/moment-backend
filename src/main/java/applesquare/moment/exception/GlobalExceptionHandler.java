@@ -3,7 +3,6 @@ package applesquare.moment.exception;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -51,6 +49,18 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * JWT 인증에서 발생한 Token 예외 처리
+     * @param e TokenException
+     * @return 401 (Unauthorized)
+     */
+    @ExceptionHandler(TokenException.class)
+    public ResponseEntity<Map<String, Object>> handleTokenException(TokenException e){
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", e.getMessage());
+        return ResponseEntity.status(e.getStatus()).body(responseMap.getMap());
+    }
+
+    /**
      * 로직 처리에 필요한 데이터가 존재하지 않는 경우 발생하는 예외 처리
      * @param e EntityNotFoundException,
      *          UsernameNotFoundException
@@ -65,6 +75,8 @@ public class GlobalExceptionHandler {
         responseMap.put("message", e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseMap.getMap());
     }
+
+
 
     /**
      * 데이터 무결성 위반 예외 처리
