@@ -2,6 +2,8 @@ package applesquare.moment.config;
 
 import applesquare.moment.auth.filter.JwtAuthenticationFilter;
 import applesquare.moment.auth.filter.LoginFilter;
+import applesquare.moment.auth.handler.CustomLogoutHandler;
+import applesquare.moment.auth.handler.CustomLogoutSuccessHandler;
 import applesquare.moment.auth.handler.LoginFailureHandler;
 import applesquare.moment.auth.handler.LoginSuccessHandler;
 import applesquare.moment.auth.security.UserDetailsServiceImpl;
@@ -23,6 +25,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -78,14 +84,19 @@ public class SecurityConfig {
         // LoginFilter 설정
         LoginFilter loginFilter=new LoginFilter("/api/auth/login");
         loginFilter.setAuthenticationManager(authManager);
-
-        // LoginFilter에 Handler 설정
         LoginSuccessHandler loginSuccessHandler=new LoginSuccessHandler(userInfoService, jwtUtil);
         LoginFailureHandler loginFailureHandler=new LoginFailureHandler();
         loginFilter.setAuthenticationSuccessHandler(loginSuccessHandler);
         loginFilter.setAuthenticationFailureHandler(loginFailureHandler);
 
         http.addFilterBefore(loginFilter, UsernamePasswordAuthenticationFilter.class);
+
+        // LogoutFilter 설정
+        LogoutHandler logoutHandler = new CustomLogoutHandler(tokenBlacklistService);
+        LogoutSuccessHandler logoutSuccessHandler = new CustomLogoutSuccessHandler(jwtUtil);
+        LogoutFilter logoutFilter = new LogoutFilter(logoutSuccessHandler, logoutHandler);
+        logoutFilter.setLogoutRequestMatcher(new AntPathRequestMatcher("/api/auth/logout"));
+        http.addFilterBefore(logoutFilter, LogoutFilter.class);
 
 
         // JwtAuthenticationFilter 설정

@@ -128,19 +128,25 @@ public class JwtUtil {
      * @return 만료 기한
      */
     public long getRemainingMilliSecFromToken(String token){
-        // 만료일 추출
-        Date expirationDate=Jwts.parserBuilder()
-                 .setSigningKey(key())
-                 .build()
-                 .parseClaimsJws(token)
-                 .getBody()
-                 .getExpiration();
+        try{
+            // 만료일 추출
+            Date expirationDate=Jwts.parserBuilder()
+                    .setSigningKey(key())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getExpiration();
 
-        // 만료까지 남은 시간 계산 (ms)
-        long expTime= expirationDate.getTime();
-        long nowTime = System.currentTimeMillis();
+            // 만료까지 남은 시간 계산 (ms)
+            long expTime= expirationDate.getTime();
+            long nowTime = System.currentTimeMillis();
 
-        return expTime - nowTime;
+            return expTime - nowTime;
+        }
+        catch(ExpiredJwtException e){
+            // 만료된 토큰이면 만료까지 남은 시간 0 ms
+            return 0L;
+        }
     }
 
     /**

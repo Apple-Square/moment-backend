@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.TimeUnit;
 
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -18,7 +19,7 @@ public class TokenBlacklistServiceImpl implements TokenBlacklistService {
 
     @Override
     public void blacklist(String token, String reason){
-        long remainingMilliSec= jwtUtil.getRemainingMilliSecFromToken(token);
+        long remainingMilliSec=jwtUtil.getRemainingMilliSecFromToken(token);
         tokenBlacklistRepository.saveStringWithTimeout(token, reason, remainingMilliSec, TimeUnit.MILLISECONDS);
     }
 

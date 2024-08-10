@@ -11,11 +11,6 @@ import java.io.IOException;
 public class TokenException extends RuntimeException {
     private final HttpStatus status;
 
-    public TokenException(HttpStatus status, String message){
-        super(message);
-        this.status=status;
-    }
-
     public TokenException(TokenError error){
         super(error.getMessage());
         this.status=error.getStatus();
@@ -31,7 +26,7 @@ public class TokenException extends RuntimeException {
         try{
             resp.getWriter().write(responseMap.toJson());
         }catch(IOException e){
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 }
