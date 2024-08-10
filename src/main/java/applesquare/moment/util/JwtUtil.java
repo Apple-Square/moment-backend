@@ -92,7 +92,7 @@ public class JwtUtil {
      * JWT 검증
      * @param token 토큰
      * @return 토큰 유효 여부
-     * @throws TokenException
+     * @throws TokenException TokenException
      */
     public boolean validateToken(String token) throws TokenException {
         try {
@@ -129,5 +129,19 @@ public class JwtUtil {
     public Date getExpirationFromToken(String token){
         return Jwts.parserBuilder().setSigningKey(key()).build()
                 .parseClaimsJws(token).getBody().getExpiration();
+    }
+
+    /**
+     * Refresh 토큰의 재발급이 필요한지 확인
+     * @param refreshToken Refresh 토큰
+     * @return 재발급이 필요한지 여부
+     */
+    public boolean needNewRefreshToken(String refreshToken){
+        // Refresh 토큰 만료까지 남은 시간 계산
+        long expTime= getExpirationFromToken(refreshToken).getTime();
+        long nowTime = System.currentTimeMillis();
+        long diff = expTime - nowTime;
+
+        return diff < REFRESH_TOKEN_REISSUE_MS;
     }
 }
