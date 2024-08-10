@@ -45,15 +45,16 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
             response.setStatus(HttpServletResponse.SC_OK);
 
             // Access 토큰 발급
-            String userId=userDetails.getId();
-            String accessToken = jwtUtil.generateAccessToken(userId);
+            String username=userDetails.getUsername();
+            String accessToken = jwtUtil.generateAccessToken(username);
             response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
 
             // Refresh 토큰 발급
-            ResponseCookie refreshTokenCookie= jwtUtil.generateRefreshCookie(userId);
+            ResponseCookie refreshTokenCookie= jwtUtil.generateRefreshCookie(username);
             response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
             // 사용자 정보 조회
+            String userId=userDetails.getId();
             UserInfoReadResponseDTO userInfoReadResponseDTO=userInfoService.readById(userId);
 
             // 응답 본문 구성
