@@ -6,6 +6,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,18 +20,6 @@ import java.util.Map;
 @Log4j2
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    /**
-     * 중복되는 데이터가 들어왔을 때 발생하는 예외 처리
-     * @param e DuplicateDataException
-     * @return 409 (Conflict)
-     */
-    @ExceptionHandler(DuplicateDataException.class)
-    public ResponseEntity<Map<String, Object>> handleInvalidInputException(DuplicateDataException e){
-        ResponseMap responseMap=new ResponseMap();
-        responseMap.put("message", e.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(responseMap.getMap());
-    }
-
     /**
      * Validation 도중 발생한 예외 처리
      * @param e MethodArgumentNotValidException
@@ -63,6 +52,18 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 접근 거부 예외 처리
+     * @param e AccessDeniedException
+     * @return 403 (Forbidden)
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccessDeniedException(AccessDeniedException e){
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", e.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(responseMap.getMap());
+    }
+
+    /**
      * 로직 처리에 필요한 데이터가 존재하지 않는 경우 발생하는 예외 처리
      * @param e EntityNotFoundException,
      *          UsernameNotFoundException
@@ -78,7 +79,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseMap.getMap());
     }
 
-
+    /**
+     * 중복되는 데이터가 들어왔을 때 발생하는 예외 처리
+     * @param e DuplicateDataException
+     * @return 409 (Conflict)
+     */
+    @ExceptionHandler(DuplicateDataException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidInputException(DuplicateDataException e){
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", e.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(responseMap.getMap());
+    }
 
     /**
      * 데이터 무결성 위반 예외 처리

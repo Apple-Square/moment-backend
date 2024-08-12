@@ -1,4 +1,4 @@
-package applesquare.moment.common;
+package applesquare.moment.common.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

@@ -1,6 +1,6 @@
 package applesquare.moment.user.model;
 
-import applesquare.moment.common.BaseEntity;
+import applesquare.moment.common.model.BaseEntity;
 import applesquare.moment.user.service.UserInfoService;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
