@@ -1,6 +1,7 @@
 package applesquare.moment.post.model;
 
 import applesquare.moment.common.model.BaseEntity;
+import applesquare.moment.post.service.PostService;
 import applesquare.moment.user.model.UserInfo;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,7 @@ public class Post extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = true, updatable = true)
+    @Column(length = PostService.MAX_CONTENT_LENGTH, nullable = true, updatable = true)
     private String content;
     @Column(nullable = false, updatable = true)
     private int viewCount;
