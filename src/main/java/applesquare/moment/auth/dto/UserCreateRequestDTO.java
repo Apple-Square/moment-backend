@@ -22,15 +22,15 @@ import java.time.LocalDate;
 public class UserCreateRequestDTO {
     @NotBlank
     @Size(min= UserInfoService.MIN_NICKNAME_LENGTH, max=UserInfoService.MAX_NICKNAME_LENGTH)
-    @Pattern(regexp = ValidationUtil.NICKNAME_PATTERN)
+    @Pattern(regexp = ValidationUtil.NICKNAME_PATTERN, message = "한글, 알파벳 대소문자, 숫자, 밑줄 (_), 하이픈 (-)만 입력 가능합니다.")
     private String nickname;
     @NotBlank
     @Size(min= AuthService.MIN_USERNAME_LENGTH, max = AuthService.MAX_USERNAME_LENGTH)
-    @Pattern(regexp = ValidationUtil.USERNAME_PATTERN)
+    @Pattern(regexp = ValidationUtil.USERNAME_PATTERN, message = "알파벳 대소문자, 숫자, 밑줄 (_), 하이픈 (-)만 입력 가능합니다.")
     private String username;
     @NotBlank
     @Size(min = AuthService.MIN_PASSWORD_LENGTH, max = AuthService.MAX_PASSWORD_LENGTH)
-    @Pattern(regexp = ValidationUtil.PASSWORD_PATTERN)
+    @Pattern(regexp = ValidationUtil.PASSWORD_PATTERN, message = "알파벳 대문자, 소문자, 숫자, 특수 문자 ( ! ? @ # $ % ^ & )를 모두 입력해야 합니다.")
     private String password;
     private LocalDate birth;
     private Gender gender;
