@@ -15,8 +15,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -100,25 +98,20 @@ public class PostServiceImpl implements PostService {
     @Override
     public void delete(Long postId){
         // DB에 저장된 이전 게시글 엔티티 가져오기
-        Optional<Post> postOptional=postRepository.findById(postId);
+        Post post=postRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("이미 삭제된 게시글입니다. (id = "+postId+")"));
 
-        // DB에 게시글이 있는 경우
-        if(postOptional.isPresent()){
-            // 권한 검사
-            Post post=postOptional.get();
-            String userId= securityService.getUserId();
-            if(!isOwner(post, userId)){
-                throw new AccessDeniedException("게시글 작성자만 삭제할 수 있습니다.");
-            }
-
-            // 게시글 삭제
-            postRepository.deleteById(postId);
-
-            // 게시글 종속 엔티티 삭제 (댓글)
-            commentRepository.deleteByPostId(postId);
+        // 권한 검사
+        String userId= securityService.getUserId();
+        if(!isOwner(post, userId)){
+            throw new AccessDeniedException("게시글 작성자만 삭제할 수 있습니다.");
         }
 
-        // 이미 게시글이 삭제된 상태라면 아무 동작도 하지 않기
+        // 게시글 삭제
+        postRepository.deleteById(postId);
+
+        // 게시글 종속 엔티티 삭제 (댓글)
+        commentRepository.deleteByPostId(postId);
     }
 
 

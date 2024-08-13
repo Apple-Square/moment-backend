@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -113,22 +112,17 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void delete(Long commentId){
         // DB에 저장된 이전 댓글 엔티티 가져오기
-        Optional<Comment> commentOptional=commentRepository.findById(commentId);
+        Comment comment=commentRepository.findById(commentId)
+                .orElseThrow(() -> new EntityNotFoundException("이미 삭제된 댓글입니다. (id = "+commentId+")"));
 
-        // DB에 댓글이 있는 경우
-        if(commentOptional.isPresent()){
-            // 권한 검사
-            Comment comment=commentOptional.get();
-            String userId=securityService.getUserId();
-            if(!isOwner(comment, userId)){
-                throw new AccessDeniedException("댓글 작성자만 삭제할 수 있습니다.");
-            }
-
-            // DB 삭제
-            commentRepository.deleteById(commentId);
+        // 권한 검사
+        String userId=securityService.getUserId();
+        if(!isOwner(comment, userId)){
+            throw new AccessDeniedException("댓글 작성자만 삭제할 수 있습니다.");
         }
 
-        // 이미 댓글이 삭제된 상태라면 아무 동작도 하지 않기
+        // DB 삭제
+        commentRepository.deleteById(commentId);
     }
 
     /**
