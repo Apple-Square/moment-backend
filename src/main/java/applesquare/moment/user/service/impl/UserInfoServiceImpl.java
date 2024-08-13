@@ -29,7 +29,10 @@ public class UserInfoServiceImpl implements UserInfoService {
         UserInfo userInfo=userInfoRepository.findById(id)
                 .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 사용자입니다. (id = "+id+")"));
 
-        // DTO로 변환해서 반환
-        return modelMapper.map(userInfo, UserInfoReadResponseDTO.class);
+        // DTO 변환
+        UserInfoReadResponseDTO userInfoReadResponseDTO=modelMapper.map(userInfo, UserInfoReadResponseDTO.class);
+
+        // DTO 반환
+        return userInfoReadResponseDTO;
     }
 }

@@ -22,7 +22,7 @@ public class PostController {
 
     /**
      * 게시글 등록 API
-     * @param postCreateRequestDTO 게시글 입력 정보
+     * @param postCreateRequestDTO 게시글 생성 정보
      * @return  (status) 201,
      *          (body)  게시글 등록 성공 메세지,
      *                  등록된 게시글 ID

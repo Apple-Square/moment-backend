@@ -1,5 +1,6 @@
 package applesquare.moment.post.service.impl;
 
+import applesquare.moment.comment.repository.CommentRepository;
 import applesquare.moment.common.service.SecurityService;
 import applesquare.moment.post.dto.PostCreateRequestDTO;
 import applesquare.moment.post.dto.PostUpdateRequestDTO;
@@ -21,6 +22,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
     private final UserInfoRepository userInfoRepository;
     private final SecurityService securityService;
 
@@ -28,7 +30,6 @@ public class PostServiceImpl implements PostService {
     /**
      * 게시글 생성
      * [필요 권한 : 로그인 상태]
-     * (Controller 계층에서 @PreAuthorize 검사)
      *
      * @param postCreateRequestDTO 게시글 생성 정보
      * @return 새로 생성된 게시글의 ID
@@ -37,8 +38,10 @@ public class PostServiceImpl implements PostService {
     public Long create(PostCreateRequestDTO postCreateRequestDTO){
         // 입력 형식 검사
 
-        // 엔티티 생성
+        // 권한 검사
         String userId= securityService.getUserId();
+
+        // 엔티티 생성
         UserInfo writer=userInfoRepository.findById(userId)
                 .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 사용자입니다. (id = "+userId+")"));
         Post post=Post.builder()
@@ -108,16 +111,19 @@ public class PostServiceImpl implements PostService {
                 throw new AccessDeniedException("게시글 작성자만 삭제할 수 있습니다.");
             }
 
-            // DB 삭제
+            // 게시글 삭제
             postRepository.deleteById(postId);
+
+            // 게시글 종속 엔티티 삭제 (댓글)
+            commentRepository.deleteByPostId(postId);
         }
 
-        // 이미 게시글이 삭제된 상태라면 아무 동작도 하지 않고 않기
+        // 이미 게시글이 삭제된 상태라면 아무 동작도 하지 않기
     }
 
 
     /**
-     * 특정 사용자가 특정 게시글을 소유하고 있는지 여부 검사
+     * 특정 사용자가 특정 게시글을 소유하고 있는지 검사
      * @param post 게시글
      * @param userId 사용자 ID
      * @return 게시글 소유 여부
