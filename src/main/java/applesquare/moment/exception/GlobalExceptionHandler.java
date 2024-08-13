@@ -12,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -61,6 +62,18 @@ public class GlobalExceptionHandler {
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", e.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(responseMap.getMap());
+    }
+
+    /**
+     * 존재하지 않는 API를 요청한 경우 발생하는 예외 처리
+     * @param e NoHandlerFoundException
+     * @return 404 (Not Found)
+     */
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<Map<String,Object>> handleNoHandlerFoundException(NoHandlerFoundException e){
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", "요청하신 엔드 포인트를 찾을 수 없습니다. http 메소드와 경로를 다시 확인해주세요.");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseMap.getMap());
     }
 
     /**
