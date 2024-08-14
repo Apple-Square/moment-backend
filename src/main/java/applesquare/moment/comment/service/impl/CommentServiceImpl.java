@@ -173,7 +173,8 @@ public class CommentServiceImpl implements CommentService {
      * @param userId 사용자 ID
      * @return 댓글 소유 여부
      */
-    private boolean isOwner(Comment comment, String userId){
+    @Override
+    public boolean isOwner(Comment comment, String userId){
         return comment.getWriter().getId().equals(userId);
     }
 }

@@ -14,7 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/comments")
+@RequestMapping("/api/comments/{commentId}")
 public class CommentController {
     private final CommentService commentService;
 
@@ -27,7 +27,7 @@ public class CommentController {
      *          (body)  댓글 수정 성공 메세지,
      *                  수정된 댓글 ID
      */
-    @PatchMapping(value = "/{commentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> update(@PathVariable Long commentId, @Valid @RequestBody CommentUpdateRequestDTO commentUpdateRequestDTO){
         // 댓글 수정
         Long result=commentService.update(commentId, commentUpdateRequestDTO);
@@ -46,7 +46,7 @@ public class CommentController {
      * @return  (status) 200,
      *          (body)  댓글 삭제 성공 메세지
      */
-    @DeleteMapping("/{commentId}")
+    @DeleteMapping("")
     public ResponseEntity<Map<String, Object>> delete(@PathVariable Long commentId){
         // 댓글 삭제
         commentService.delete(commentId);

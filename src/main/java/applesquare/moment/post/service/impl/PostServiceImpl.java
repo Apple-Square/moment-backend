@@ -121,7 +121,8 @@ public class PostServiceImpl implements PostService {
      * @param userId 사용자 ID
      * @return 게시글 소유 여부
      */
-    private boolean isOwner(Post post, String userId){
+    @Override
+    public boolean isOwner(Post post, String userId){
         return post.getWriter().getId().equals(userId);
     }
 }

@@ -3,6 +3,7 @@ package applesquare.moment.comment.service;
 import applesquare.moment.comment.dto.CommentCreateRequestDTO;
 import applesquare.moment.comment.dto.CommentReadAllResponseDTO;
 import applesquare.moment.comment.dto.CommentUpdateRequestDTO;
+import applesquare.moment.comment.model.Comment;
 import applesquare.moment.common.dto.PageRequestDTO;
 import applesquare.moment.common.dto.PageResponseDTO;
 
@@ -15,4 +16,6 @@ public interface CommentService {
     void delete(Long commentId);
 
     PageResponseDTO<CommentReadAllResponseDTO> readAll(Long postId, PageRequestDTO pageRequestDTO);
+
+    boolean isOwner(Comment comment, String userId);
 }
