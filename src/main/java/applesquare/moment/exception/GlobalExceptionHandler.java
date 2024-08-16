@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,18 @@ public class GlobalExceptionHandler {
         });
         responseMap.put("message", errorMessages);
 
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap.getMap());
+    }
+
+    /**
+     * 잘못된 요청 예외 처리
+     * @param e IllegalArgumentException
+     * @return 400 (Bad Request)
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(IllegalArgumentException e){
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap.getMap());
     }
 
@@ -79,14 +92,16 @@ public class GlobalExceptionHandler {
     /**
      * 로직 처리에 필요한 데이터가 존재하지 않는 경우 발생하는 예외 처리
      * @param e EntityNotFoundException,
+     *          FileNotFoundException,
      *          UsernameNotFoundException
      * @return 404 (Not Found)
      */
     @ExceptionHandler({
             EntityNotFoundException.class,
+            FileNotFoundException.class,
             UsernameNotFoundException.class
     })
-    public ResponseEntity<Map<String,Object>> handleNoSuchElementException(Exception e){
+    public ResponseEntity<Map<String,Object>> handleNotFoundException(Exception e){
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseMap.getMap());
@@ -114,6 +129,18 @@ public class GlobalExceptionHandler {
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", "데이터 무결성을 위반했습니다.");
         return ResponseEntity.status(HttpStatus.CONFLICT).body(responseMap.getMap());
+    }
+
+    /**
+     * 파일 전송 예외 처리
+     * @param e FileTransferException
+     * @return 500 (Internal Server Error)
+     */
+    @ExceptionHandler(FileTransferException.class)
+    public ResponseEntity<Map<String,Object>> handleFileTransferException(FileTransferException e){
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", "파일 전송 중 오류가 발생했습니다.");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap.getMap());
     }
 
     /**
