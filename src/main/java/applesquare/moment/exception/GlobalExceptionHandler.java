@@ -12,6 +12,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.io.FileNotFoundException;
@@ -50,6 +52,30 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(IllegalArgumentException e){
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap.getMap());
+    }
+
+    /**
+     * 컨트롤러에 필요한 Param이 들어오지 않았을 때 발생하는 예외 처리
+     * @param e MissingServletRequestPartException
+     * @return 400 (Bad Request)
+     */
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<Map<String, Object>> handleMissingServletRequestPartException(MissingServletRequestPartException e){
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap.getMap());
+    }
+
+    /**
+     * 업로드 용량 초과 예외 처리
+     * @param e MaxUploadSizeExceededException
+     * @return 400 (Bad Request)
+     */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<Map<String, Object>> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e){
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", "파일이 업로드 가능한 용량을 초과했습니다.");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap.getMap());
     }
 
@@ -165,7 +191,7 @@ public class GlobalExceptionHandler {
         log.error(e.getMessage());
 
         ResponseMap responseMap=new ResponseMap();
-        responseMap.put("message", "서버에서 예상치 못한 오류가 발생했습니다.");
+        responseMap.put("message", e.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap.getMap());
     }
 }

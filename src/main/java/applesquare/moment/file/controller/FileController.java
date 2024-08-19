@@ -33,7 +33,7 @@ public class FileController {
         Resource resource=fileService.read(filename);
 
         // 파일 형식 조회
-        String contentType=fileService.getContentType(resource);
+        String contentType=fileService.getResourceContentType(resource);
         MediaType mediaType=MediaType.parseMediaType(contentType);
 
         return ResponseEntity.status(HttpStatus.OK)

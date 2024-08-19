@@ -19,7 +19,6 @@ import java.util.UUID;
 @Service
 public class FileServiceImpl implements FileService {
     private static final String FILE_NAME_SEPARATOR="_";
-
     @Value("${applesquare.moment.file.upload-path}")
     private String uploadDirectory;
     @Value("${applesquare.moment.file.base-url}")
@@ -35,7 +34,7 @@ public class FileServiceImpl implements FileService {
     public String upload(MultipartFile file){
         // file이 null이라면 예외 던지기
         if(file==null){
-            throw new IllegalArgumentException("지원하지 않는 형식의 파일입니다. (file = null)");
+            throw new IllegalArgumentException("지원하지 않는 형식의 파일입니다. (type = null)");
         }
 
         // 파일명 정하기
@@ -90,10 +89,9 @@ public class FileServiceImpl implements FileService {
         // 파일이 존재하는지 검사
         if(file.exists()){
             // 파일이 존재한다면 삭제
-            boolean success=file.delete();
-
-            // 파일 삭제에 실패했다면 예외 던지기
-            if(!success){
+            boolean deleted=file.delete();
+            if(!deleted){
+                // 파일 삭제에 실패했다면 예외 던지기
                 throw new IOException("파일 삭제에 실패했습니다. (filename = " + filename + ")");
             }
         }
@@ -110,7 +108,7 @@ public class FileServiceImpl implements FileService {
      * @throws IOException IOException
      */
     @Override
-    public String getContentType(Resource resource) throws IOException {
+    public String getResourceContentType(Resource resource) throws IOException {
         if(resource.exists()){
             Path filePath=Paths.get(resource.getURI());
             String contentType=Files.probeContentType(filePath);
@@ -124,6 +122,31 @@ public class FileServiceImpl implements FileService {
         }
         else{
             throw new FileNotFoundException("존재하지 않는 자원입니다.");
+        }
+    }
+
+    /**
+     * 파일 URL에서 파일명을 추출
+     * @param url 파일 URL
+     * @return 파일명
+     */
+    @Override
+    public String convertUrlToFilename(String url){
+        // filename 앞에 baseURL 제거
+        String prefix=baseUrl+"/";
+        if(url.startsWith(prefix)){
+            String filename=url.substring(prefix.length());
+
+            // filename 뒤에 쿼리 스트링이 붙어있으면 제거
+            int queryIdx=filename.indexOf('?');
+            if(queryIdx != -1){
+                filename=filename.substring(0, queryIdx);
+            }
+
+            return filename;
+        }
+        else{
+            throw new IllegalArgumentException("파일 URL이 Base URL로 시작하지 않습니다. (url = "+url+")");
         }
     }
 

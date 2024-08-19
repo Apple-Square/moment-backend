@@ -4,13 +4,16 @@ import applesquare.moment.exception.ResponseMap;
 import applesquare.moment.post.dto.PostCreateRequestDTO;
 import applesquare.moment.post.dto.PostUpdateRequestDTO;
 import applesquare.moment.post.service.PostService;
-import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -22,13 +25,21 @@ public class PostController {
 
     /**
      * 게시글 등록 API
-     * @param postCreateRequestDTO 게시글 생성 정보
+     * @param content 게시글 내용
+     * @param files 첨부 파일
      * @return  (status) 201,
      *          (body)  게시글 등록 성공 메세지,
      *                  등록된 게시글 ID
      */
-    @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> create(@Valid @RequestBody PostCreateRequestDTO postCreateRequestDTO){
+    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Map<String, Object>> create(@RequestParam(value = "content", required = false) @Size(min = PostService.MIN_CONTENT_LENGTH, max = PostService.MAX_CONTENT_LENGTH) String content,
+                                                      @RequestParam("files") @Size(min = 1, message = "반드시 하나 이상의 파일을 등록해야 합니다.") List<MultipartFile> files){
+        // DTO 생성
+        PostCreateRequestDTO postCreateRequestDTO=PostCreateRequestDTO.builder()
+                .content(content)
+                .files(files)
+                .build();
+
         // 게시글 등록
         Long result= postService.create(postCreateRequestDTO);
 
@@ -43,13 +54,25 @@ public class PostController {
     /**
      * 게시글 수정 API
      * @param postId 게시글 ID
-     * @param postUpdateRequestDTO 게시글 변경 정보
+     * @param content 수정한 게시글 내용
+     * @param urls 수정한 기존 첨부파일
+     * @param files 새로 추가할 첨부파일
      * @return  (status) 200,
      *          (body)  게시글 수정 성공 메세지,
      *                  수정된 게시글 ID
      */
-    @PatchMapping(value = "/{postId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> update(@PathVariable Long postId, @Valid @RequestBody PostUpdateRequestDTO postUpdateRequestDTO){
+    @PatchMapping(value = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Map<String, Object>> update(@PathVariable Long postId,
+                                                      @RequestParam(required = false) @Size(min=PostService.MIN_CONTENT_LENGTH, max=PostService.MAX_CONTENT_LENGTH) String content,
+                                                      @RequestParam(required = false) List<String> urls,
+                                                      @RequestParam(required = false) List<MultipartFile> files){
+        // DTO 생성
+        PostUpdateRequestDTO postUpdateRequestDTO=PostUpdateRequestDTO.builder()
+                .content(content)
+                .urls(urls)
+                .files(files)
+                .build();
+
         // 게시글 수정
         Long result=postService.update(postId, postUpdateRequestDTO);
 
@@ -68,7 +91,7 @@ public class PostController {
      *          (body) 게시글 삭제 성공 메세지
      */
     @DeleteMapping("{postId}")
-    public ResponseEntity<Map<String, Object>> delete(@PathVariable Long postId){
+    public ResponseEntity<Map<String, Object>> delete(@PathVariable Long postId) throws IOException{
         // 게시글 삭제
         postService.delete(postId);
 

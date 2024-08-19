@@ -1,6 +1,7 @@
 package applesquare.moment.post.model;
 
 import applesquare.moment.common.model.BaseEntity;
+import applesquare.moment.file.model.StorageFile;
 import applesquare.moment.post.service.PostService;
 import applesquare.moment.user.model.UserInfo;
 import jakarta.persistence.*;
@@ -8,6 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.Set;
 
 @Entity
 @Getter
@@ -25,4 +28,8 @@ public class Post extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="writer_id", nullable = false, updatable = false)
     private UserInfo writer;
+    @OneToMany(fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private Set<StorageFile> files;
 }
