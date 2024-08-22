@@ -4,7 +4,7 @@ import applesquare.moment.auth.security.UserDetailsImpl;
 import applesquare.moment.exception.ResponseMap;
 import applesquare.moment.exception.TokenError;
 import applesquare.moment.exception.TokenException;
-import applesquare.moment.user.dto.UserInfoReadResponseDTO;
+import applesquare.moment.user.dto.UserProfileReadResponseDTO;
 import applesquare.moment.user.service.UserInfoService;
 import applesquare.moment.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -55,12 +55,12 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
             // 사용자 정보 조회
             String userId=userDetails.getId();
-            UserInfoReadResponseDTO userInfoReadResponseDTO=userInfoService.readById(userId);
+            UserProfileReadResponseDTO userProfileReadResponseDTO =userInfoService.readProfileById(userId);
 
             // 응답 본문 구성
             ResponseMap responseMap=new ResponseMap();
             responseMap.put("message", "로그인에 성공했습니다.");
-            responseMap.put("user", userInfoReadResponseDTO);
+            responseMap.put("user", userProfileReadResponseDTO);
 
             // 응답 전달
             response.getWriter().write(responseMap.toJson());

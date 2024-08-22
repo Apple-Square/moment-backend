@@ -2,7 +2,7 @@ package applesquare.moment.auth.filter;
 
 import applesquare.moment.auth.service.AuthService;
 import applesquare.moment.util.RequestUtil;
-import applesquare.moment.util.ValidationUtil;
+import applesquare.moment.util.Validator;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
@@ -54,10 +54,10 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
             }
 
             // 정규식 검사
-            if(!username.matches(ValidationUtil.USERNAME_PATTERN)){
+            if(!username.matches(Validator.USERNAME_PATTERN)){
                 throw new BadCredentialsException("username: 입력 형식이 올바르지 않습니다.");
             }
-            if(!password.matches(ValidationUtil.PASSWORD_PATTERN)){
+            if(!password.matches(Validator.PASSWORD_PATTERN)){
                 throw new BadCredentialsException("password: 입력 형식이 올바르지 않습니다.");
             }
 

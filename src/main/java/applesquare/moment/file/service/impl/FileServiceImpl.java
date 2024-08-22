@@ -49,7 +49,7 @@ public class FileServiceImpl implements FileService {
             throw new FileTransferException();
         }
 
-        return generateFileUrl(filename);
+        return convertFilenameToUrl(filename);
     }
 
     /**
@@ -126,6 +126,16 @@ public class FileServiceImpl implements FileService {
     }
 
     /**
+     * 파일명으로 파일 URL 생성
+     * @param filename 파일명
+     * @return 파일 URL
+     */
+    @Override
+    public String convertFilenameToUrl(String filename){
+        return baseUrl+"/"+filename;
+    }
+
+    /**
      * 파일 URL에서 파일명을 추출
      * @param url 파일 URL
      * @return 파일명
@@ -170,15 +180,6 @@ public class FileServiceImpl implements FileService {
 
         // 파일명 앞에 UUID를 추가해서 중복 문제 방지
         return uuid+FILE_NAME_SEPARATOR+originalFilename;
-    }
-
-    /**
-     * 파일 URL 생성
-     * @param filename 파일명
-     * @return 파일 URL
-     */
-    private String generateFileUrl(String filename){
-        return baseUrl+"/"+filename;
     }
 
     private Path generateFilePath(String filename){

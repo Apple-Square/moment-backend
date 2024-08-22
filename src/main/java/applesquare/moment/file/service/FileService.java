@@ -35,6 +35,9 @@ public interface FileService {
     String upload(MultipartFile file);
     Resource read(String filename) throws FileNotFoundException;
     void delete(String filename) throws IOException;
+
     String getResourceContentType(Resource resource) throws IOException;
+
     String convertUrlToFilename(String url);
+    String convertFilenameToUrl(String filename);
 }

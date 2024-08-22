@@ -4,6 +4,7 @@ import applesquare.moment.exception.ResponseMap;
 import applesquare.moment.post.dto.PostCreateRequestDTO;
 import applesquare.moment.post.dto.PostUpdateRequestDTO;
 import applesquare.moment.post.service.PostService;
+import applesquare.moment.util.Validator;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -40,6 +41,9 @@ public class PostController {
                 .files(files)
                 .build();
 
+        // DTO 유효성 검사
+        Validator.validate(postCreateRequestDTO);
+
         // 게시글 등록
         Long result= postService.create(postCreateRequestDTO);
 
@@ -72,6 +76,9 @@ public class PostController {
                 .urls(urls)
                 .files(files)
                 .build();
+
+        // DTO 유효성 검사
+        Validator.validate(postUpdateRequestDTO);
 
         // 게시글 수정
         Long result=postService.update(postId, postUpdateRequestDTO);

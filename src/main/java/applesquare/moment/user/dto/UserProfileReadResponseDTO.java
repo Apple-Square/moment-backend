@@ -1,19 +1,16 @@
 package applesquare.moment.user.dto;
 
-import applesquare.moment.user.model.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
-@Builder
+@Getter
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserInfoReadResponseDTO {
+public class UserProfileReadResponseDTO {
     private String id;
     private String nickname;
-    private LocalDate birth;
-    private Gender gender;
-    private String address;
+    private String profileImage;  // 프로필 이미지 URL
 }

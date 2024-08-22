@@ -1,6 +1,8 @@
 package applesquare.moment.exception;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -20,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Log4j2
 @RestControllerAdvice
@@ -31,13 +34,36 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String,Object>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e){
-        BindingResult bindingResult=e.getBindingResult();
-        ResponseMap responseMap=new ResponseMap();
-
         final List<String> errorMessages=new LinkedList<>();
+
+        BindingResult bindingResult=e.getBindingResult();
         bindingResult.getFieldErrors().forEach((fieldError)->{
             errorMessages.add(fieldError.getField()+": "+fieldError.getDefaultMessage()+".");
         });
+
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", errorMessages);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap.getMap());
+    }
+
+    /**
+     * Validation 도중 발생한 예외 처리
+     * @param e ConstraintViolationException
+     * @return 400 (Bad Request)
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Map<String,Object>> handleConstraintViolationException(ConstraintViolationException e){
+        final List<String> errorMessages=new LinkedList<>();
+
+        Set<ConstraintViolation<?>> violations=e.getConstraintViolations();
+        for (ConstraintViolation<?> violation : violations) {
+            String fieldName = violation.getPropertyPath().toString();
+            String errorMessage = violation.getMessage();
+            errorMessages.add(fieldName+": "+errorMessage);
+        }
+
+        ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", errorMessages);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap.getMap());

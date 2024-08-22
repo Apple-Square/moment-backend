@@ -1,6 +1,7 @@
 package applesquare.moment.user.model;
 
 import applesquare.moment.common.model.BaseEntity;
+import applesquare.moment.file.model.StorageFile;
 import applesquare.moment.user.service.UserInfoService;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -12,7 +13,7 @@ import java.time.LocalDate;
 
 @Entity
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(uniqueConstraints = {
@@ -31,4 +32,8 @@ public class UserInfo extends BaseEntity {
     private Gender gender;
     @Column(nullable=true, updatable = true)
     private String address;
+    @OneToOne(cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    @JoinColumn(nullable = true, updatable = true)
+    private StorageFile profileImage;
 }
