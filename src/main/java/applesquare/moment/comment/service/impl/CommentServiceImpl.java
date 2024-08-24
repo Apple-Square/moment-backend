@@ -11,8 +11,10 @@ import applesquare.moment.common.dto.PageResponseDTO;
 import applesquare.moment.common.service.SecurityService;
 import applesquare.moment.post.model.Post;
 import applesquare.moment.post.repository.PostRepository;
+import applesquare.moment.user.dto.UserProfileReadResponseDTO;
 import applesquare.moment.user.model.UserInfo;
 import applesquare.moment.user.repository.UserInfoRepository;
+import applesquare.moment.user.service.UserInfoService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -34,6 +36,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final UserInfoRepository userInfoRepository;
     private final SecurityService securityService;
+    private final UserInfoService userInfoService;
     private final ModelMapper modelMapper;
 
 
@@ -155,7 +158,10 @@ public class CommentServiceImpl implements CommentService {
         // DTO 변환
         List<CommentReadAllResponseDTO> commentReadAllResponseDTOS=comments.stream().map(comment -> {
             CommentReadAllResponseDTO commentReadAllResponseDTO=modelMapper.map(comment, CommentReadAllResponseDTO.class);
-            return commentReadAllResponseDTO;
+            UserProfileReadResponseDTO writer=userInfoService.readProfileById(comment.getWriter().getId());
+            return commentReadAllResponseDTO.toBuilder()
+                    .writer(writer)
+                    .build();
         }).collect(Collectors.toList());
 
         PageResponseDTO<CommentReadAllResponseDTO> pageResponseDTO=PageResponseDTO.<CommentReadAllResponseDTO>builder()
