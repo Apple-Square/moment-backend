@@ -27,10 +27,10 @@ public class FollowServiceImpl implements FollowService {
      * [필요 권한 : 로그인 상태 & 본인이 아닌 사용자]
      *
      * @param followeeId 팔로우할 사용자
-     * @return 팔로우 ID
+     * @return 팔로우한 사용자 ID
      */
     @Override
-    public Long follow(String followeeId){
+    public String follow(String followeeId){
         // 권한 검사
         String myUserId=securityService.getUserId();
         if(myUserId.equals(followeeId)){
@@ -56,10 +56,10 @@ public class FollowServiceImpl implements FollowService {
                 .build();
 
         // DB 저장
-        Follow result=followRepository.save(follow);
+        followRepository.save(follow);
 
-        // 리소스 ID 반환
-        return result.getId();
+        // 팔로우한 사용자의 ID 반환
+        return followeeId;
     }
 
     /**
@@ -67,9 +67,10 @@ public class FollowServiceImpl implements FollowService {
      * [필요 권한 : 로그인 상태 & 본인이 아닌 사용자]
      *
      * @param followeeId 팔로우 취소할 사용자
+     * @return 팔로우 취소한 사용자 ID
      */
     @Override
-    public void unfollow(String followeeId){
+    public String unfollow(String followeeId){
         // 권한 검사
         String myUserId=securityService.getUserId();
         if(myUserId.equals(followeeId)){
@@ -90,5 +91,7 @@ public class FollowServiceImpl implements FollowService {
 
         // DB에서 Follow 엔티티 삭제
         followRepository.deleteByFollowerAndFollowee(follower, followee);
+
+        return followeeId;
     }
 }
