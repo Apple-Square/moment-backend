@@ -45,7 +45,7 @@ public class FollowServiceImpl implements FollowService {
                 .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 사용자입니다. (id = "+followeeId+")"));
 
         // 이미 팔로우한 상태인지 검사
-        if(followRepository.existsByFollowerAndFollowee(follower, followee)){
+        if(followRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)){
             throw new DuplicateDataException("이미 팔로우한 사용자입니다. (id = "+followeeId+")");
         }
 
@@ -77,20 +77,22 @@ public class FollowServiceImpl implements FollowService {
             throw new AccessDeniedException("자기 자신은 팔로우 취소할 수 없습니다.");
         }
 
-        // 사용자 정보 가져오기
+        // 존재하는 사용자인지 검사
         String followerId=myUserId;
-        UserInfo follower=userInfoRepository.findById(followerId)
-                .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 사용자입니다. (id = "+followerId+")"));
-        UserInfo followee=userInfoRepository.findById(followeeId)
-                .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 사용자입니다. (id = "+followeeId+")"));
+        if(!userInfoRepository.existsById(followerId)){
+            new EntityNotFoundException("존재하지 않는 사용자입니다. (id = "+followerId+")");
+        }
+        if(!userInfoRepository.existsById(followeeId)){
+            new EntityNotFoundException("존재하지 않는 사용자입니다. (id = "+followeeId+")");
+        }
 
         // 이미 팔로우 취소한 상태인지 검사
-        if(!followRepository.existsByFollowerAndFollowee(follower, followee)){
+        if(!followRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)){
             throw new DuplicateDataException("이미 팔로우 취소한 사용자입니다. (id = "+followeeId+")");
         }
 
         // DB에서 Follow 엔티티 삭제
-        followRepository.deleteByFollowerAndFollowee(follower, followee);
+        followRepository.deleteByFollowerIdAndFolloweeId(followerId, followeeId);
 
         return followeeId;
     }

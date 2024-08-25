@@ -1,6 +1,7 @@
 package applesquare.moment.user.service;
 
 import applesquare.moment.user.dto.UserInfoUpdateRequestDTO;
+import applesquare.moment.user.dto.UserPageReadResponseDTO;
 import applesquare.moment.user.dto.UserProfileReadResponseDTO;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,8 +15,10 @@ public interface UserInfoService {
 
     UserProfileReadResponseDTO readMyProfile();
     UserProfileReadResponseDTO readProfileById(String userId);
+    UserPageReadResponseDTO readUserPageById(String userId);
 
     String updateUserInfo(String userId, UserInfoUpdateRequestDTO userInfoUpdateRequestDTO);
     String updateProfileImage(String userId, MultipartFile profileImage);
+
     void deleteProfileImage(String userId) throws IOException;
 }
