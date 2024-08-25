@@ -98,12 +98,14 @@ public class UserInfoServiceImpl implements UserInfoService {
         LocalDate newBirth=(userInfoUpdateRequestDTO.getBirth()!=null)? userInfoUpdateRequestDTO.getBirth():oldUserInfo.getBirth();
         Gender newGender=(userInfoUpdateRequestDTO.getGender()!=null)? userInfoUpdateRequestDTO.getGender():oldUserInfo.getGender();
         String newAddress=(userInfoUpdateRequestDTO.getAddress()!=null)? userInfoUpdateRequestDTO.getAddress():oldUserInfo.getAddress();
+        String newIntro=(userInfoUpdateRequestDTO.getIntro()!=null)?userInfoUpdateRequestDTO.getIntro():oldUserInfo.getIntro();
 
         UserInfo newUserInfo=oldUserInfo.toBuilder()
                 .nickname(newNickname)
                 .birth(newBirth)
                 .gender(newGender)
                 .address(newAddress)
+                .intro(newIntro)
                 .build();
 
         // DB 저장

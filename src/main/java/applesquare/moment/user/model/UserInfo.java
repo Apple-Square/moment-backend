@@ -32,6 +32,9 @@ public class UserInfo extends BaseEntity {
     private Gender gender;
     @Column(nullable=true, updatable = true)
     private String address;
+    @Builder.Default
+    @Column(nullable = false, updatable = true)
+    private String intro="";
     @OneToOne(cascade = CascadeType.ALL,
             orphanRemoval = true)
     @JoinColumn(nullable = true, updatable = true)

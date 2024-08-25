@@ -23,4 +23,5 @@ public class UserInfoUpdateRequestDTO {
     private LocalDate birth;
     private Gender gender;
     private String address;
+    private String intro;
 }
