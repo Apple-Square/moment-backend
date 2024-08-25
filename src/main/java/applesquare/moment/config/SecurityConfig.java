@@ -8,7 +8,7 @@ import applesquare.moment.auth.handler.LoginFailureHandler;
 import applesquare.moment.auth.handler.LoginSuccessHandler;
 import applesquare.moment.auth.security.UserDetailsServiceImpl;
 import applesquare.moment.auth.service.TokenBlacklistService;
-import applesquare.moment.user.service.UserInfoService;
+import applesquare.moment.user.service.UserProfileService;
 import applesquare.moment.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -40,7 +40,7 @@ import java.util.Arrays;
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final UserInfoService userInfoService;
+    private final UserProfileService userProfileService;
     private final UserDetailsServiceImpl userDetailsService;
     private final TokenBlacklistService tokenBlacklistService;
     private final PasswordEncoder passwordEncoder;
@@ -84,7 +84,7 @@ public class SecurityConfig {
         // LoginFilter 설정
         LoginFilter loginFilter=new LoginFilter("/api/auth/login");
         loginFilter.setAuthenticationManager(authManager);
-        LoginSuccessHandler loginSuccessHandler=new LoginSuccessHandler(userInfoService, jwtUtil);
+        LoginSuccessHandler loginSuccessHandler=new LoginSuccessHandler(userProfileService, jwtUtil);
         LoginFailureHandler loginFailureHandler=new LoginFailureHandler();
         loginFilter.setAuthenticationSuccessHandler(loginSuccessHandler);
         loginFilter.setAuthenticationFailureHandler(loginFailureHandler);

@@ -5,7 +5,7 @@ import applesquare.moment.exception.ResponseMap;
 import applesquare.moment.exception.TokenError;
 import applesquare.moment.exception.TokenException;
 import applesquare.moment.user.dto.UserProfileReadResponseDTO;
-import applesquare.moment.user.service.UserInfoService;
+import applesquare.moment.user.service.UserProfileService;
 import applesquare.moment.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,7 +23,7 @@ import java.io.IOException;
 @Log4j2
 @RequiredArgsConstructor
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
-    private final UserInfoService userInfoService;
+    private final UserProfileService userProfileService;
     private final JwtUtil jwtUtil;
 
     @Override
@@ -55,7 +55,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
             // 사용자 정보 조회
             String userId=userDetails.getId();
-            UserProfileReadResponseDTO userProfileReadResponseDTO =userInfoService.readProfileById(userId);
+            UserProfileReadResponseDTO userProfileReadResponseDTO =userProfileService.readProfileById(userId);
 
             // 응답 본문 구성
             ResponseMap responseMap=new ResponseMap();

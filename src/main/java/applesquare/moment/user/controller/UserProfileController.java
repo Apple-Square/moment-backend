@@ -2,7 +2,7 @@ package applesquare.moment.user.controller;
 
 import applesquare.moment.exception.ResponseMap;
 import applesquare.moment.user.dto.UserProfileReadResponseDTO;
-import applesquare.moment.user.service.UserInfoService;
+import applesquare.moment.user.service.UserProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,7 +17,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
 public class UserProfileController {
-    private final UserInfoService userInfoService;
+    private final UserProfileService userProfileService;
 
 
     /**
@@ -29,7 +29,7 @@ public class UserProfileController {
     @GetMapping("/me")
     public ResponseEntity<Map<String, Object>> readMyProfile(){
         // 나의 프로필 조회
-        UserProfileReadResponseDTO userProfileReadResponseDTO=userInfoService.readMyProfile();
+        UserProfileReadResponseDTO userProfileReadResponseDTO=userProfileService.readMyProfile();
 
         // 응답 생성
         ResponseMap responseMap=new ResponseMap();
@@ -48,7 +48,7 @@ public class UserProfileController {
     public ResponseEntity<Map<String, Object>> updateProfileImage(@PathVariable String userId,
                                                                   @RequestParam(value = "profileImage") MultipartFile profileImage){
         // 사용자 프로필 사진 설정
-        String result=userInfoService.updateProfileImage(userId, profileImage);
+        String result=userProfileService.updateProfileImage(userId, profileImage);
 
         // 응답 생성
         ResponseMap responseMap=new ResponseMap();
@@ -67,7 +67,7 @@ public class UserProfileController {
     @DeleteMapping(value = "/{userId}/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, Object>> deleteProfileImage(@PathVariable String userId) throws IOException {
         // 사용자 프로필 사진 삭제
-        userInfoService.deleteProfileImage(userId);
+        userProfileService.deleteProfileImage(userId);
 
         // 응답 생성
         ResponseMap responseMap=new ResponseMap();
