@@ -1,23 +1,26 @@
 package applesquare.moment.auth.controller;
 
+import applesquare.moment.auth.dto.EmailValidateRequestDTO;
+import applesquare.moment.auth.dto.NicknameValidateRequestDTO;
 import applesquare.moment.auth.dto.UserCreateRequestDTO;
+import applesquare.moment.auth.dto.UsernameValidateRequestDTO;
 import applesquare.moment.auth.service.AuthService;
 import applesquare.moment.auth.service.TokenBlacklistService;
+import applesquare.moment.exception.DuplicateDataException;
 import applesquare.moment.exception.ResponseMap;
 import applesquare.moment.exception.TokenError;
 import applesquare.moment.exception.TokenException;
+import applesquare.moment.user.service.UserInfoService;
 import applesquare.moment.util.JwtUtil;
 import applesquare.moment.util.RequestUtil;
+import applesquare.moment.util.Validator;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.*;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.Map;
@@ -29,6 +32,7 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 public class AuthController {
     private final AuthService authService;
+    private final UserInfoService userInfoService;
     private final TokenBlacklistService tokenBlacklistService;
     private final JwtUtil jwtUtil;
 
@@ -103,5 +107,98 @@ public class AuthController {
                 throw new TokenException(TokenError.BLACKLISTED);
             }
         }
+    }
+
+    /**
+     * 아이디 유효성 검사 API
+     * @param username 아이디
+     * @return  (status) 200,
+     *          (body)  아이디 유효성 여부 메세지,
+     *                  아이디 유효성 여부
+     */
+    @GetMapping("/username/validation")
+    public ResponseEntity<Map<String, Object>> validateUsername(@RequestParam(value = "username", required = true) String username){
+        // DTO 생성
+        UsernameValidateRequestDTO usernameValidateRequestDTO= UsernameValidateRequestDTO.builder()
+                .username(username)
+                .build();
+
+        // Validation 검사
+        Validator.validate(usernameValidateRequestDTO);
+
+        // 아이디 유일성 검사
+        boolean isUnique= authService.isUniqueUsername(username);
+        if(!isUnique){
+            throw new DuplicateDataException("이미 존재하는 아이디입니다. (id = "+username+")");
+        }
+
+        // 응답 생성
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", "사용 가능한 아이디입니다.");
+        responseMap.put("available", true);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseMap.getMap());
+    }
+
+    /**
+     * 이메일 유효성 검사 API
+     * @param email 이메일
+     * @return  (status) 200,
+     *          (body)  이메일 유효성 여부 메세지,
+     *                  이메일 유효성 여부
+     */
+    @GetMapping("/email/validation")
+    public ResponseEntity<Map<String, Object>> validateEmail(@RequestParam(value = "email", required = true) String email){
+        // DTO 생성
+        EmailValidateRequestDTO emailValidateRequestDTO=EmailValidateRequestDTO.builder()
+                .email(email)
+                .build();
+
+        // Validation 검사
+        Validator.validate(emailValidateRequestDTO);
+
+        // 이메일 유일성 검사
+        boolean isUnique=authService.isUniqueEmail(email);
+        if(!isUnique){
+            throw new DuplicateDataException("이미 사용 중인 이메일입니다. (email = "+email+")");
+        }
+
+        // 응답 생성
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", "사용 가능한 이메일입니다.");
+        responseMap.put("available", true);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseMap.getMap());
+    }
+
+    /**
+     * 닉네임 유효성 검사 API
+     * @param nickname 닉네임
+     * @return  (status) 200,
+     *          (body)  닉네임 유효성 여부 메세지,
+     *                  닉네임 유효성 여부
+     */
+    @GetMapping("/nickname/validation")
+    public ResponseEntity<Map<String, Object>> validateNickname(@RequestParam(value = "nickname", required = true) String nickname){
+        // DTO 생성
+        NicknameValidateRequestDTO nicknameValidateRequestDTO=NicknameValidateRequestDTO.builder()
+                .nickname(nickname)
+                .build();
+
+        // Validation 검사
+        Validator.validate(nicknameValidateRequestDTO);
+
+        // 닉네임 유일성 검사
+        boolean isUnique=userInfoService.isUniqueNickname(nickname);
+        if(!isUnique){
+            throw new DuplicateDataException("이미 존재하는 닉네임입니다. (nickname = "+nickname+")");
+        }
+
+        // 응답 생성
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", "사용 가능한 닉네임입니다.");
+        responseMap.put("available", true);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseMap.getMap());
     }
 }

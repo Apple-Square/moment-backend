@@ -33,8 +33,8 @@ public class PostController {
      *                  등록된 게시글 ID
      */
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Map<String, Object>> create(@RequestParam(value = "content", required = false) @Size(min = PostService.MIN_CONTENT_LENGTH, max = PostService.MAX_CONTENT_LENGTH) String content,
-                                                      @RequestParam("files") @Size(min = 1, message = "반드시 하나 이상의 파일을 등록해야 합니다.") List<MultipartFile> files){
+    public ResponseEntity<Map<String, Object>> create(@RequestParam(value = "content", required = false) String content,
+                                                      @RequestParam("files") List<MultipartFile> files){
         // DTO 생성
         PostCreateRequestDTO postCreateRequestDTO=PostCreateRequestDTO.builder()
                 .content(content)

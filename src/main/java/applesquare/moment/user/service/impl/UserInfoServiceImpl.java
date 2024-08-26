@@ -66,4 +66,14 @@ public class UserInfoServiceImpl implements UserInfoService {
         // 리소스 ID 반환
         return userId;
     }
+
+    /**
+     * 닉네임 유일성 검사
+     * @param nickname 닉네임
+     * @return 유일성 여부
+     */
+    @Override
+    public boolean isUniqueNickname(String nickname){
+        return !userInfoRepository.existsByNickname(nickname);
+    }
 }

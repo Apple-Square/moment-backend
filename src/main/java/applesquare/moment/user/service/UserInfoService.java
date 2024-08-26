@@ -9,4 +9,5 @@ public interface UserInfoService {
 
 
     String updateUserInfo(String userId, UserInfoUpdateRequestDTO userInfoUpdateRequestDTO);
+    boolean isUniqueNickname(String nickname);
 }

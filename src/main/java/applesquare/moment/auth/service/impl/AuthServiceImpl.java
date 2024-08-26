@@ -81,4 +81,24 @@ public class AuthServiceImpl implements AuthService {
         // UserAccount, UserInfo는 OneToOne으로 연결되어 있기 때문에 UserAccount만 저장
         userAccountRepository.save(userAccount);
     }
+
+    /**
+     * 아이디 유일성 검사
+     * @param username 아이디
+     * @return 유일성 여부
+     */
+    @Override
+    public boolean isUniqueUsername(String username){
+        return !userAccountRepository.existsByUsername(username);
+    }
+
+    /**
+     * 이메일 유일성 검사
+     * @param email 이메일
+     * @return 유일성 여부
+     */
+    @Override
+    public boolean isUniqueEmail(String email){
+        return !userAccountRepository.existsByEmail(email);
+    }
 }

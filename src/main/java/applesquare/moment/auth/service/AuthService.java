@@ -10,4 +10,6 @@ public interface AuthService {
 
 
     void createUser(UserCreateRequestDTO userCreateRequestDTO);
+    boolean isUniqueUsername(String username);
+    boolean isUniqueEmail(String email);
 }

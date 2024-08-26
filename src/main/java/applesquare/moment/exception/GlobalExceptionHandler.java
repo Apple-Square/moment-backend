@@ -12,6 +12,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
@@ -102,6 +103,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e){
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", "파일이 업로드 가능한 용량을 초과했습니다.");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap.getMap());
+    }
+
+    /**
+     * 요청에 필요한 파라미터를 입력하지 않은 경우 발생하는 예외 처리
+     * @param e MissingServletRequestParameterException
+     * @return 400 (Bad Request)
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<Map<String, Object>> handleMissingServletRequestParameterException(MissingServletRequestParameterException e){
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap.getMap());
     }
 
