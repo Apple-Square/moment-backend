@@ -6,7 +6,7 @@ import applesquare.moment.exception.ResponseMap;
 import applesquare.moment.follow.service.FollowService;
 import applesquare.moment.user.dto.UserPageReadResponseDTO;
 import applesquare.moment.user.dto.UserProfileReadResponseDTO;
-import applesquare.moment.user.service.UserInfoService;
+import applesquare.moment.user.service.UserPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("/api/users/{userId}")
 public class UserPageController {
-    private final UserInfoService userInfoService;
+    private final UserPageService userPageService;
     private final FollowService followService;
 
 
@@ -35,7 +35,7 @@ public class UserPageController {
     @GetMapping("")
     public ResponseEntity<Map<String, Object>> readUserPage(@PathVariable String userId){
         // 유저 페이지 조회
-        UserPageReadResponseDTO userPageReadResponseDTO=userInfoService.readUserPageById(userId);
+        UserPageReadResponseDTO userPageReadResponseDTO=userPageService.readUserPageById(userId);
 
         // 응답 생성
         ResponseMap responseMap=new ResponseMap();
