@@ -190,7 +190,6 @@ public class UserProfileServiceImpl implements UserProfileService {
                 log.error(e.getMessage());
                 throw e;
             }
-
         }
     }
 }

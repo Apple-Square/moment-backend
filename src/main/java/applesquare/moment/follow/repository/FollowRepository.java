@@ -1,7 +1,12 @@
 package applesquare.moment.follow.repository;
 
 import applesquare.moment.follow.model.Follow;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 public interface FollowRepository extends JpaRepository<Follow, Long> {
     boolean existsByFollowerIdAndFolloweeId(String followerId, String followeeId);
@@ -9,4 +14,20 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
 
     long countByFollowerId(String userId);
     long countByFolloweeId(String userId);
+
+    @Query("SELECT f " +
+            "FROM Follow f " +
+            "WHERE f.followee.id=:followeeId " +
+                "AND (:cursor IS NULL OR f.id < :cursor)")
+    List<Follow> findAllFollowerByFolloweeId(@Param("followeeId") String followeeId,
+                                             @Param("cursor") Long cursor,
+                                             Pageable pageable);
+
+    @Query("SELECT f " +
+            "FROM Follow f " +
+            "WHERE f.follower.id=:followerId " +
+                "AND (:cursor IS NULL OR f.id < :cursor)")
+    List<Follow> findAllFolloweeByFollowerId(@Param("followerId") String followerId,
+                                             @Param("cursor") Long cursor,
+                                             Pageable pageable);
 }

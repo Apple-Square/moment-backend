@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -162,7 +161,7 @@ public class CommentServiceImpl implements CommentService {
             return commentReadAllResponseDTO.toBuilder()
                     .writer(writer)
                     .build();
-        }).collect(Collectors.toList());
+        }).toList();
 
         PageResponseDTO<CommentReadAllResponseDTO> pageResponseDTO=PageResponseDTO.<CommentReadAllResponseDTO>builder()
                 .content(commentReadAllResponseDTOS)
