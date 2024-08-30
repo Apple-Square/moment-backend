@@ -1,6 +1,8 @@
 package applesquare.moment.post.dto;
 
 import applesquare.moment.post.service.PostService;
+import applesquare.moment.tag.service.TagService;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,4 +21,9 @@ public class PostUpdateRequestDTO {
     private String content;
     private List<String> urls;
     private List<MultipartFile> files;
+    @Size(max = PostService.MAX_TAG_COUNT, message = "태그는 최대 10개까지 등록 가능합니다.")
+    private List<
+            @Size(min = TagService.MIN_TAG_NAME_LENGTH, max = TagService.MAX_TAG_NAME_LENGTH)
+            @Pattern(regexp = "^[a-z0-9가-힣_]+$", message = "태그에는 한글, 영어 소문자, 숫자, 언더바(_)만 포함할 수 있습니다.")
+                    String> tags;
 }

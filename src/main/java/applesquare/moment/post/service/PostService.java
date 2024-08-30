@@ -13,6 +13,7 @@ public interface PostService {
     int MAX_VIDEO_COUNT=1;
     int MAX_FILE_SIZE_MB=100;
     int MAX_FILE_SIZE_BYTES=MAX_FILE_SIZE_MB*1024*1024; // 100MB
+    int MAX_TAG_COUNT=10;
 
     Long create(PostCreateRequestDTO postCreateRequestDTO);
     Long update(Long postId, PostUpdateRequestDTO postUpdateRequestDTO);

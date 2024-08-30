@@ -10,6 +10,8 @@ import applesquare.moment.post.dto.PostUpdateRequestDTO;
 import applesquare.moment.post.model.Post;
 import applesquare.moment.post.repository.PostRepository;
 import applesquare.moment.post.service.PostService;
+import applesquare.moment.tag.model.Tag;
+import applesquare.moment.tag.service.TagService;
 import applesquare.moment.user.model.UserInfo;
 import applesquare.moment.user.repository.UserInfoRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -35,6 +37,7 @@ public class PostServiceImpl implements PostService {
     private final StorageFileRepository storageFileRepository;
     private final SecurityService securityService;
     private final FileService fileService;
+    private final TagService tagService;
 
 
     // 허용되는 MIME 타입 이미지 목록
@@ -71,6 +74,17 @@ public class PostServiceImpl implements PostService {
         UserInfo writer=userInfoRepository.findById(userId)
                 .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 사용자입니다. (id = "+userId+")"));
 
+        // 태그 등록하기
+        List<String> tagNames=postCreateRequestDTO.getTags();
+        Set<Tag> tags=new LinkedHashSet<>();
+        if(tagNames!=null){
+            for(String tagName : tagNames){
+                // 기존에 있던 태그면 가져오고, 없는 태그면 생성하기
+                Tag tag=tagService.readTagByName(tagName);
+                tags.add(tag);
+            }
+        }
+
         // 첨부파일 처리
         Set<StorageFile> storageFiles=new LinkedHashSet<>();
         try{
@@ -97,6 +111,7 @@ public class PostServiceImpl implements PostService {
                     .viewCount(0)
                     .writer(writer)
                     .files(storageFiles)
+                    .tags(tags)
                     .build();
 
             // DB 저장
@@ -136,6 +151,7 @@ public class PostServiceImpl implements PostService {
         Post oldPost=postRepository.findById(postId)
                 .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 게시글입니다. (id = "+postId+")"));
         Set<StorageFile> oldStorageFiles=oldPost.getFiles();
+        Set<Tag> oldTags=oldPost.getTags();
 
         // 권한 검사
         String userId= securityService.getUserId();
@@ -186,6 +202,31 @@ public class PostServiceImpl implements PostService {
             newStorageFiles.addAll(oldStorageFiles);
         }
 
+        // 태그 추가
+        List<String> tagNames=postUpdateRequestDTO.getTags();
+        Set<Tag> newTags=new LinkedHashSet<>();
+        if(tagNames!=null){
+            // 태그에 변경사항이 있다면
+            for(String tagName : tagNames){
+                Tag tag=tagService.readTagByName(tagName);
+                newTags.add(tag);
+            }
+        }
+        else{
+            // 태그에 변경사항이 없다면, 기존 데이터 그대로 사용
+            newTags.addAll(oldTags);
+        }
+
+        // 유효하지 않은 태그 목록 추리기
+        List<Tag> deletedTags=new LinkedList<>();
+        if(tagNames!=null){
+            for(Tag oldTag : oldTags){
+                if(!tagNames.contains(oldTag.getName())){
+                    deletedTags.add(oldTag);
+                }
+            }
+        }
+
         // 새로 등록한 파일의 StorageFile 엔티티 추가
         List<String> uploadFilenames=new LinkedList<>();
         try{
@@ -215,13 +256,14 @@ public class PostServiceImpl implements PostService {
             Post newPost=oldPost.toBuilder()
                     .content(newContent)
                     .files(newStorageFiles)
+                    .tags(newTags)
                     .build();
 
             // DB 저장
             postRepository.save(newPost);
 
         } catch(Exception exception){
-            // 만약 게시글을 등록하던 도중 문제가 생긴다면, 저장소에 업로드한 파일을 삭제해야 한다.
+            // 만약 게시글을 수정하던 도중 문제가 생긴다면, 저장소에 업로드한 파일을 삭제해야 한다.
             log.error(exception.getMessage());
             try{
                 // 저장소에 새로 업로드한 파일 삭제
@@ -235,6 +277,9 @@ public class PostServiceImpl implements PostService {
 
             throw exception;
         }
+
+        // 유효하지 않은 태그 삭제하기
+        tagService.deleteUnreferencedTags(deletedTags);
 
         // 저장소에서 삭제된 기존 파일 제거
         try{
@@ -270,6 +315,10 @@ public class PostServiceImpl implements PostService {
 
         // 게시글 삭제
         postRepository.deleteById(postId);
+
+        // 게시글 종속 엔티티 삭제 (태그)
+        Set<Tag> tags=post.getTags();
+        tagService.deleteUnreferencedTags(tags);
 
         // 게시글 종속 엔티티 삭제 (댓글)
         commentRepository.deleteByPostId(postId);

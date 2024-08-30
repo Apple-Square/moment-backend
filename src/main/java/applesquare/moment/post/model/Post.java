@@ -3,6 +3,7 @@ package applesquare.moment.post.model;
 import applesquare.moment.common.model.BaseEntity;
 import applesquare.moment.file.model.StorageFile;
 import applesquare.moment.post.service.PostService;
+import applesquare.moment.tag.model.Tag;
 import applesquare.moment.user.model.UserInfo;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -32,4 +33,11 @@ public class Post extends BaseEntity {
             cascade = CascadeType.ALL,
             orphanRemoval = true)
     private Set<StorageFile> files;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "post_tags",
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "tags_id")
+    )
+    private Set<Tag> tags;
 }

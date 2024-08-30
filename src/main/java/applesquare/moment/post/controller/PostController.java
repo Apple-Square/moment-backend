@@ -5,7 +5,6 @@ import applesquare.moment.post.dto.PostCreateRequestDTO;
 import applesquare.moment.post.dto.PostUpdateRequestDTO;
 import applesquare.moment.post.service.PostService;
 import applesquare.moment.util.Validator;
-import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -33,12 +32,14 @@ public class PostController {
      *                  등록된 게시글 ID
      */
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Map<String, Object>> create(@RequestParam(value = "content", required = false) String content,
-                                                      @RequestParam("files") List<MultipartFile> files){
+    public ResponseEntity<Map<String, Object>> create(@RequestParam("files") List<MultipartFile> files,
+                                                      @RequestParam(value = "content", required = false) String content,
+                                                      @RequestParam(value = "tags", required = false) List<String> tags){
         // DTO 생성
         PostCreateRequestDTO postCreateRequestDTO=PostCreateRequestDTO.builder()
                 .content(content)
                 .files(files)
+                .tags(tags)
                 .build();
 
         // DTO 유효성 검사
@@ -67,14 +68,16 @@ public class PostController {
      */
     @PatchMapping(value = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, Object>> update(@PathVariable Long postId,
-                                                      @RequestParam(required = false) @Size(min=PostService.MIN_CONTENT_LENGTH, max=PostService.MAX_CONTENT_LENGTH) String content,
-                                                      @RequestParam(required = false) List<String> urls,
-                                                      @RequestParam(required = false) List<MultipartFile> files){
+                                                      @RequestParam(value = "content", required = false) String content,
+                                                      @RequestParam(value = "urls", required = false) List<String> urls,
+                                                      @RequestParam(value = "files", required = false) List<MultipartFile> files,
+                                                      @RequestParam(value = "tags", required = false) List<String> tags){
         // DTO 생성
         PostUpdateRequestDTO postUpdateRequestDTO=PostUpdateRequestDTO.builder()
                 .content(content)
                 .urls(urls)
                 .files(files)
+                .tags(tags)
                 .build();
 
         // DTO 유효성 검사
