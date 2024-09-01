@@ -69,6 +69,12 @@ public class TagServiceImpl implements TagService {
      */
     @Override
     public PageResponseDTO<TagReadResponseDTO> search(PageRequestDTO pageRequestDTO){
+        // 입력 형식 검사
+        String keyword=pageRequestDTO.getKeyword();
+        if(keyword==null){
+            throw new IllegalArgumentException("키워드를 입력해주세요.");
+        }
+
         // 다음 페이지 존재 여부를 확인하기 위해 (size + 1)
         int pageSize=pageRequestDTO.getSize()+1;
         Sort sort= Sort.by(Sort.Direction.DESC, "id");
@@ -77,7 +83,6 @@ public class TagServiceImpl implements TagService {
         Long cursor=pageRequestDTO.getCursor();
 
         // 키워드에 따른 태그 검색
-        String keyword= (pageRequestDTO.getKeyword()!=null)? pageRequestDTO.getKeyword() : "";
         List<Tuple> tuples=tagRepository.findByKeyword(keyword, cursor, pageable);
 
         // hasNext 설정
