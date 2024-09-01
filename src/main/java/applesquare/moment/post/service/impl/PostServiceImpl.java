@@ -80,7 +80,7 @@ public class PostServiceImpl implements PostService {
         if(tagNames!=null){
             for(String tagName : tagNames){
                 // 기존에 있던 태그면 가져오고, 없는 태그면 생성하기
-                Tag tag=tagService.readTagByName(tagName);
+                Tag tag=tagService.readByName(tagName);
                 tags.add(tag);
             }
         }
@@ -208,7 +208,7 @@ public class PostServiceImpl implements PostService {
         if(tagNames!=null){
             // 태그에 변경사항이 있다면
             for(String tagName : tagNames){
-                Tag tag=tagService.readTagByName(tagName);
+                Tag tag=tagService.readByName(tagName);
                 newTags.add(tag);
             }
         }

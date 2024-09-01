@@ -10,4 +10,5 @@ import lombok.*;
 public class PageRequestDTO {
     private int size = 10;
     private Long cursor;
+    private String keyword;
 }
