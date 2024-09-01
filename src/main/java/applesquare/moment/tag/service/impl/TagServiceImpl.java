@@ -15,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TagServiceImpl implements TagService {
     private final TagRepository tagRepository;
+
 
     /**
      * 이름으로 태그 조회
@@ -76,19 +78,19 @@ public class TagServiceImpl implements TagService {
 
         // 키워드에 따른 태그 검색
         String keyword= (pageRequestDTO.getKeyword()!=null)? pageRequestDTO.getKeyword() : "";
-        List<Tuple> tagTuples=tagRepository.findByKeyword(keyword, cursor, pageable);
+        List<Tuple> tuples=tagRepository.findByKeyword(keyword, cursor, pageable);
 
         // hasNext 설정
         boolean hasNext=false;
-        if(tagTuples.size()>pageRequestDTO.getSize()){
-            tagTuples.remove(tagTuples.size()-1);
+        if(tuples.size()>pageRequestDTO.getSize()){
+            tuples.remove(tuples.size()-1);
             hasNext=true;
         }
 
         // DTO 변환
-        List<TagReadResponseDTO> tagDTOS=tagTuples.stream().map((tagTuple)->{
-            Tag tag1=(Tag)tagTuple.get("tag");
-            long postCount=(long)tagTuple.get("postCount");
+        List<TagReadResponseDTO> tagDTOs=tuples.stream().map((tuple)->{
+            Tag tag1=(Tag) tuple.get("tag");
+            long postCount=(long) tuple.get("postCount");
 
             return TagReadResponseDTO.builder()
                     .id(tag1.getId())
@@ -98,10 +100,46 @@ public class TagServiceImpl implements TagService {
         }).toList();
 
         PageResponseDTO<TagReadResponseDTO> pageResponseDTO=PageResponseDTO.<TagReadResponseDTO>builder()
-                .content(tagDTOS)
+                .content(tagDTOs)
                 .hasNext(hasNext)
                 .build();
 
         return pageResponseDTO;
+    }
+
+    /**
+     * 인기 태그 조회
+     * @param days 며칠 전 기록부터 조회할 것인지
+     * @param size 조회할 태그 개수
+     * @return 인기 태그 목록
+     */
+    @Override
+    public List<TagReadResponseDTO> readPopularTags(Integer days, Integer size){
+        size = (size!=null)? size : 10;
+        Sort sort= Sort.by(Sort.Direction.DESC, "id");
+        Pageable pageable= PageRequest.of(0, size, sort);
+
+        // 키워드에 따른 태그 검색
+        LocalDateTime baseTime = (days!=null)? LocalDateTime.now().minusDays(days) : null;
+        List<Tuple> tuples=tagRepository.findPopularTags(baseTime, pageable);
+
+        if(tuples.size()==0 && baseTime!=null){
+            // 만약 최근 (days)일 동안 사용된 태그가 없다면, 전체 기간에서 인기 태그 조회
+            tuples=tagRepository.findPopularTags(null, pageable);
+        }
+
+        // DTO 변환
+        List<TagReadResponseDTO> tagDTOs=tuples.stream().map((tuple)->{
+            Tag tag1=(Tag) tuple.get("tag");
+            long postCount=(long) tuple.get("postCount");
+
+            return TagReadResponseDTO.builder()
+                    .id(tag1.getId())
+                    .name(tag1.getName())
+                    .usageCount(postCount)
+                    .build();
+        }).toList();
+
+        return tagDTOs;
     }
 }

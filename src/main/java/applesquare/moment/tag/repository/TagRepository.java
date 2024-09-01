@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,4 +30,13 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     List<Tuple> findByKeyword(@Param("keyword") String keyword,
                               @Param("cursor") Long cursor,
                               Pageable pageable);
+
+    @Query(value = "SELECT t AS tag, COUNT(p) AS postCount " +
+            "FROM Tag t " +
+            "LEFT JOIN t.posts p " +
+            "WHERE (:baseTime IS NULL OR p.modDate >= :baseTime) " +
+            "GROUP BY t " +
+            "ORDER BY postCount DESC")
+    List<Tuple> findPopularTags(@Param("baseTime") LocalDateTime baseTime,
+                                Pageable pageable);
 }

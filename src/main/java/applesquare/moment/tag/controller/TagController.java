@@ -10,8 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -38,6 +40,28 @@ public class TagController {
         responseMap.put("message", "태그 검색에 성공했습니다.");
         responseMap.put("content", pageResponseDTO.getContent());
         responseMap.put("hasNext", pageResponseDTO.isHasNext());
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseMap.getMap());
+    }
+
+    /**
+     * 인기 태그 목록 조회 API
+     * @param days 며칠 전 기록부터 조회할 것인지
+     * @param size 조회할 태그 개수
+     * @return  (status) 200,
+     *          (body)  인기 태그 목록 조회 성공 메세지,
+     *                  인기 태그 목록
+     */
+    @GetMapping("/popular")
+    public ResponseEntity<Map<String, Object>> readPopularTags(@RequestParam(value = "days", required = false) Integer days,
+                                                               @RequestParam(value = "size", required = false) Integer size){
+        // 인기 태그 목록 조회
+        List<TagReadResponseDTO> tagReadResponseDTOS=tagService.readPopularTags(days, size);
+
+        // 응답 생성
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", "인기 태그 목록 조회에 성공했습니다.");
+        responseMap.put("tags", tagReadResponseDTOS);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseMap.getMap());
     }
