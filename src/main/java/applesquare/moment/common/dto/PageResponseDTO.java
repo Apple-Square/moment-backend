@@ -14,4 +14,5 @@ import java.util.List;
 public class PageResponseDTO<T> {
     private List<T> content;
     private boolean hasNext;
+    private int totalCount;
 }
