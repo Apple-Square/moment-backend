@@ -1,5 +1,7 @@
 package applesquare.moment.auth.service.impl;
 
+import applesquare.moment.address.dto.AddressSearchResponseDTO;
+import applesquare.moment.address.service.AddressService;
 import applesquare.moment.auth.dto.UserCreateRequestDTO;
 import applesquare.moment.auth.model.UserAccount;
 import applesquare.moment.auth.repository.UserAccountRepository;
@@ -21,6 +23,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserAccountRepository userAccountRepository;
     private final UserInfoRepository userInfoRepository;
     private final PasswordEncoder encoder;
+    private final AddressService addressService;
 
 
     /**
@@ -49,11 +52,15 @@ public class AuthServiceImpl implements AuthService {
          */
 
 
-        // 주소 유효성 검사
-        /*
-            실제로 존재하는 주소지인지 확인
-         */
-
+        // 주소 유효성 검사 (실제로 존재하는 주소인지 검사)
+        String address=null;
+        if(userCreateRequestDTO.getAddress()!=null){
+            AddressSearchResponseDTO addressSearchResponseDTO=addressService.searchAddress(userCreateRequestDTO.getAddress());
+            if(addressSearchResponseDTO==null){
+                throw new IllegalArgumentException("존재하지 않는 주소입니다. 정확한 주소를 입력해주세요.");
+            }
+            address=addressSearchResponseDTO.getAddressName();
+        }
 
         // UserAccount, UserInfo 엔티티 생성
         String userId;
@@ -66,7 +73,7 @@ public class AuthServiceImpl implements AuthService {
                 .nickname(nickname)
                 .birth(userCreateRequestDTO.getBirth())
                 .gender(userCreateRequestDTO.getGender())
-                .address(userCreateRequestDTO.getAddress())
+                .address(address)
                 .build();
 
         // 비밀번호 해시값 생성

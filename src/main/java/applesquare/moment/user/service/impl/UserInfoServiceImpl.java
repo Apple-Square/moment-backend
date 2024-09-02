@@ -1,5 +1,7 @@
 package applesquare.moment.user.service.impl;
 
+import applesquare.moment.address.dto.AddressSearchResponseDTO;
+import applesquare.moment.address.service.AddressService;
 import applesquare.moment.common.service.SecurityService;
 import applesquare.moment.user.dto.UserInfoUpdateRequestDTO;
 import applesquare.moment.user.model.Gender;
@@ -22,6 +24,7 @@ import java.time.LocalDate;
 public class UserInfoServiceImpl implements UserInfoService {
     private final UserInfoRepository userInfoRepository;
     private final SecurityService securityService;
+    private final AddressService addressService;
 
 
     /**
@@ -36,7 +39,6 @@ public class UserInfoServiceImpl implements UserInfoService {
     public String updateUserInfo(String userId, UserInfoUpdateRequestDTO userInfoUpdateRequestDTO){
         // 권한 검사
         String myUserId= securityService.getUserId();
-
         if(!myUserId.equals(userId)){
             throw new AccessDeniedException("사용자 본인의 정보만 수정할 수 있습니다.");
         }
@@ -45,11 +47,20 @@ public class UserInfoServiceImpl implements UserInfoService {
         UserInfo oldUserInfo=userInfoRepository.findById(userId)
                 .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 사용자입니다. (id = "+userId+")"));
 
+        // 주소 유효성 검사 (실제로 존재하는 주소인지 검사)
+        String newAddress=oldUserInfo.getAddress();
+        if(userInfoUpdateRequestDTO.getAddress()!=null){
+            AddressSearchResponseDTO addressSearchResponseDTO=addressService.searchAddress(userInfoUpdateRequestDTO.getAddress());
+            if(addressSearchResponseDTO==null){
+                throw new IllegalArgumentException("존재하지 않는 주소입니다. 정확한 주소를 입력해주세요.");
+            }
+            newAddress=addressSearchResponseDTO.getAddressName();
+        }
+
         // 새로운 UserInfo 엔티티 생성
         String newNickname=(userInfoUpdateRequestDTO.getNickname()!=null)? userInfoUpdateRequestDTO.getNickname():oldUserInfo.getNickname();
         LocalDate newBirth=(userInfoUpdateRequestDTO.getBirth()!=null)? userInfoUpdateRequestDTO.getBirth():oldUserInfo.getBirth();
         Gender newGender=(userInfoUpdateRequestDTO.getGender()!=null)? userInfoUpdateRequestDTO.getGender():oldUserInfo.getGender();
-        String newAddress=(userInfoUpdateRequestDTO.getAddress()!=null)? userInfoUpdateRequestDTO.getAddress():oldUserInfo.getAddress();
         String newIntro=(userInfoUpdateRequestDTO.getIntro()!=null)?userInfoUpdateRequestDTO.getIntro():oldUserInfo.getIntro();
 
         UserInfo newUserInfo=oldUserInfo.toBuilder()
