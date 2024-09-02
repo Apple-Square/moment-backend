@@ -34,12 +34,14 @@ public class PostController {
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, Object>> create(@RequestParam("files") List<MultipartFile> files,
                                                       @RequestParam(value = "content", required = false) String content,
-                                                      @RequestParam(value = "tags", required = false) List<String> tags){
+                                                      @RequestParam(value = "tags", required = false) List<String> tags,
+                                                      @RequestParam(value = "address", required = false) String address){
         // DTO 생성
         PostCreateRequestDTO postCreateRequestDTO=PostCreateRequestDTO.builder()
                 .content(content)
                 .files(files)
                 .tags(tags)
+                .address(address)
                 .build();
 
         // DTO 유효성 검사
@@ -71,13 +73,15 @@ public class PostController {
                                                       @RequestParam(value = "content", required = false) String content,
                                                       @RequestParam(value = "urls", required = false) List<String> urls,
                                                       @RequestParam(value = "files", required = false) List<MultipartFile> files,
-                                                      @RequestParam(value = "tags", required = false) List<String> tags){
+                                                      @RequestParam(value = "tags", required = false) List<String> tags,
+                                                      @RequestParam(value = "address", required = false) String address){
         // DTO 생성
         PostUpdateRequestDTO postUpdateRequestDTO=PostUpdateRequestDTO.builder()
                 .content(content)
                 .urls(urls)
                 .files(files)
                 .tags(tags)
+                .address(address)
                 .build();
 
         // DTO 유효성 검사

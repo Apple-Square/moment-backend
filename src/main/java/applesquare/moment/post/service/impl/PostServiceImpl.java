@@ -1,5 +1,7 @@
 package applesquare.moment.post.service.impl;
 
+import applesquare.moment.address.dto.AddressSearchResponseDTO;
+import applesquare.moment.address.service.AddressService;
 import applesquare.moment.comment.repository.CommentRepository;
 import applesquare.moment.common.service.SecurityService;
 import applesquare.moment.file.model.StorageFile;
@@ -38,6 +40,7 @@ public class PostServiceImpl implements PostService {
     private final SecurityService securityService;
     private final FileService fileService;
     private final TagService tagService;
+    private final AddressService addressService;
 
 
     // 허용되는 MIME 타입 이미지 목록
@@ -85,6 +88,21 @@ public class PostServiceImpl implements PostService {
             }
         }
 
+        // 위치 정보 등록하기
+        String address=postCreateRequestDTO.getAddress();
+        String addressName=null;
+        Double x=null;
+        Double y=null;
+        if(address!=null){
+            AddressSearchResponseDTO addressSearchResponseDTO =addressService.searchAddress(address);
+            if(addressSearchResponseDTO==null){
+                throw new IllegalArgumentException("존재하지 않는 주소입니다. 정확한 주소를 입력해주세요.");
+            }
+            addressName= addressSearchResponseDTO.getAddressName();
+            x=Double.parseDouble(addressSearchResponseDTO.getX());
+            y=Double.parseDouble(addressSearchResponseDTO.getY());
+        }
+
         // 첨부파일 처리
         Set<StorageFile> storageFiles=new LinkedHashSet<>();
         try{
@@ -110,6 +128,9 @@ public class PostServiceImpl implements PostService {
                     .content(postCreateRequestDTO.getContent())
                     .viewCount(0)
                     .writer(writer)
+                    .address(addressName)
+                    .x(x)
+                    .y(y)
                     .files(storageFiles)
                     .tags(tags)
                     .build();
@@ -227,6 +248,21 @@ public class PostServiceImpl implements PostService {
             }
         }
 
+        // 위치 정보 등록하기
+        String address=postUpdateRequestDTO.getAddress();
+        String newAddress=oldPost.getAddress();
+        Double newX=oldPost.getX();
+        Double newY=oldPost.getY();
+        if(address!=null){
+            AddressSearchResponseDTO addressSearchResponseDTO =addressService.searchAddress(address);
+            if(addressSearchResponseDTO ==null){
+                throw new IllegalArgumentException("존재하지 않는 주소입니다. 정확한 주소를 입력해주세요.");
+            }
+            newAddress= addressSearchResponseDTO.getAddressName();
+            newX=Double.parseDouble(addressSearchResponseDTO.getX());
+            newY=Double.parseDouble(addressSearchResponseDTO.getY());
+        }
+
         // 새로 등록한 파일의 StorageFile 엔티티 추가
         List<String> uploadFilenames=new LinkedList<>();
         try{
@@ -255,6 +291,9 @@ public class PostServiceImpl implements PostService {
             String newContent=(postUpdateRequestDTO.getContent()!=null)? postUpdateRequestDTO.getContent() : oldPost.getContent();
             Post newPost=oldPost.toBuilder()
                     .content(newContent)
+                    .address(newAddress)
+                    .x(newX)
+                    .y(newY)
                     .files(newStorageFiles)
                     .tags(newTags)
                     .build();

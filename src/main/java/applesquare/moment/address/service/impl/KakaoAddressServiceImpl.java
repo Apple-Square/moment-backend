@@ -1,7 +1,7 @@
 package applesquare.moment.address.service.impl;
 
-import applesquare.moment.address.dto.KakaoLocationSearchRequestDTO;
-import applesquare.moment.address.dto.KakaoLocationSearchResponseDTO;
+import applesquare.moment.address.dto.KakaoAddressSearchRequestDTO;
+import applesquare.moment.address.dto.KakaoAddressSearchResponseDTO;
 import applesquare.moment.address.service.KakaoAddressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,19 +21,22 @@ public class KakaoAddressServiceImpl implements KakaoAddressService {
     private String kakaoApiKey;
     private final RestTemplate restTemplate;
 
+
     /**
-     * 카카오 API를 이용해서 키워드에 따라 장소 검색
-     * @param kakaoLocationSearchRequestDTO 검색 요청 정보
-     * @return 장소 검색 결과
+     * 카카오 API를 이용해서 키워드에 따라 주소 검색
+     * @param kakaoAddressSearchRequestDTO 검색 요청 정보
+     * @return 주소 검색 결과
      */
     @Override
-    public KakaoLocationSearchResponseDTO searchLocationByKeyword(KakaoLocationSearchRequestDTO kakaoLocationSearchRequestDTO) {
-        String keyword = kakaoLocationSearchRequestDTO.getKeyword();
-        Integer page = kakaoLocationSearchRequestDTO.getPage();
-        Integer size = kakaoLocationSearchRequestDTO.getSize();
+    public KakaoAddressSearchResponseDTO searchAddressByKeyword(KakaoAddressSearchRequestDTO kakaoAddressSearchRequestDTO){
+        String keyword = kakaoAddressSearchRequestDTO.getKeyword();
+        String analyzeType=kakaoAddressSearchRequestDTO.getAnalyzeType();
+        Integer page = kakaoAddressSearchRequestDTO.getPage();
+        Integer size = kakaoAddressSearchRequestDTO.getSize();
 
         // URL 생성
-        String url = "https://dapi.kakao.com/v2/local/search/keyword.json?query=" + keyword;
+        String url = "https://dapi.kakao.com/v2/local/search/address.json?query=" + keyword;
+        if (analyzeType!= null) url += "&analyze_type=" + analyzeType;
         if (page != null) url += "&page=" + page;
         if (size != null) url += "&size=" + size;
 
@@ -43,7 +46,7 @@ public class KakaoAddressServiceImpl implements KakaoAddressService {
 
         // http 요청 (카카오 주소 검색 API)
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
-        ResponseEntity<KakaoLocationSearchResponseDTO> response = restTemplate.exchange(url, HttpMethod.GET, httpEntity, KakaoLocationSearchResponseDTO.class);
+        ResponseEntity<KakaoAddressSearchResponseDTO> response = restTemplate.exchange(url, HttpMethod.GET, httpEntity, KakaoAddressSearchResponseDTO.class);
 
         return response.getBody();
     }

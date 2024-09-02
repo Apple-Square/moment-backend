@@ -1,4 +1,4 @@
-package applesquare.moment.address.dto;
+package applesquare.moment.location.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

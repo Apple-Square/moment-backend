@@ -1,4 +1,4 @@
-package applesquare.moment.address.dto;
+package applesquare.moment.location.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;

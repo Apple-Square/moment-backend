@@ -1,9 +1,9 @@
 package applesquare.moment.address.service;
 
-import applesquare.moment.address.dto.KakaoLocationSearchRequestDTO;
-import applesquare.moment.address.dto.KakaoLocationSearchResponseDTO;
+import applesquare.moment.address.dto.KakaoAddressSearchRequestDTO;
+import applesquare.moment.address.dto.KakaoAddressSearchResponseDTO;
 
 
 public interface KakaoAddressService {
-    KakaoLocationSearchResponseDTO searchLocationByKeyword(KakaoLocationSearchRequestDTO kakaoLocationSearchRequestDTO);
+    KakaoAddressSearchResponseDTO searchAddressByKeyword(KakaoAddressSearchRequestDTO kakaoAddressSearchRequestDTO);
 }

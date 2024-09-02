@@ -19,6 +19,7 @@ import java.util.List;
 public class PostUpdateRequestDTO {
     @Size(min= PostService.MIN_CONTENT_LENGTH, max=PostService.MAX_CONTENT_LENGTH)
     private String content;
+    private String address;
     private List<String> urls;
     private List<MultipartFile> files;
     @Size(max = PostService.MAX_TAG_COUNT, message = "태그는 최대 10개까지 등록 가능합니다.")

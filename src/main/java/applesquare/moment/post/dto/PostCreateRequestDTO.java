@@ -20,6 +20,7 @@ import java.util.List;
 public class PostCreateRequestDTO {
     @Size(min = PostService.MIN_CONTENT_LENGTH, max = PostService.MAX_CONTENT_LENGTH)
     private String content;
+    private String address;
     @NotNull(message = "반드시 하나 이상의 파일을 등록해야 합니다.")
     @Size(min = 1, message = "반드시 하나 이상의 파일을 등록해야 합니다.")
     private List<MultipartFile> files;

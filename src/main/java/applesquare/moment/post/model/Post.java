@@ -29,6 +29,12 @@ public class Post extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="writer_id", nullable = false, updatable = false)
     private UserInfo writer;
+    @Column(nullable = true, updatable = true)
+    private String address;
+    @Column(nullable = true, updatable = true)
+    private Double x;  // 경도
+    @Column(nullable = true, updatable = true)
+    private Double y;  // 위도
     @OneToMany(fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
             orphanRemoval = true)
