@@ -6,6 +6,7 @@ import applesquare.moment.address.dto.KakaoAddressSearchResponseDTO;
 import applesquare.moment.address.dto.KakaoAddressSearchResponseDTO.Document;
 import applesquare.moment.address.service.AddressService;
 import applesquare.moment.address.service.KakaoAddressService;
+import applesquare.moment.util.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +26,7 @@ public class AddressServiceImpl implements AddressService {
      *                  (주소가 실존하지 않는 경우) null
      */
     @Override
-    public AddressSearchResponseDTO searchAddress(String keyword){
+    public AddressSearchResponseDTO searchAddress(String keyword) {
         // 요청 DTO 구성
         KakaoAddressSearchRequestDTO kakaoAddressSearchRequestDTO=KakaoAddressSearchRequestDTO.builder()
                 .keyword(keyword)
@@ -33,6 +34,9 @@ public class AddressServiceImpl implements AddressService {
                 .page(1)
                 .size(1)
                 .build();
+
+        // 입력 DTO 검증
+        Validator.validate(kakaoAddressSearchRequestDTO);
 
         // Kakao 주소 검색 API 요청
         KakaoAddressSearchResponseDTO kakaoAddressSearchResponseDTO =kakaoAddressService.searchAddressByKeyword(kakaoAddressSearchRequestDTO);
