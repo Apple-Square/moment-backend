@@ -27,7 +27,7 @@ public class AddressController {
 
         // 응답 생성
         ResponseMap responseMap=new ResponseMap();
-        responseMap.put("message", "장소 검색에 성공했습니다.");
+        responseMap.put("message", "주소 검색에 성공했습니다.");
         responseMap.put("address", addressSearchResponseDTO);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseMap.getMap());
