@@ -175,7 +175,7 @@ public class CommentServiceImpl implements CommentService {
         }
 
         List<Long> likedCommentIds=(myUserId!=null)?
-                commentLikeRepository.findAllLikedCommentIdByUserId(myUserId, commentIds)
+                commentLikeRepository.findAllLikedCommentIdByCommentIdsAndUserId(commentIds, myUserId)
                 : new LinkedList<>();
 
         // DTO 변환
