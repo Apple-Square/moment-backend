@@ -19,4 +19,6 @@ public class CommentReadAllResponseDTO {
     @JsonFormat(pattern="yyyy-MM-dd")
     private LocalDateTime regDate;
     private UserProfileReadResponseDTO writer;
+    private long likeCount;
+    private boolean liked;
 }

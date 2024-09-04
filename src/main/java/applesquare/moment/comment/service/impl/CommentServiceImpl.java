@@ -9,6 +9,8 @@ import applesquare.moment.comment.service.CommentService;
 import applesquare.moment.common.dto.PageRequestDTO;
 import applesquare.moment.common.dto.PageResponseDTO;
 import applesquare.moment.common.service.SecurityService;
+import applesquare.moment.exception.TokenException;
+import applesquare.moment.like.repository.CommentLikeRepository;
 import applesquare.moment.post.model.Post;
 import applesquare.moment.post.repository.PostRepository;
 import applesquare.moment.user.dto.UserProfileReadResponseDTO;
@@ -16,6 +18,7 @@ import applesquare.moment.user.model.UserInfo;
 import applesquare.moment.user.repository.UserInfoRepository;
 import applesquare.moment.user.service.UserProfileService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +28,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -33,6 +37,7 @@ import java.util.List;
 public class CommentServiceImpl implements CommentService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final CommentLikeRepository commentLikeRepository;
     private final UserInfoRepository userInfoRepository;
     private final SecurityService securityService;
     private final UserProfileService userProfileService;
@@ -145,21 +150,44 @@ public class CommentServiceImpl implements CommentService {
         Long cursor= pageRequestDTO.getCursor();
 
         // 특정 게시글의 댓글 목록 조회
-        List<Comment> comments=commentRepository.findAllByPostId(postId, cursor, pageable);
+        List<Tuple> tuples=commentRepository.findAllByPostId(postId, cursor, pageable);
 
         // hasNext 설정
         boolean hasNext=false;
-        if(comments.size()>pageRequestDTO.getSize()){
-            comments.remove(comments.size()-1);
+        if(tuples.size()>pageRequestDTO.getSize()){
+            tuples.remove(tuples.size()-1);
             hasNext=true;
         }
 
+        // 조회한 댓글 목록에서 내가 좋아요 누른 댓글의 Id 목록 가져오기
+        List<Long> commentIds=tuples.stream().map((tuple)->{
+            Comment comment=(Comment) tuple.get("comment");
+            return comment.getId();
+        }).toList();
+
+        // 나의 유저 ID 가져오기
+        String myUserId=null;
+        try{
+            myUserId=securityService.getUserId();
+        }catch(TokenException e){
+            // 로그인하지 않은 경우
+            // 로그인이 필요하지 않으므로 아무런 처리도 하지 않는다.
+        }
+
+        List<Long> likedCommentIds=(myUserId!=null)?
+                commentLikeRepository.findLikedCommentIdsByUserId(myUserId, commentIds)
+                : new LinkedList<>();
+
         // DTO 변환
-        List<CommentReadAllResponseDTO> commentReadAllResponseDTOS=comments.stream().map(comment -> {
+        List<CommentReadAllResponseDTO> commentReadAllResponseDTOS=tuples.stream().map(tuple -> {
+            Comment comment=(Comment) tuple.get("comment");
+            long likeCount=(long) tuple.get("likeCount");
             CommentReadAllResponseDTO commentReadAllResponseDTO=modelMapper.map(comment, CommentReadAllResponseDTO.class);
             UserProfileReadResponseDTO writer=userProfileService.readProfileById(comment.getWriter().getId());
             return commentReadAllResponseDTO.toBuilder()
                     .writer(writer)
+                    .likeCount(likeCount)
+                    .liked(likedCommentIds.contains(comment.getId()))
                     .build();
         }).toList();
 
