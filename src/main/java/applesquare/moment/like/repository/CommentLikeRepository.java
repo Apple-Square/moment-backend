@@ -10,6 +10,6 @@ import java.util.List;
 
 public interface CommentLikeRepository extends JpaRepository<CommentLike, CommentLikeKey> {
     @Query("SELECT cl.commentId FROM CommentLike cl WHERE cl.commentId IN :commentIds AND cl.userId=:userId")
-    List<Long> findLikedCommentIdsByUserId(@Param("userId") String userId,
+    List<Long> findAllLikedCommentIdByUserId(@Param("userId") String userId,
                                            @Param("commentIds") List<Long> commentIds);
 }

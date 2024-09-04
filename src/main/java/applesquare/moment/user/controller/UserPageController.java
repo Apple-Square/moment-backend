@@ -3,9 +3,10 @@ package applesquare.moment.user.controller;
 import applesquare.moment.common.dto.PageRequestDTO;
 import applesquare.moment.common.dto.PageResponseDTO;
 import applesquare.moment.exception.ResponseMap;
+import applesquare.moment.follow.dto.FolloweeReadAllResponseDTO;
+import applesquare.moment.follow.dto.FollowerReadAllResponseDTO;
 import applesquare.moment.follow.service.FollowService;
 import applesquare.moment.user.dto.UserPageReadResponseDTO;
-import applesquare.moment.user.dto.UserProfileReadResponseDTO;
 import applesquare.moment.user.service.UserPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -56,7 +57,7 @@ public class UserPageController {
     @GetMapping("/followers")
     public ResponseEntity<Map<String, Object>> readFollowers(@PathVariable String userId, PageRequestDTO pageRequestDTO){
         // 특정 유저의 팔로워 목록 조회
-        PageResponseDTO<UserProfileReadResponseDTO> followerPage=followService.readFollowerPage(userId, pageRequestDTO);
+        PageResponseDTO<FollowerReadAllResponseDTO> followerPage=followService.readFollowerPage(userId, pageRequestDTO);
 
         // 응답 생성
         ResponseMap responseMap=new ResponseMap();
@@ -78,7 +79,7 @@ public class UserPageController {
     @GetMapping("/followings")
     public ResponseEntity<Map<String, Object>> readFollowings(@PathVariable String userId, PageRequestDTO pageRequestDTO){
         // 특정 유저의 팔로잉 목록 조회
-        PageResponseDTO<UserProfileReadResponseDTO> followingPage=followService.readFollowingPage(userId, pageRequestDTO);
+        PageResponseDTO<FolloweeReadAllResponseDTO> followingPage=followService.readFollowingPage(userId, pageRequestDTO);
 
         // 응답 생성
         ResponseMap responseMap=new ResponseMap();
