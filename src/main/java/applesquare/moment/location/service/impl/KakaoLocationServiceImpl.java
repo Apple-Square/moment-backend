@@ -17,9 +17,12 @@ import org.springframework.web.client.RestTemplate;
 @Transactional
 @RequiredArgsConstructor
 public class KakaoLocationServiceImpl implements KakaoLocationService {
+    private final RestTemplate restTemplate;
     @Value("${kakao.api.key}")
     private String kakaoApiKey;
-    private final RestTemplate restTemplate;
+    @Value("${kakao.location.url}")
+    private String kakaoLocationUrl;
+
 
     /**
      * 카카오 API를 이용해서 키워드에 따라 장소 검색
@@ -33,9 +36,11 @@ public class KakaoLocationServiceImpl implements KakaoLocationService {
         Integer size = kakaoLocationSearchRequestDTO.getSize();
 
         // URL 생성
-        String url = "https://dapi.kakao.com/v2/local/search/keyword.json?query=" + keyword;
-        if (page != null) url += "&page=" + page;
-        if (size != null) url += "&size=" + size;
+        StringBuilder sb=new StringBuilder(kakaoLocationUrl);
+        sb.append("?query=" + keyword);
+        if (page != null) sb.append("&page=" + page);
+        if (size != null) sb.append("&size=" + size);
+        String url = sb.toString();
 
         // 헤더 설정
         HttpHeaders headers = new HttpHeaders();

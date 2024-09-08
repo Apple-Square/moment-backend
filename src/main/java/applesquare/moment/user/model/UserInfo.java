@@ -39,4 +39,5 @@ public class UserInfo extends BaseEntity {
             orphanRemoval = true)
     @JoinColumn(nullable = true, updatable = true)
     private StorageFile profileImage;
+    private boolean social;
 }

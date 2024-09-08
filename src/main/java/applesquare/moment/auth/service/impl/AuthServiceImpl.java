@@ -65,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
         // UserAccount, UserInfo 엔티티 생성
         String userId;
         do {
-            userId= StringUtil.generateRandomString(UserInfoService.USER_ID_LENGTH);
+            userId= StringUtil.generateRandomString(StringUtil.USER_ID_CHARACTERS, UserInfoService.USER_ID_LENGTH);
         } while (userInfoRepository.existsById(userId));
 
         UserInfo userInfo=UserInfo.builder()
@@ -74,6 +74,7 @@ public class AuthServiceImpl implements AuthService {
                 .birth(userCreateRequestDTO.getBirth())
                 .gender(userCreateRequestDTO.getGender())
                 .address(address)
+                .social(false)
                 .build();
 
         // 비밀번호 해시값 생성

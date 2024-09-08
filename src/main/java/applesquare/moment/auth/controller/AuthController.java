@@ -87,13 +87,13 @@ public class AuthController {
                 response.setStatus(HttpServletResponse.SC_OK);
 
                 // Access Token 재발급
-                String username = jwtUtil.getSubjectFromToken(refreshToken);
-                String accessToken = jwtUtil.generateAccessToken(username);
+                String userId = jwtUtil.getSubjectFromToken(refreshToken);
+                String accessToken = jwtUtil.generateAccessToken(userId);
                 response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
 
                 // Refresh 쿠키 유효 시간이 얼마 안 남았으면, Refresh 쿠키도 재발급
                 if(jwtUtil.needNewRefreshToken(refreshToken)){
-                    ResponseCookie newRefreshTokenCookie= jwtUtil.generateRefreshCookie(username);
+                    ResponseCookie newRefreshTokenCookie= jwtUtil.generateRefreshCookie(userId);
                     response.addHeader(HttpHeaders.SET_COOKIE, newRefreshTokenCookie.toString());
                 }
 

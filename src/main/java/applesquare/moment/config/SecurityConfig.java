@@ -100,7 +100,7 @@ public class SecurityConfig {
 
 
         // JwtAuthenticationFilter 설정
-        JwtAuthenticationFilter jwtAuthenticationFilter=new JwtAuthenticationFilter(userDetailsService, tokenBlacklistService, jwtUtil);
+        JwtAuthenticationFilter jwtAuthenticationFilter=new JwtAuthenticationFilter(tokenBlacklistService, jwtUtil);
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
 

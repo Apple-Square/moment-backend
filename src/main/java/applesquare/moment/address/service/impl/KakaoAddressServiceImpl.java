@@ -17,9 +17,11 @@ import org.springframework.web.client.RestTemplate;
 @Transactional
 @RequiredArgsConstructor
 public class KakaoAddressServiceImpl implements KakaoAddressService {
+    private final RestTemplate restTemplate;
     @Value("${kakao.api.key}")
     private String kakaoApiKey;
-    private final RestTemplate restTemplate;
+    @Value("${kakao.address.url}")
+    private String kakaoAddressUrl;
 
 
     /**
@@ -35,10 +37,12 @@ public class KakaoAddressServiceImpl implements KakaoAddressService {
         Integer size = kakaoAddressSearchRequestDTO.getSize();
 
         // URL 생성
-        String url = "https://dapi.kakao.com/v2/local/search/address.json?query=" + keyword;
-        if (analyzeType!= null) url += "&analyze_type=" + analyzeType;
-        if (page != null) url += "&page=" + page;
-        if (size != null) url += "&size=" + size;
+        StringBuilder sb=new StringBuilder(kakaoAddressUrl);
+        sb.append("?query=" + keyword);
+        if (analyzeType!= null) sb.append("&analyze_type=" + analyzeType);
+        if (page != null) sb.append("&page=" + page);
+        if (size != null) sb.append("&size=" + size);
+        String url=sb.toString();
 
         // 헤더 설정
         HttpHeaders headers = new HttpHeaders();

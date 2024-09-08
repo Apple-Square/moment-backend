@@ -30,6 +30,10 @@ public class UserDetailsImpl implements UserDetails {
         );
     }
 
+    public UserDetailsImpl(String userId){
+        this.id=userId;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // 현재 프로젝트에서는 Authority를 설정할 일이 없어서 빈 Collection을 반환

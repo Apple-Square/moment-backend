@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -128,6 +129,18 @@ public class GlobalExceptionHandler {
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", e.getMessage());
         return ResponseEntity.status(e.getStatus()).body(responseMap.getMap());
+    }
+
+    /**
+     * 소셜 로그인에서 발생한 예외 처리
+     * @param e OAuth2AuthenticationException
+     * @return 401 (Unauthorized)
+     */
+    @ExceptionHandler(OAuth2AuthenticationException.class)
+    public ResponseEntity<Map<String, Object>> handleOAuth2AuthenticationException(OAuth2AuthenticationException e){
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMap.getMap());
     }
 
     /**

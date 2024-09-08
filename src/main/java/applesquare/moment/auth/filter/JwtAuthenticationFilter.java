@@ -1,5 +1,6 @@
 package applesquare.moment.auth.filter;
 
+import applesquare.moment.auth.security.UserDetailsImpl;
 import applesquare.moment.auth.service.TokenBlacklistService;
 import applesquare.moment.exception.TokenError;
 import applesquare.moment.exception.TokenException;
@@ -14,7 +15,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -24,7 +24,6 @@ import java.io.IOException;
 @Log4j2
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final UserDetailsService userDetailsService;
     private final TokenBlacklistService tokenBlacklistService;
     private final JwtUtil jwtUtil;
 
@@ -47,10 +46,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         // 블랙 리스트에 등록되었는지 확인
                         if(!tokenBlacklistService.exists(accessToken)){
                             // Access 토큰의 Subject 값으로 UserDetails 조회
-                            String username=jwtUtil.getSubjectFromToken(accessToken);
-                            UserDetails userDetails=userDetailsService.loadUserByUsername(username);
+                            String userId=jwtUtil.getSubjectFromToken(accessToken);
 
                             // authentication 생성
+                            UserDetails userDetails=new UserDetailsImpl(userId);
                             UsernamePasswordAuthenticationToken authentication= new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
