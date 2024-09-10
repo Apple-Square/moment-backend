@@ -27,14 +27,21 @@ public class KakaoOAuthController {
     private final JwtUtil jwtUtil;
 
     // 카카오 로그인 환경 변수
-    @Value("${kakao.api.key}")
-    private String kakaoApiKey;
+    @Value("${kakao.client.id}")
+    private String kakaoClientId;
     @Value("${kakao.oauth.redirect-uri}")
     private String kakaoOauthRedirectUri;
     @Value("${kakao.login.url}")
     private String kakaoLoginUrl;
 
 
+    /**
+     * 카카오 로그인 API
+     * (카카오 로그인 화면으로 리다이렉트)
+     *
+     * @return  (status) 302,
+     *          (header) 카카오 로그인 URL
+     */
     @GetMapping("/login")
     public ResponseEntity<Void> redirectToKakaoAuth(){
         // HTTP Header 생성
@@ -42,7 +49,7 @@ public class KakaoOAuthController {
 
         // 카카오 로그인 화면으로 리다이렉트
         String url = new StringBuilder(kakaoLoginUrl)
-                .append("?client_id=").append(kakaoApiKey)
+                .append("?client_id=").append(kakaoClientId)
                 .append("&redirect_uri=").append(kakaoOauthRedirectUri)
                 .append("&response_type=code")
                 .toString();
@@ -53,6 +60,15 @@ public class KakaoOAuthController {
                 .build();
     }
 
+    /**
+     * 카카오 로그인 콜백 API
+     * (인가 코드를 받아 로그인 처리를 완료시킴)
+     *
+     * @param code 인가 코드
+     * @return  (status) 200,
+     *          (header) Access, Refresh 토큰
+     *          (body) 소셜 유저 정보
+     */
     @GetMapping("/callback")
     public ResponseEntity<Map<String, Object>> callback(@RequestParam String code){
         // 유저 프로필 조회

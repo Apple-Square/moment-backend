@@ -23,8 +23,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class KakaoAuthServiceImpl implements KakaoAuthService {
     private final RestTemplate restTemplate;
-    @Value("${kakao.api.key}")
-    private String kakaoApiKey;
+    @Value("${kakao.client.id}")
+    private String kakaoClientId;
     @Value("${kakao.oauth.redirect-uri}")
     private String kakaoOauthRedirectUri;
     @Value("${kakao.token.url}")
@@ -33,6 +33,11 @@ public class KakaoAuthServiceImpl implements KakaoAuthService {
     private String kakaoUserInfoUrl;
 
 
+    /**
+     * (인가 코드로) 카카오 액세스 토큰 획득
+     * @param code 인가 코드
+     * @return 카카오 액세스 토큰
+     */
     @Override
     public String getAccessToken(String code){
         // HTTP Header 생성
@@ -42,7 +47,7 @@ public class KakaoAuthServiceImpl implements KakaoAuthService {
         // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
-        body.add("client_id", kakaoApiKey);
+        body.add("client_id", kakaoClientId);
         body.add("redirect_uri", kakaoOauthRedirectUri);
         body.add("code", code);
 
@@ -68,6 +73,11 @@ public class KakaoAuthServiceImpl implements KakaoAuthService {
         return accessToken;
     }
 
+    /**
+     * (액세스 토큰으로) 카카오 사용자 정보 조회
+     * @param accessToken 액세스 토큰
+     * @return 카카오 사용자 정보
+     */
     @Override
     public KakaoUserInfoReadResponseDTO getUserInfoByToken(String accessToken){
         // HTTP Header 생성

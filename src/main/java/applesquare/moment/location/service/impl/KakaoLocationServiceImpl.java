@@ -18,8 +18,8 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class KakaoLocationServiceImpl implements KakaoLocationService {
     private final RestTemplate restTemplate;
-    @Value("${kakao.api.key}")
-    private String kakaoApiKey;
+    @Value("${kakao.client.id}")
+    private String kakaoClientId;
     @Value("${kakao.location.url}")
     private String kakaoLocationUrl;
 
@@ -36,15 +36,14 @@ public class KakaoLocationServiceImpl implements KakaoLocationService {
         Integer size = kakaoLocationSearchRequestDTO.getSize();
 
         // URL 생성
-        StringBuilder sb=new StringBuilder(kakaoLocationUrl);
-        sb.append("?query=" + keyword);
-        if (page != null) sb.append("&page=" + page);
-        if (size != null) sb.append("&size=" + size);
+        StringBuilder sb=new StringBuilder(kakaoLocationUrl).append("?query=").append(keyword);
+        if (page != null) sb.append("&page=").append(page);
+        if (size != null) sb.append("&size=").append(size);
         String url = sb.toString();
 
         // 헤더 설정
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "KakaoAK " + kakaoApiKey);
+        headers.set("Authorization", "KakaoAK " + kakaoClientId);
 
         // http 요청 (카카오 주소 검색 API)
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);

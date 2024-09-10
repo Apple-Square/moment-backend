@@ -29,6 +29,12 @@ public class NaverAuthServiceImpl implements NaverAuthService {
     private String naverUserInfoUrl;
 
 
+    /**
+     * (인가 코드로) 네이버 액세스 토큰 획득
+     * @param code 인가 코드
+     * @param state 상태 토큰 (CSRF 방지 용도)
+     * @return 네이버 액세스 토큰
+     */
     @Override
     public String getAccessToken(String code, String state){
         // URL 생성
@@ -69,6 +75,11 @@ public class NaverAuthServiceImpl implements NaverAuthService {
         return accessToken;
     }
 
+    /**
+     * (액세스 토큰으로) 네이버 사용자 정보 조회
+     * @param accessToken 액세스 토큰
+     * @return 네이버 사용자 정보
+     */
     @Override
     public NaverUserInfoReadResponseDTO getUserInfoByToken(String accessToken){
         // HTTP Header 생성

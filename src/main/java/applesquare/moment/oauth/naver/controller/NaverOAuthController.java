@@ -43,6 +43,13 @@ public class NaverOAuthController{
     private String naverOauthRedirectUri;
 
 
+    /**
+     * 네이버 로그인 API
+     * (네이버 로그인 화면으로 리다이렉트)
+     *
+     * @return  (status) 302,
+     *          (header) 네이버 로그인 URL
+     */
     @GetMapping("/login")
     public ResponseEntity<Void> redirectToNaverAuth(){
         // CSRF 방지를 위해 CSRF 방지 토큰 생성
@@ -69,6 +76,18 @@ public class NaverOAuthController{
                 .build();
     }
 
+    /**
+     * 네이버 로그인 콜백 API
+     * (인가 코드와 state를 받아 로그인 처리를 완료시킴)
+     *
+     * @param state 상태 토큰 (CSRF 방지 용도)
+     * @param code 인증 코드
+     * @param error 에러 코드
+     * @param errorDescription 에러 메세지
+     * @return  (statue) 200,
+     *          (header) Access, Refresh 토큰
+     *          (body) 소셜 유저 정보
+     */
     @GetMapping("/callback")
     public ResponseEntity<Map<String, Object>> callback(@RequestParam(value = "state", required = true) String state,
                                                         @RequestParam(value = "code", required = false) String code,
@@ -77,7 +96,7 @@ public class NaverOAuthController{
         // CSRF 토큰 확인
         if(!stateService.exists(state)){
             // state 값이 다르다면
-            throw new AccessDeniedException("요청이 유효하지 않습니다.");
+            throw new AccessDeniedException("유효하지 않은 요청입니다.");
         }
 
         // 네이버 로그인 과정에서 문제가 발생했다면 예외 처리
