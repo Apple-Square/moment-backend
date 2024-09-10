@@ -5,5 +5,5 @@ import applesquare.moment.oauth.kakao.dto.KakaoUserInfoReadResponseDTO;
 public interface KakaoAuthService {
 
     String getAccessToken(String authCode);
-    KakaoUserInfoReadResponseDTO getUserInfo(String accessToken);
+    KakaoUserInfoReadResponseDTO getUserInfoByToken(String accessToken);
 }

@@ -1,4 +1,5 @@
-package applesquare.moment.oauth.controller;
+package applesquare.moment.oauth.kakao.controller;
+
 
 import applesquare.moment.exception.ResponseMap;
 import applesquare.moment.oauth.service.OAuthService;
@@ -20,11 +21,12 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/oauth")
-public class OAuthController {
+@RequestMapping("/api/oauth/kakao")
+public class KakaoOAuthController {
     private final OAuthService oAuthService;
     private final JwtUtil jwtUtil;
 
+    // 카카오 로그인 환경 변수
     @Value("${kakao.api.key}")
     private String kakaoApiKey;
     @Value("${kakao.oauth.redirect-uri}")
@@ -32,16 +34,18 @@ public class OAuthController {
     @Value("${kakao.login.url}")
     private String kakaoLoginUrl;
 
-    @GetMapping("/kakao/login")
+
+    @GetMapping("/login")
     public ResponseEntity<Void> redirectToKakaoAuth(){
         // HTTP Header 생성
         HttpHeaders headers=new HttpHeaders();
 
         // 카카오 로그인 화면으로 리다이렉트
-        String url = kakaoLoginUrl
-                + "?client_id=" + kakaoApiKey
-                + "&redirect_uri=" + kakaoOauthRedirectUri
-                + "&response_type=code";
+        String url = new StringBuilder(kakaoLoginUrl)
+                .append("?client_id=").append(kakaoApiKey)
+                .append("&redirect_uri=").append(kakaoOauthRedirectUri)
+                .append("&response_type=code")
+                .toString();
         headers.setLocation(URI.create(url));
 
         return ResponseEntity.status(HttpStatus.FOUND)
@@ -49,8 +53,8 @@ public class OAuthController {
                 .build();
     }
 
-    @GetMapping("/kakao/callback")
-    public ResponseEntity<Map<String, Object>> loginWithKakao(@RequestParam String code){
+    @GetMapping("/callback")
+    public ResponseEntity<Map<String, Object>> callback(@RequestParam String code){
         // 유저 프로필 조회
         UserProfileReadResponseDTO userProfileDTO=oAuthService.loginWithKakao(code);
 

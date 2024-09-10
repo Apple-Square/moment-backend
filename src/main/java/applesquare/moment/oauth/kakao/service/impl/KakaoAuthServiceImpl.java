@@ -39,7 +39,6 @@ public class KakaoAuthServiceImpl implements KakaoAuthService {
         HttpHeaders headers=new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8");
 
-
         // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
@@ -49,14 +48,14 @@ public class KakaoAuthServiceImpl implements KakaoAuthService {
 
         // HTTP 요청 보내기
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest=new HttpEntity<>(body, headers);
-        ResponseEntity<Map> response = restTemplate.exchange(
+        ResponseEntity<Map> kakaoTokenResponse = restTemplate.exchange(
                 kakaoTokenUrl,
                 HttpMethod.POST,
                 kakaoTokenRequest,
                 Map.class);
 
-        // Id 토큰 추출
-        Map<String, Object> responseBody = response.getBody();
+        // 액세스 토큰 추출
+        Map<String, Object> responseBody = kakaoTokenResponse.getBody();
         if(responseBody==null){
             throw new OAuth2AuthenticationException("Kakao 토큰 요청에 실패했습니다.");
         }
@@ -70,20 +69,20 @@ public class KakaoAuthServiceImpl implements KakaoAuthService {
     }
 
     @Override
-    public KakaoUserInfoReadResponseDTO getUserInfo(String accessToken){
+    public KakaoUserInfoReadResponseDTO getUserInfoByToken(String accessToken){
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + accessToken);
+        headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
 
         // HTTP 요청 보내기
         HttpEntity<String> kakaoUserRequest = new HttpEntity<>(headers);
-        ResponseEntity<KakaoUserInfoReadResponseDTO> response = restTemplate.exchange(
+        ResponseEntity<KakaoUserInfoReadResponseDTO> kakaoUserResponse = restTemplate.exchange(
                 kakaoUserInfoUrl,
                 HttpMethod.GET,
                 kakaoUserRequest,
                 KakaoUserInfoReadResponseDTO.class
         );
 
-        return response.getBody();
+        return kakaoUserResponse.getBody();
     }
 }

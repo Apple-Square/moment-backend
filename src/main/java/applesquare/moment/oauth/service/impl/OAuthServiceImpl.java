@@ -5,6 +5,8 @@ import applesquare.moment.oauth.kakao.service.KakaoAuthService;
 import applesquare.moment.oauth.model.SocialType;
 import applesquare.moment.oauth.model.SocialUserAccount;
 import applesquare.moment.oauth.model.SocialUserAccountKey;
+import applesquare.moment.oauth.naver.dto.NaverUserInfoReadResponseDTO;
+import applesquare.moment.oauth.naver.service.NaverAuthService;
 import applesquare.moment.oauth.repository.SocialUserAccountRepository;
 import applesquare.moment.oauth.service.OAuthService;
 import applesquare.moment.user.dto.UserProfileReadResponseDTO;
@@ -28,7 +30,9 @@ public class OAuthServiceImpl implements OAuthService {
     private final SocialUserAccountRepository socialUserAccountRepository;
     private final UserInfoRepository userInfoRepository;
     private final KakaoAuthService kakaoAuthService;
+    private final NaverAuthService naverAuthService;
     private final UserProfileService userProfileService;
+
 
     @Override
     public UserProfileReadResponseDTO loginWithKakao(String code){
@@ -36,7 +40,7 @@ public class OAuthServiceImpl implements OAuthService {
         String kakaoAccessToken= kakaoAuthService.getAccessToken(code);
 
         // 카카오 사용자 정보 조회하기
-        KakaoUserInfoReadResponseDTO kakaoUserInfoDTO=kakaoAuthService.getUserInfo(kakaoAccessToken);
+        KakaoUserInfoReadResponseDTO kakaoUserInfoDTO=kakaoAuthService.getUserInfoByToken(kakaoAccessToken);
         if(kakaoUserInfoDTO==null || kakaoUserInfoDTO.getId()==null){
             throw new OAuth2AuthenticationException("Kakao 사용자 정보 조회에 실패했습니다.");
         }
@@ -56,14 +60,47 @@ public class OAuthServiceImpl implements OAuthService {
         }
         else{
             // 존재하지 않는 사용자이면, 자동 회원가입
-            userId=createSocialUser(kakaoUserId);
+            userId=createSocialUser(SocialType.KAKAO.name(), kakaoUserId);
         }
 
         // 사용자 프로필 정보 반환
         return userProfileService.readProfileById(userId);
     }
 
-    private String createSocialUser(String socialUserId){
+    @Override
+    public UserProfileReadResponseDTO loginWithNaver(String code, String state){
+        // 네이버 Access Token 발급
+        String naverAccessToken= naverAuthService.getAccessToken(code, state);
+
+        // 네이버 사용자 정보 조회하기
+        NaverUserInfoReadResponseDTO naverUserInfoDTO =naverAuthService.getUserInfoByToken(naverAccessToken);
+        if(naverUserInfoDTO==null || naverUserInfoDTO.getResponse().getId()==null){
+            throw new OAuth2AuthenticationException("Naver 사용자 정보 조회에 실패했습니다.");
+        }
+
+        // 이미 회원가입한 유저인지 조회
+        String naverUserId=naverUserInfoDTO.getResponse().getId();
+        SocialUserAccountKey socialUserAccountKey= SocialUserAccountKey.builder()
+                .socialType(SocialType.NAVER.name())
+                .socialId(naverUserId)
+                .build();
+        Optional<SocialUserAccount> optionalSocialUserAccount=socialUserAccountRepository.findById(socialUserAccountKey);
+
+        String userId;
+        if(optionalSocialUserAccount.isPresent()){
+            // 이미 존재하는 사용자이면
+            userId=optionalSocialUserAccount.get().getUserInfo().getId();
+        }
+        else{
+            // 존재하지 않는 사용자이면, 자동 회원가입
+            userId=createSocialUser(SocialType.NAVER.name(), naverUserId);
+        }
+
+        // 사용자 프로필 정보 반환
+        return userProfileService.readProfileById(userId);
+    }
+
+    private String createSocialUser(String socialType, String socialUserId){
         // 중복되지 않는 사용자 ID 생성
         String userId;
         do {
@@ -80,15 +117,12 @@ public class OAuthServiceImpl implements OAuthService {
         UserInfo userInfo=UserInfo.builder()
                 .id(userId)
                 .nickname(nickname)
-                .birth(null)
-                .gender(null)
-                .address(null)
                 .social(true)
                 .build();
 
         // SocialUserAccount 엔티티 생성
         SocialUserAccount socialUserAccount= SocialUserAccount.builder()
-                .socialType(SocialType.KAKAO.name())
+                .socialType(socialType)
                 .socialId(socialUserId)
                 .userInfo(userInfo)
                 .build();
