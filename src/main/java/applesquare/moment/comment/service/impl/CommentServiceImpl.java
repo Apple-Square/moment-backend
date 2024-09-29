@@ -28,7 +28,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -176,7 +176,7 @@ public class CommentServiceImpl implements CommentService {
 
         List<Long> likedCommentIds=(myUserId!=null)?
                 commentLikeRepository.findAllLikedCommentIdByCommentIdsAndUserId(commentIds, myUserId)
-                : new LinkedList<>();
+                : new ArrayList<>();
 
         // DTO 변환
         List<CommentReadAllResponseDTO> commentReadAllResponseDTOS=tuples.stream().map(tuple -> {

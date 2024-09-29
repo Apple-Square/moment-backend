@@ -11,7 +11,7 @@ import applesquare.moment.post.dto.PostCreateRequestDTO;
 import applesquare.moment.post.dto.PostUpdateRequestDTO;
 import applesquare.moment.post.model.Post;
 import applesquare.moment.post.repository.PostRepository;
-import applesquare.moment.post.service.PostService;
+import applesquare.moment.post.service.PostManagementService;
 import applesquare.moment.tag.model.Tag;
 import applesquare.moment.tag.service.TagService;
 import applesquare.moment.user.model.UserInfo;
@@ -25,14 +25,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Log4j2
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class PostServiceImpl implements PostService {
+public class PostManagementServiceImpl implements PostManagementService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final UserInfoRepository userInfoRepository;
@@ -65,7 +67,7 @@ public class PostServiceImpl implements PostService {
      * @return 새로 생성된 게시글의 ID
      */
     @Override
-    public Long create(PostCreateRequestDTO postCreateRequestDTO){
+    public Long create(PostCreateRequestDTO postCreateRequestDTO) throws Exception {
         // 권한 검사
         String userId= securityService.getUserId();
 
@@ -79,7 +81,7 @@ public class PostServiceImpl implements PostService {
 
         // 태그 등록하기
         List<String> tagNames=postCreateRequestDTO.getTags();
-        Set<Tag> tags=new LinkedHashSet<>();
+        List<Tag> tags=new LinkedList<>();
         if(tagNames!=null){
             for(String tagName : tagNames){
                 // 기존에 있던 태그면 가져오고, 없는 태그면 생성하기
@@ -104,22 +106,20 @@ public class PostServiceImpl implements PostService {
         }
 
         // 첨부파일 처리
-        Set<StorageFile> storageFiles=new LinkedHashSet<>();
+        List<StorageFile> storageFiles=new LinkedList<>();
         try{
-            for(MultipartFile file : files){
+            for(int i=0;i<files.size();i++){
+                MultipartFile file=files.get(i);
+
                 // 저장소에 파일 저장
-                String url=fileService.upload(file);
+                StorageFile storageFile=fileService.upload(file, writer);
+
+                // 첫번째 파일이면, 저장소에 썸네일 파일 저장
+                if(i==0){
+                    fileService.uploadThumbnail(file, storageFile.getFilename(), writer);
+                }
 
                 // StorageFile 엔티티 생성
-                StorageFile storageFile=StorageFile.builder()
-                        .filename(fileService.convertUrlToFilename(url))
-                        .originalFilename(file.getOriginalFilename())
-                        .contentType(file.getContentType())
-                        .fileSize(file.getSize())
-                        .uploader(writer)
-                        .ord(storageFiles.size())
-                        .build();
-
                 storageFiles.add(storageFile);
             }
 
@@ -147,7 +147,9 @@ public class PostServiceImpl implements PostService {
             try{
                 // 저장소에 업로드한 파일 삭제
                 for(StorageFile storageFile : storageFiles){
-                    fileService.delete(storageFile.getFilename());
+                    String uploadedFilename=storageFile.getFilename();
+                    fileService.delete(uploadedFilename);
+                    fileService.deleteThumbnail(uploadedFilename);
                 }
             } catch (IOException ioException){
                 // 만약 삭제하는 것도 실패했다면, 로그를 남긴다.
@@ -167,12 +169,13 @@ public class PostServiceImpl implements PostService {
      * @return 수정된 게시글의 ID
      */
     @Override
-    public Long update(Long postId, PostUpdateRequestDTO postUpdateRequestDTO) {
+    public Long update(Long postId, PostUpdateRequestDTO postUpdateRequestDTO) throws Exception {
         // DB에 저장된 이전 게시글 엔티티 가져오기
         Post oldPost=postRepository.findById(postId)
                 .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 게시글입니다. (id = "+postId+")"));
-        Set<StorageFile> oldStorageFiles=oldPost.getFiles();
-        Set<Tag> oldTags=oldPost.getTags();
+        UserInfo oldWriter=oldPost.getWriter();
+        List<StorageFile> oldStorageFiles=oldPost.getFiles();
+        List<Tag> oldTags=oldPost.getTags();
 
         // 권한 검사
         String userId= securityService.getUserId();
@@ -203,15 +206,13 @@ public class PostServiceImpl implements PostService {
         }
 
         // 기존 StorageFile 중 유효한 것만 추리기
-        Set<StorageFile> newStorageFiles=new LinkedHashSet<>();
+        List<StorageFile> newStorageFiles=new LinkedList<>();
         List<String> deletedFilenames=new LinkedList<>();  // 삭제된 기존 파일명
         if(urls!=null){
             // 입력으로 파일 URL 목록이 들어온 경우 (파일 URL 목록에 변화가 있는 경우)
             for(StorageFile storageFile : oldStorageFiles){
                 if(urlFilenames.contains(storageFile.getFilename())){
-                    newStorageFiles.add(storageFile.toBuilder()
-                            .ord(newStorageFiles.size())
-                            .build());
+                    newStorageFiles.add(storageFile);
                 }
                 else{
                     deletedFilenames.add(storageFile.getFilename());
@@ -225,7 +226,7 @@ public class PostServiceImpl implements PostService {
 
         // 태그 추가
         List<String> tagNames=postUpdateRequestDTO.getTags();
-        Set<Tag> newTags=new LinkedHashSet<>();
+        List<Tag> newTags=new LinkedList<>();
         if(tagNames!=null){
             // 태그에 변경사항이 있다면
             for(String tagName : tagNames){
@@ -265,24 +266,28 @@ public class PostServiceImpl implements PostService {
 
         // 새로 등록한 파일의 StorageFile 엔티티 추가
         List<String> uploadFilenames=new LinkedList<>();
+        StorageFile oldFirstFile=null;
         try{
             if(files!=null){
-                for(MultipartFile file : files){
+                for(int i=0;i<files.size();i++){
+                    MultipartFile file=files.get(i);
+
                     // 저장소에 새로운 파일 저장
-                    String url=fileService.upload(file);
+                    StorageFile storageFile=fileService.upload(file, oldWriter);
+
+                    // 기존 파일이 모두 삭제되고 새로운 파일이 첫번째 파일이 되었다면,
+                    if(i==0 && (urls==null || urls.size()==0)){
+                        // 저장소에 썸네일 파일 업로드
+                        fileService.uploadThumbnail(file, storageFile.getFilename(), oldWriter);
+
+                        // 기존 썸네일 파일명 가져오기 (게시글 수정 작업이 성공한 후에 삭제)
+                        if(oldStorageFiles.size()>0){
+                            oldFirstFile=oldStorageFiles.get(0);
+                        }
+                    }
 
                     // StorageFile 엔티티 생성
-                    String uploadFilename=fileService.convertUrlToFilename(url);
-                    StorageFile storageFile=StorageFile.builder()
-                            .filename(uploadFilename)
-                            .originalFilename(file.getOriginalFilename())
-                            .contentType(file.getContentType())
-                            .fileSize(file.getSize())
-                            .uploader(oldPost.getWriter())
-                            .ord(newStorageFiles.size())
-                            .build();
-
-                    uploadFilenames.add(uploadFilename);
+                    uploadFilenames.add(storageFile.getFilename());
                     newStorageFiles.add(storageFile);
                 }
             }
@@ -308,6 +313,7 @@ public class PostServiceImpl implements PostService {
                 // 저장소에 새로 업로드한 파일 삭제
                 for(String uploadFilename : uploadFilenames){
                     fileService.delete(uploadFilename);
+                    fileService.deleteThumbnail(uploadFilename);
                 }
             } catch (IOException ioException){
                 // 만약 삭제하는 것도 실패했다면, 로그를 남긴다.
@@ -322,9 +328,15 @@ public class PostServiceImpl implements PostService {
 
         // 저장소에서 삭제된 기존 파일 제거
         try{
+            // 원본 파일 삭제
             for(String filename : deletedFilenames){
                 fileService.delete(filename);
             }
+            // 기존 썸네일 파일 삭제
+            if(oldFirstFile!=null){
+                fileService.deleteThumbnail(oldFirstFile.getFilename());
+            }
+
         } catch (IOException ioException){
             // 만약 삭제에 실패했다면, 로그를 남긴다.
             log.error(ioException.getMessage());
@@ -352,21 +364,28 @@ public class PostServiceImpl implements PostService {
             throw new AccessDeniedException("게시글 작성자만 삭제할 수 있습니다.");
         }
 
-        // 게시글 삭제
-        postRepository.deleteById(postId);
-
-        // 게시글 종속 엔티티 삭제 (태그)
-        Set<Tag> tags=post.getTags();
-        tagService.deleteUnreferencedTags(tags);
-
         // 게시글 종속 엔티티 삭제 (댓글)
         commentRepository.deleteByPostId(postId);
 
+        // 게시글 종속 엔티티 삭제 (태그)
+        List<Tag> tags=post.getTags();
+        tagService.deleteUnreferencedTags(tags);
+
         // 첨부파일 삭제
-        Set<StorageFile> storageFiles=post.getFiles();
-        for(StorageFile storageFile : storageFiles){
-            fileService.delete(storageFile.getFilename());
+        List<StorageFile> storageFiles=post.getFiles();
+        for(int i=0;i<storageFiles.size();i++){
+            String filename=storageFiles.get(i).getFilename();
+            // 저장소에서 파일 삭제
+            fileService.delete(filename);
+
+            // 첫번째 파일이면, 썸네일 파일도 함께 삭제
+            if(i==0){
+                fileService.deleteThumbnail(filename);
+            }
         }
+
+        // 게시글 삭제
+        postRepository.deleteById(postId);
     }
 
 
@@ -379,6 +398,25 @@ public class PostServiceImpl implements PostService {
     @Override
     public boolean isOwner(Post post, String userId){
         return post.getWriter().getId().equals(userId);
+    }
+
+    @Override
+    public long incrementViewCount(Long postId, long increment){
+        // Post 엔티티 가져오기
+        Post oldPost=postRepository.findById(postId)
+                .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 게시글입니다. (id = "+postId+")"));
+
+        // 조회수 올리기
+        long newViewCount=oldPost.getViewCount()+1;
+        Post newPost=oldPost.toBuilder()
+                .viewCount(newViewCount)
+                .build();
+
+        // 변경사항 저장
+        postRepository.save(newPost);
+
+        // 증가한 게시글 조회수 반환
+        return newViewCount;
     }
 
 
@@ -426,8 +464,8 @@ public class PostServiceImpl implements PostService {
         // 이미지가 입력된 경우
         if(imageCount > 0){
             // 이미지 개수 제한
-            if(imageCount > MAX_IMAGE_COUNT){
-                throw new IllegalArgumentException("게시글에는 최대 "+MAX_IMAGE_COUNT+"개의 사진을 등록할 수 있습니다.");
+            if(imageCount > PostManagementService.MAX_IMAGE_COUNT){
+                throw new IllegalArgumentException("게시글에는 최대 "+PostManagementService.MAX_IMAGE_COUNT+"개의 사진을 등록할 수 있습니다.");
             }
 
             // 허용되지 않은 타입의 파일이 있는지 검사
@@ -443,16 +481,16 @@ public class PostServiceImpl implements PostService {
             }
 
             // 파일 용량 검사
-            if(totalFileSize>MAX_FILE_SIZE_BYTES){
-                throw new IllegalArgumentException("게시글에 등록되는 파일 크기는 "+MAX_FILE_SIZE_MB+"MB를 초과할 수 없습니다.");
+            if(totalFileSize>PostManagementService.MAX_FILE_SIZE_BYTES){
+                throw new IllegalArgumentException("게시글에 등록되는 파일 크기는 "+PostManagementService.MAX_FILE_SIZE_MB+"MB를 초과할 수 없습니다.");
             }
         }
 
         // 비디오가 입력된 경우
         if(videoCount > 0){
             // 비디오 개수 제한
-            if(videoCount > MAX_VIDEO_COUNT){
-                throw new IllegalArgumentException("게시글에는 최대 "+MAX_VIDEO_COUNT+"개의 영상을 등록할 수 있습니다.");
+            if(videoCount > PostManagementService.MAX_VIDEO_COUNT){
+                throw new IllegalArgumentException("게시글에는 최대 "+PostManagementService.MAX_VIDEO_COUNT+"개의 영상을 등록할 수 있습니다.");
             }
 
             // 허용되지 않은 타입의 파일이 있는지 검사
@@ -468,8 +506,8 @@ public class PostServiceImpl implements PostService {
             }
 
             // 파일 용량 검사
-            if(totalFileSize>MAX_FILE_SIZE_BYTES){
-                throw new IllegalArgumentException("게시글에 등록되는 파일 크기는 "+MAX_FILE_SIZE_MB+"MB를 초과할 수 없습니다.");
+            if(totalFileSize>PostManagementService.MAX_FILE_SIZE_BYTES){
+                throw new IllegalArgumentException("게시글에 등록되는 파일 크기는 "+PostManagementService.MAX_FILE_SIZE_MB+"MB를 초과할 수 없습니다.");
             }
         }
 
@@ -547,8 +585,8 @@ public class PostServiceImpl implements PostService {
         // 이미지가 입력된 경우
         if(imageCount > 0){
             // 이미지 개수 제한
-            if(imageCount > MAX_IMAGE_COUNT){
-                throw new IllegalArgumentException("게시글에는 최대 "+MAX_IMAGE_COUNT+"개의 사진을 등록할 수 있습니다.");
+            if(imageCount > PostManagementService.MAX_IMAGE_COUNT){
+                throw new IllegalArgumentException("게시글에는 최대 "+PostManagementService.MAX_IMAGE_COUNT+"개의 사진을 등록할 수 있습니다.");
             }
 
             // 허용되지 않은 타입의 파일이 있는지 검사
@@ -566,16 +604,16 @@ public class PostServiceImpl implements PostService {
             }
 
             // 파일 용량 검사
-            if(totalFileSize>MAX_FILE_SIZE_BYTES){
-                throw new IllegalArgumentException("게시글에 등록되는 파일 크기는 "+MAX_FILE_SIZE_MB+"MB를 초과할 수 없습니다.");
+            if(totalFileSize>PostManagementService.MAX_FILE_SIZE_BYTES){
+                throw new IllegalArgumentException("게시글에 등록되는 파일 크기는 "+PostManagementService.MAX_FILE_SIZE_MB+"MB를 초과할 수 없습니다.");
             }
         }
 
         // 비디오가 입력된 경우
         if(videoCount > 0){
             // 비디오 개수 제한
-            if(videoCount > MAX_VIDEO_COUNT){
-                throw new IllegalArgumentException("게시글에는 최대 "+MAX_VIDEO_COUNT+"개의 영상을 등록할 수 있습니다.");
+            if(videoCount > PostManagementService.MAX_VIDEO_COUNT){
+                throw new IllegalArgumentException("게시글에는 최대 "+PostManagementService.MAX_VIDEO_COUNT+"개의 영상을 등록할 수 있습니다.");
             }
 
             // 허용되지 않은 타입의 파일이 있는지 검사
@@ -593,8 +631,8 @@ public class PostServiceImpl implements PostService {
             }
 
             // 파일 용량 검사
-            if(totalFileSize>MAX_FILE_SIZE_BYTES){
-                throw new IllegalArgumentException("게시글에 등록되는 파일 크기는 "+MAX_FILE_SIZE_MB+"MB를 초과할 수 없습니다.");
+            if(totalFileSize>PostManagementService.MAX_FILE_SIZE_BYTES){
+                throw new IllegalArgumentException("게시글에 등록되는 파일 크기는 "+PostManagementService.MAX_FILE_SIZE_MB+"MB를 초과할 수 없습니다.");
             }
         }
 

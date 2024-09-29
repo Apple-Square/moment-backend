@@ -8,6 +8,8 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface StorageFileRepository extends JpaRepository<StorageFile, Long> {
+    void deleteByFilename(String filename);
+
     @Query("SELECT sf.filename " +
             "FROM StorageFile sf " +
             "WHERE sf.filename IN :filenames " +

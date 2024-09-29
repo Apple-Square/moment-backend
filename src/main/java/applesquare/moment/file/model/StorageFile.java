@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class StorageFile extends BaseEntity implements Comparable<StorageFile>{
+public class StorageFile extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,11 +28,4 @@ public class StorageFile extends BaseEntity implements Comparable<StorageFile>{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "uploader_id", nullable = false, updatable = false)
     private UserInfo uploader;
-    @Column(nullable = false, updatable = true)
-    private Integer ord;
-
-    @Override
-    public int compareTo(StorageFile other){
-        return this.ord-other.ord;
-    }
 }

@@ -8,7 +8,7 @@ import applesquare.moment.like.repository.PostLikeRepository;
 import applesquare.moment.like.service.PostLikeService;
 import applesquare.moment.post.model.Post;
 import applesquare.moment.post.repository.PostRepository;
-import applesquare.moment.post.service.PostService;
+import applesquare.moment.post.service.PostManagementService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class PostLikeServiceImpl implements PostLikeService {
-    private final PostService postService;
+    private final PostManagementService postManagementService;
     private final SecurityService securityService;
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
@@ -39,7 +39,7 @@ public class PostLikeServiceImpl implements PostLikeService {
         // 해당 게시글의 작성자가 아닌지 확인
         Post post=postRepository.findById(postId)
                 .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 게시글입니다. (id = "+postId+")"));
-        if(postService.isOwner(post, userId)){
+        if(postManagementService.isOwner(post, userId)){
             throw new AccessDeniedException("본인이 작성한 게시글에는 좋아요를 누를 수 없습니다.");
         }
 

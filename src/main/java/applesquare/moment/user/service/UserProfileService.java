@@ -11,7 +11,7 @@ public interface UserProfileService {
 
     UserProfileReadResponseDTO readMyProfile();
     UserProfileReadResponseDTO readProfileById(String userId);
-    String updateProfileImage(String userId, MultipartFile profileImage);
+    String updateProfileImage(String userId, MultipartFile profileImage) throws Exception;
 
     void deleteProfileImage(String userId) throws IOException;
 }

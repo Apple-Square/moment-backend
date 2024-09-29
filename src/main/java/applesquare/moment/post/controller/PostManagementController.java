@@ -3,7 +3,7 @@ package applesquare.moment.post.controller;
 import applesquare.moment.exception.ResponseMap;
 import applesquare.moment.post.dto.PostCreateRequestDTO;
 import applesquare.moment.post.dto.PostUpdateRequestDTO;
-import applesquare.moment.post.service.PostService;
+import applesquare.moment.post.service.PostManagementService;
 import applesquare.moment.util.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,8 +19,8 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/posts")
-public class PostController {
-    private final PostService postService;
+public class PostManagementController {
+    private final PostManagementService postManagementService;
 
 
     /**
@@ -35,7 +35,8 @@ public class PostController {
     public ResponseEntity<Map<String, Object>> create(@RequestParam("files") List<MultipartFile> files,
                                                       @RequestParam(value = "content", required = false) String content,
                                                       @RequestParam(value = "tags", required = false) List<String> tags,
-                                                      @RequestParam(value = "address", required = false) String address){
+                                                      @RequestParam(value = "address", required = false) String address
+    )throws Exception {
         // DTO 생성
         PostCreateRequestDTO postCreateRequestDTO=PostCreateRequestDTO.builder()
                 .content(content)
@@ -48,7 +49,7 @@ public class PostController {
         Validator.validate(postCreateRequestDTO);
 
         // 게시글 등록
-        Long result= postService.create(postCreateRequestDTO);
+        Long result= postManagementService.create(postCreateRequestDTO);
 
         // 응답 생성
         ResponseMap responseMap=new ResponseMap();
@@ -74,7 +75,8 @@ public class PostController {
                                                       @RequestParam(value = "urls", required = false) List<String> urls,
                                                       @RequestParam(value = "files", required = false) List<MultipartFile> files,
                                                       @RequestParam(value = "tags", required = false) List<String> tags,
-                                                      @RequestParam(value = "address", required = false) String address){
+                                                      @RequestParam(value = "address", required = false) String address
+    ) throws Exception {
         // DTO 생성
         PostUpdateRequestDTO postUpdateRequestDTO=PostUpdateRequestDTO.builder()
                 .content(content)
@@ -88,7 +90,7 @@ public class PostController {
         Validator.validate(postUpdateRequestDTO);
 
         // 게시글 수정
-        Long result=postService.update(postId, postUpdateRequestDTO);
+        Long result=postManagementService.update(postId, postUpdateRequestDTO);
 
         // 응답 생성
         ResponseMap responseMap=new ResponseMap();
@@ -107,11 +109,24 @@ public class PostController {
     @DeleteMapping("{postId}")
     public ResponseEntity<Map<String, Object>> delete(@PathVariable Long postId) throws IOException{
         // 게시글 삭제
-        postService.delete(postId);
+        postManagementService.delete(postId);
 
         // 응답 생성
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", "게시글 삭제에 성공했습니다.");
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseMap.getMap());
+    }
+
+    @PatchMapping("/{postId}/view")
+    public ResponseEntity<Map<String, Object>> view(@PathVariable Long postId){
+        // 게시글 조회수 1 증가시키기
+        long viewCount=postManagementService.incrementViewCount(postId, 1);
+
+        // 응답 객체 생성
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", "게시글 조회수를 증가시켰습니다.");
+        responseMap.put("viewCount", viewCount);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseMap.getMap());
     }

@@ -240,8 +240,10 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String,Object>> handleException(Exception e){
-        log.error(e.getMessage());
+        // 에러 로그 출력
+        e.printStackTrace();
 
+        // 에러 응답 반환
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", e.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap.getMap());

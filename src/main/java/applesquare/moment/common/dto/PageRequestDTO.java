@@ -8,6 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PageRequestDTO {
+    @Builder.Default
     private int size = 10;
     private Long cursor;
     private String keyword;

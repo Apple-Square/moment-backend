@@ -67,6 +67,13 @@ dependencies {
     // OAuth2
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
+    // Thumbnail 생성
+    implementation 'net.coobird:thumbnailator:0.4.20'
+
+    // Video 편집
+    implementation 'com.cloudinary:cloudinary-http44:1.36.0'
+    implementation 'com.cloudinary:cloudinary-taglib:1.36.0'
+    implementation 'io.github.cdimascio:dotenv-java:2.2.4'
 }
 
 tasks.named('test') {

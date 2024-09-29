@@ -9,7 +9,9 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface CommentLikeRepository extends JpaRepository<CommentLike, CommentLikeKey> {
-    @Query("SELECT cl.commentId FROM CommentLike cl WHERE cl.commentId IN :commentIds AND cl.userId=:userId")
+    @Query("SELECT cl.commentId " +
+            "FROM CommentLike cl " +
+            "WHERE cl.commentId IN :commentIds AND cl.userId=:userId")
     List<Long> findAllLikedCommentIdByCommentIdsAndUserId(@Param("commentIds") List<Long> commentIds,
                                                           @Param("userId") String userId);
 }

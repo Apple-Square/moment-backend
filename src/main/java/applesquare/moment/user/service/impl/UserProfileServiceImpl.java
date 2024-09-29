@@ -78,7 +78,7 @@ public class UserProfileServiceImpl implements UserProfileService {
      * @return 사진을 설정한 사용자 ID
      */
     @Override
-    public String updateProfileImage(String userId, MultipartFile profileImage){
+    public String updateProfileImage(String userId, MultipartFile profileImage) throws Exception {
         // 권한 검사
         String myUserId= securityService.getUserId();
         if(!myUserId.equals(userId)){
@@ -95,22 +95,10 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 사용자입니다. (id = "+userId+")"));
         StorageFile oldProfileImage=oldUserInfo.getProfileImage();
 
-        String uploadFilename=null;
+        StorageFile newProfileImage=null;
         try{
             // 저장소에 새로운 프로필 사진 업로드
-            String url=fileService.upload(profileImage);
-
-            // StorageFile 엔티티 생성
-            uploadFilename=fileService.convertUrlToFilename(url);
-
-            StorageFile newProfileImage=StorageFile.builder()
-                    .filename(uploadFilename)
-                    .originalFilename(profileImage.getOriginalFilename())
-                    .contentType(profileImage.getContentType())
-                    .fileSize(profileImage.getSize())
-                    .uploader(oldUserInfo)
-                    .ord(0)
-                    .build();
+            newProfileImage=fileService.upload(profileImage, oldUserInfo);
 
             // 새로운 UserInfo 엔티티 생성
             UserInfo newUserInfo=oldUserInfo.toBuilder()
@@ -120,21 +108,21 @@ public class UserProfileServiceImpl implements UserProfileService {
             // DB 저장
             userInfoRepository.save(newUserInfo);
 
-        }catch(Exception exception){
-            log.error(exception.getMessage());
+        }catch(Exception e){
+            log.error(e.getMessage());
 
             // 저장소에 새로 업로드한 파일이 있다면
-            if(uploadFilename!=null){
+            if(newProfileImage!=null){
                 try{
                     // 업로드한 파일 삭제
-                    fileService.delete(uploadFilename);
+                    fileService.delete(newProfileImage.getFilename());
                 } catch (IOException ioException){
                     // 만약 삭제하는 것도 실패했다면, 로그를 남긴다.
                     log.error(ioException.getMessage());
                 }
             }
 
-            throw exception;
+            throw e;
         }
 
         // 기존에 프로필 이미지가 존재하는 상태였다면

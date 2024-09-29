@@ -46,7 +46,7 @@ public class UserProfileController {
      */
     @PutMapping(value = "/{userId}/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, Object>> updateProfileImage(@PathVariable String userId,
-                                                                  @RequestParam(value = "profileImage") MultipartFile profileImage){
+                                                                  @RequestParam(value = "profileImage") MultipartFile profileImage) throws Exception{
         // 사용자 프로필 사진 설정
         String result=userProfileService.updateProfileImage(userId, profileImage);
 

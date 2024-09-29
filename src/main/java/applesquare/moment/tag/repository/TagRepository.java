@@ -33,10 +33,18 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
 
     @Query(value = "SELECT t AS tag, COUNT(p) AS postCount " +
             "FROM Tag t " +
-            "LEFT JOIN t.posts p " +
+            "INNER JOIN t.posts p " +
             "WHERE (:baseTime IS NULL OR p.modDate >= :baseTime) " +
             "GROUP BY t " +
             "ORDER BY postCount DESC")
     List<Tuple> findPopularTags(@Param("baseTime") LocalDateTime baseTime,
                                 Pageable pageable);
+
+    @Query(value = "SELECT p.id AS postId, t.name AS tagName " +
+            "FROM Post p " +
+            "INNER JOIN post_tags pt ON p.id = pt.post_id " +
+            "LEFT JOIN Tag t ON pt.tag_id = t.id " +
+            "WHERE p.id IN :postIds " +
+            "ORDER BY p.id, pt.tag_order", nativeQuery = true)
+    List<Tuple> findTagAllByPostIds(@Param("postIds") List<Long> postIds);
 }
