@@ -23,23 +23,27 @@ public class MomentController {
     /**
      * 모먼트 목록 조회 API
      * @param type 게시물 조회 타입
-     * @param pageRequestDTO 페이지 요청 정보
+     * @param size 페이지 크기
+     * @param cursor 페이지 커서
      * @return  (status) 200,
      *          (body)  조회 성공 메세지,
      *                  모먼트 목록
      */
     @GetMapping("/posts/moments")
-    public ResponseEntity<Map<String, Object>> readDetailAll(@RequestParam(value = "type", required = false) String type,
-                                                             PageRequestDTO pageRequestDTO){
+    public ResponseEntity<Map<String, Object>> readDetailAll(@RequestParam(value = "type", required = false, defaultValue = "DETAIL") PostReadType type,
+                                                             @RequestParam(value = "size", required = false, defaultValue = "10") int size,
+                                                             @RequestParam(value = "cursor", required = false) String cursor){
+        // 페이지 요청 설정
+        PageRequestDTO pageRequestDTO=PageRequestDTO.builder()
+                .size(size)
+                .cursor(cursor)
+                .build();
+
         // 응답 객체 구성
         ResponseMap responseMap=new ResponseMap();
 
         // 게시글 조회 타입
-        PostReadType postReadType;
-        if(type==null || type.isBlank()) postReadType = PostReadType.DETAIL;
-        else postReadType = PostReadType.parsePostType(type);
-
-        switch(postReadType){
+        switch(type){
             case DETAIL:
                 // 모먼트 목록 조회
                 PageResponseDTO<MomentDetailReadAllResponseDTO> pageResponseDTO=momentReadService.readDetailAll(pageRequestDTO);
@@ -59,24 +63,28 @@ public class MomentController {
      * 특정 유저가 작성한 모먼트 목록 조회 API
      * @param userId 작성자 ID
      * @param type 게시물 조회 타입
-     * @param pageRequestDTO 페이지 요청 정보
+     * @param size 페이지 크기
+     * @param cursor 페이지 커서
      * @return  (status) 200,
      *          (body)  조회 성공 메세지,
      *                  모먼트 목록
      */
     @GetMapping("/users/{userId}/posts/moments")
     public ResponseEntity<Map<String, Object>> readAllByWriter(@PathVariable("userId") String userId,
-                                                               @RequestParam(value = "type", required = false) String type,
-                                                               PageRequestDTO pageRequestDTO){
+                                                               @RequestParam(value = "type", required = false, defaultValue = "DETAIL") PostReadType type,
+                                                               @RequestParam(value = "size", required = false, defaultValue = "10") int size,
+                                                               @RequestParam(value = "cursor", required = false) String cursor){
+        // 페이지 요청 설정
+        PageRequestDTO pageRequestDTO=PageRequestDTO.builder()
+                .size(size)
+                .cursor(cursor)
+                .build();
+
         // 응답 객체 구성
         ResponseMap responseMap=new ResponseMap();
 
         // 게시글 조회 타입
-        PostReadType postReadType;
-        if(type==null || type.isBlank()) postReadType = PostReadType.DETAIL;
-        else postReadType = PostReadType.parsePostType(type);
-
-        switch(postReadType){
+        switch(type){
             case DETAIL:
                 // 특정 유저가 작성한 모먼트 목록 조회
                 PageResponseDTO<MomentDetailReadAllResponseDTO> detailPageResponseDTO=momentReadService.readDetailAllByUser(userId, pageRequestDTO);
@@ -100,24 +108,28 @@ public class MomentController {
      * 특정 유저가 좋아요 누른 모먼트 목록 조회 API
      * @param userId 사용자 ID
      * @param type 게시물 조회 타입
-     * @param pageRequestDTO 페이지 요청 정보
+     * @param size 페이지 크기
+     * @param cursor 페이지 커서
      * @return  (status) 200,
      *          (bdoy)  조회 성공 메세지,
      *                  모먼트 목록
      */
     @GetMapping("/users/{userId}/liked-posts/moments")
     public ResponseEntity<Map<String, Object>> readLikedMomentAllByUser(@PathVariable("userId") String userId,
-                                                                        @RequestParam(value = "type", required = false) String type,
-                                                                        PageRequestDTO pageRequestDTO){
+                                                                        @RequestParam(value = "type", required = false, defaultValue = "DETAIL") PostReadType type,
+                                                                        @RequestParam(value = "size", required = false, defaultValue = "10") int size,
+                                                                        @RequestParam(value = "cursor", required = false) String cursor){
+        // 페이지 요청 설정
+        PageRequestDTO pageRequestDTO=PageRequestDTO.builder()
+                .size(size)
+                .cursor(cursor)
+                .build();
+
         // 응답 객체 구성
         ResponseMap responseMap=new ResponseMap();
 
         // 게시글 조회 타입
-        PostReadType postReadType;
-        if(type==null || type.isBlank()) postReadType = PostReadType.DETAIL;
-        else postReadType = PostReadType.parsePostType(type);
-
-        switch(postReadType){
+        switch(type){
             case DETAIL:
                 // 특정 유저가 좋아요 누른 모먼트 목록 조회
                 PageResponseDTO<MomentDetailReadAllResponseDTO> detailPageResponseDTO=momentReadService.readLikedDetailAllByUser(userId, pageRequestDTO);

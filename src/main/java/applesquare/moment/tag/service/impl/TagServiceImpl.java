@@ -80,7 +80,10 @@ public class TagServiceImpl implements TagService {
         Sort sort= Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable= PageRequest.of(0, pageSize, sort);
 
-        Long cursor=pageRequestDTO.getCursor();
+        Long cursor=null;
+        if(pageRequestDTO.getCursor()!=null){
+            cursor= Long.parseLong(pageRequestDTO.getCursor());
+        }
 
         // 키워드에 따른 태그 검색
         List<Tuple> tuples=tagRepository.findByKeyword(keyword, cursor, pageable);

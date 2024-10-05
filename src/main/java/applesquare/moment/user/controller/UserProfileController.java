@@ -1,5 +1,7 @@
 package applesquare.moment.user.controller;
 
+import applesquare.moment.common.dto.PageRequestDTO;
+import applesquare.moment.common.dto.PageResponseDTO;
 import applesquare.moment.exception.ResponseMap;
 import applesquare.moment.user.dto.UserProfileReadResponseDTO;
 import applesquare.moment.user.service.UserProfileService;
@@ -72,6 +74,40 @@ public class UserProfileController {
         // 응답 생성
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", "사용자 프로필 사진 설정 해제에 성공했습니다.");
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseMap.getMap());
+    }
+
+    /**
+     * 사용자 검색 API
+     * (키워드와 비슷한 ID, 닉네임을 가진 사용자의 프로필 조회)
+     *
+     * @param size 페이지 크기
+     * @param cursor 페이지 커서
+     * @param keyword 검색 키워드
+     * @return  (status) 200,
+     *          (body)  검색 성공 메세지,
+     *                  사용자 프로필 목록 페이지
+     */
+    @GetMapping("/search")
+    public ResponseEntity<Map<String, Object>> searchByKeyword(@RequestParam(value = "size", required = false, defaultValue = "10") int size,
+                                                               @RequestParam(value = "cursor", required = false) String cursor,
+                                                               @RequestParam(value = "keyword", required = false) String keyword){
+        // 페이지 요청 설정
+        PageRequestDTO pageRequestDTO=PageRequestDTO.builder()
+                .size(size)
+                .cursor(cursor)
+                .keyword(keyword)
+                .build();
+
+        // 키워드로 사용자 프로필 검색
+        PageResponseDTO<UserProfileReadResponseDTO> pageResponseDTO=userProfileService.search(pageRequestDTO);
+
+        // 응답 생성
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", "사용자 검색에 성공했습니다.");
+        responseMap.put("content", pageResponseDTO.getContent());
+        responseMap.put("hasNext", pageResponseDTO.isHasNext());
 
         return ResponseEntity.status(HttpStatus.OK).body(responseMap.getMap());
     }

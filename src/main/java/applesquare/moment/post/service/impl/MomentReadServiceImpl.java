@@ -56,7 +56,10 @@ public class MomentReadServiceImpl implements MomentReadService {
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable = PageRequest.of(0, pageSize, sort);
 
-        Long cursor = pageRequestDTO.getCursor();
+        Long cursor=null;
+        if(pageRequestDTO.getCursor()!=null){
+            cursor = Long.parseLong(pageRequestDTO.getCursor());
+        }
 
         // 모먼츠 목록 조회
         List<Post> posts = postRepository.findMomentAll(cursor, pageable);
@@ -91,7 +94,10 @@ public class MomentReadServiceImpl implements MomentReadService {
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable = PageRequest.of(0, pageSize, sort);
 
-        Long cursor = pageRequestDTO.getCursor();
+        Long cursor=null;
+        if(pageRequestDTO.getCursor()!=null){
+            cursor = Long.parseLong(pageRequestDTO.getCursor());
+        }
 
         // 특정 유저가 작성한 모먼츠 목록 조회
         List<Post> posts=postRepository.findMomentAllByWriterId(userId, cursor, pageable);
@@ -126,7 +132,10 @@ public class MomentReadServiceImpl implements MomentReadService {
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable = PageRequest.of(0, pageSize, sort);
 
-        Long cursor = pageRequestDTO.getCursor();
+        Long cursor=null;
+        if(pageRequestDTO.getCursor()!=null){
+            cursor = Long.parseLong(pageRequestDTO.getCursor());
+        }
 
         // 특정 유저가 작성한 모먼츠 썸네일 목록 조회
         List<Tuple> tuples = postRepository.findMomentAllWithFirstFileByWriterId(userId, cursor, pageable);
@@ -168,7 +177,10 @@ public class MomentReadServiceImpl implements MomentReadService {
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable = PageRequest.of(0, pageSize, sort);
 
-        Long cursor = pageRequestDTO.getCursor();
+        Long cursor=null;
+        if(pageRequestDTO.getCursor()!=null){
+            cursor = Long.parseLong(pageRequestDTO.getCursor());
+        }
 
         // 특정 유저가 좋아요 누른 모먼트 목록 조회
         List<Post> posts=postRepository.findLikedMomentAllByUserId(userId, cursor, pageable);

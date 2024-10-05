@@ -28,7 +28,8 @@ public class CommentController {
      *                  수정된 댓글 ID
      */
     @PatchMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> update(@PathVariable Long commentId, @Valid @RequestBody CommentUpdateRequestDTO commentUpdateRequestDTO){
+    public ResponseEntity<Map<String, Object>> update(@PathVariable Long commentId,
+                                                      @Valid @RequestBody CommentUpdateRequestDTO commentUpdateRequestDTO){
         // 댓글 수정
         Long result=commentService.update(commentId, commentUpdateRequestDTO);
 

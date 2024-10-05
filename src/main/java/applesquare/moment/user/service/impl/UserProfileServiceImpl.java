@@ -1,5 +1,7 @@
 package applesquare.moment.user.service.impl;
 
+import applesquare.moment.common.dto.PageRequestDTO;
+import applesquare.moment.common.dto.PageResponseDTO;
 import applesquare.moment.common.service.SecurityService;
 import applesquare.moment.file.model.StorageFile;
 import applesquare.moment.file.service.FileService;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Log4j2
 @Service
@@ -179,5 +182,49 @@ public class UserProfileServiceImpl implements UserProfileService {
                 throw e;
             }
         }
+    }
+
+    /**
+     * 키워드로 사용자 프로필 검색
+     * - 검색 속성 : 사용자 ID | 닉네임
+     * - 정렬 기준 : 인기순 (팔로워가 많은 순)
+     *
+     * @param pageRequestDTO 페이지 요청 정보
+     * @return 사용자 프로필 목록
+     */
+    @Override
+    public PageResponseDTO<UserProfileReadResponseDTO> search(PageRequestDTO pageRequestDTO){
+        // 다음 페이지 존재 여부를 확인하기 위해 (size + 1)
+        int pageSize= pageRequestDTO.getSize()+1;
+        String cursor= pageRequestDTO.getCursor();
+        String keyword= pageRequestDTO.getKeyword();
+
+        // 키워드로 사용자 검색 (팔로워가 많은 순으로 정렬)
+        List<UserInfo> userInfos=userInfoRepository.searchByKeyword(keyword, cursor, pageSize);
+
+        // hasNext 설정
+        boolean hasNext=false;
+        if(userInfos.size()>pageRequestDTO.getSize()){
+            userInfos.remove(userInfos.size()-1);
+            hasNext=true;
+        }
+
+        // DTO 변환
+        List<UserProfileReadResponseDTO> userProfileReadResponseDTOS=userInfos.stream().map((userInfo)->{
+            StorageFile profileImage=userInfo.getProfileImage();
+            String profileUrl = (profileImage != null)?
+                    fileService.convertFilenameToUrl(profileImage.getFilename())
+                    : UserProfileService.DEFAULT_PROFILE_NAME;
+            return UserProfileReadResponseDTO.builder()
+                    .id(userInfo.getId())
+                    .nickname(userInfo.getNickname())
+                    .profileImage(profileUrl)
+                    .build();
+        }).toList();
+
+        return PageResponseDTO.<UserProfileReadResponseDTO>builder()
+                .content(userProfileReadResponseDTOS)
+                .hasNext(hasNext)
+                .build();
     }
 }

@@ -30,7 +30,8 @@ public class PostCommentController {
      *                  등록된 댓글 ID
      */
     @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> create(@PathVariable Long postId, @Valid @RequestBody CommentCreateRequestDTO commentCreateRequestDTO){
+    public ResponseEntity<Map<String, Object>> create(@PathVariable Long postId,
+                                                      @Valid @RequestBody CommentCreateRequestDTO commentCreateRequestDTO){
         // 댓글 등록
         Long result= commentService.create(postId, commentCreateRequestDTO);
 
@@ -44,14 +45,23 @@ public class PostCommentController {
 
     /**
      * 댓글 목록 조회 API
-     * @param postId 소속한 게시글 ID
-     * @param pageRequestDTO 페이지 요청 정보
+     * @param postId postId 소속한 게시글 ID
+     * @param size 페이지 크기
+     * @param cursor 페이지 커서
      * @return  (status) 200,
      *          (body)  댓글 목록 조회 성공 메세지,
      *                  댓글 목록 페이지
      */
     @GetMapping("")
-    public ResponseEntity<Map<String, Object>> readAll(@PathVariable Long postId, PageRequestDTO pageRequestDTO){
+    public ResponseEntity<Map<String, Object>> readAll(@PathVariable Long postId,
+                                                       @RequestParam(value = "size", required = false, defaultValue = "10") int size,
+                                                       @RequestParam(value = "cursor", required = false) String cursor){
+        // 페이지 요청 설정
+        PageRequestDTO pageRequestDTO=PageRequestDTO.builder()
+                .size(size)
+                .cursor(cursor)
+                .build();
+
         // 특정 게시글의 댓글 목록 조회
         PageResponseDTO<CommentReadAllResponseDTO> pageResponseDTO=commentService.readAll(postId, pageRequestDTO);
 

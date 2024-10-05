@@ -6,25 +6,24 @@ import applesquare.moment.common.service.SecurityService;
 import applesquare.moment.exception.DuplicateDataException;
 import applesquare.moment.exception.TokenException;
 import applesquare.moment.file.service.FileService;
-import applesquare.moment.follow.dto.FolloweeReadAllResponseDTO;
-import applesquare.moment.follow.dto.FollowerReadAllResponseDTO;
+import applesquare.moment.follow.dto.FollowReadAllResponseDTO;
 import applesquare.moment.follow.model.Follow;
 import applesquare.moment.follow.repository.FollowRepository;
 import applesquare.moment.follow.service.FollowService;
 import applesquare.moment.user.model.UserInfo;
 import applesquare.moment.user.repository.UserInfoRepository;
 import applesquare.moment.user.service.UserProfileService;
+import com.querydsl.core.Tuple;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import static applesquare.moment.follow.model.QFollow.follow;
 
 @Service
 @Transactional
@@ -118,26 +117,24 @@ public class FollowServiceImpl implements FollowService {
      * @return 팔로워 목록 페이지
      */
     @Override
-    public PageResponseDTO<FollowerReadAllResponseDTO> readFollowerPage(String userId, PageRequestDTO pageRequestDTO){
+    public PageResponseDTO<FollowReadAllResponseDTO> searchFollowerByKeyword(String userId, PageRequestDTO pageRequestDTO){
         // 다음 페이지 존재 여부를 확인하기 위해 (size + 1)
         int pageSize=pageRequestDTO.getSize()+1;
-        Sort sort= Sort.by(Sort.Direction.DESC, "id");
-        Pageable pageable= PageRequest.of(0, pageSize, sort);
-
-        Long cursor=pageRequestDTO.getCursor();
+        String keyword=pageRequestDTO.getKeyword();
+        Long cursor=null;
+        if(pageRequestDTO.getCursor()!=null){
+            cursor=Long.parseLong(pageRequestDTO.getCursor());
+        }
 
         // 특정 유저의 팔로워 목록 조회
-        List<Follow> follows=followRepository.findAllFollowerByFolloweeId(userId, cursor, pageable);
+        List<Tuple> tuples=followRepository.searchFollowerByKeyword(userId, keyword, cursor, pageSize);
 
         // hasNext 설정
         boolean hasNext=false;
-        if(follows.size()>pageRequestDTO.getSize()){
-            follows.remove(follows.size()-1);
+        if(tuples.size()>pageRequestDTO.getSize()){
+            tuples.remove(tuples.size()-1);
             hasNext=true;
         }
-
-        // 조회한 팔로워 Id 목록 가져오기
-        List<String> followerIds=follows.stream().map((follow)-> follow.getFollower().getId()).toList();
 
         // 나의 유저 Id 가져오기
         String myUserId=null;
@@ -149,29 +146,33 @@ public class FollowServiceImpl implements FollowService {
         }
 
         // 조회한 팔로워 목록 중에서 내가 팔로우한 유저의 Id 목록 가져오기
+        List<String> followerIds=tuples.stream().map((tuple)-> tuple.get(follow.follower.id)).toList();
         List<String> followedFollowerIds=(myUserId!=null)?
                 followRepository.findAllFollowedFollowerIdByFollowerIdsAndUserId(followerIds, myUserId)
                 : new LinkedList<>();
 
         // DTO 변환
-        List<FollowerReadAllResponseDTO> followerReadAllResponseDTOS=follows.stream().map((follow)->{
-            UserInfo follower=follow.getFollower();
+        List<FollowReadAllResponseDTO> followReadAllResponseDTOS=tuples.stream().map((tuple)->{
+            Long followId=tuple.get(follow.id);
+            String followerId=tuple.get(follow.follower.id);
+            String followerNickname=tuple.get(follow.follower.nickname);
+            String followerProfileName=tuple.get(follow.follower.profileImage.filename);
 
             // 프로필 사진 URL 생성
-            String profileName=(follower.getProfileImage()!=null)?
-                    follower.getProfileImage().getFilename() : UserProfileService.DEFAULT_PROFILE_NAME;
+            String profileName=(followerProfileName!=null)? followerProfileName : UserProfileService.DEFAULT_PROFILE_NAME;
             String profileImageURL=fileService.convertFilenameToUrl(profileName);
 
-            return FollowerReadAllResponseDTO.builder()
-                    .id(follower.getId())
-                    .nickname(follower.getNickname())
+            return FollowReadAllResponseDTO.builder()
+                    .followId(followId)
+                    .userId(followerId)
+                    .nickname(followerNickname)
                     .profileImage(profileImageURL)
-                    .followed(followedFollowerIds.contains(follower.getId()))
+                    .followed(followedFollowerIds.contains(followerId))
                     .build();
         }).toList();
 
-        PageResponseDTO<FollowerReadAllResponseDTO> pageResponseDTO=PageResponseDTO.<FollowerReadAllResponseDTO>builder()
-                .content(followerReadAllResponseDTOS)
+        PageResponseDTO<FollowReadAllResponseDTO> pageResponseDTO=PageResponseDTO.<FollowReadAllResponseDTO>builder()
+                .content(followReadAllResponseDTOS)
                 .hasNext(hasNext)
                 .build();
 
@@ -185,26 +186,24 @@ public class FollowServiceImpl implements FollowService {
      * @return 팔로잉 목록 페이지
      */
     @Override
-    public PageResponseDTO<FolloweeReadAllResponseDTO> readFollowingPage(String userId, PageRequestDTO pageRequestDTO){
+    public PageResponseDTO<FollowReadAllResponseDTO> searchFollowingByKeyword(String userId, PageRequestDTO pageRequestDTO){
         // 다음 페이지 존재 여부를 확인하기 위해 (size + 1)
         int pageSize=pageRequestDTO.getSize()+1;
-        Sort sort= Sort.by(Sort.Direction.DESC, "id");
-        Pageable pageable= PageRequest.of(0, pageSize, sort);
-
-        Long cursor=pageRequestDTO.getCursor();
+        String keyword=pageRequestDTO.getKeyword();
+        Long cursor=null;
+        if(pageRequestDTO.getCursor()!=null){
+            cursor=Long.parseLong(pageRequestDTO.getCursor());
+        }
 
         // 특정 유저의 팔로잉 목록 조회
-        List<Follow> follows=followRepository.findAllFolloweeByFollowerId(userId, cursor, pageable);
+        List<Tuple> tuples=followRepository.searchFolloweeByKeyword(userId, keyword, cursor, pageSize);
 
         // hasNext 설정
         boolean hasNext=false;
-        if(follows.size()>pageRequestDTO.getSize()){
-            follows.remove(follows.size()-1);
+        if(tuples.size()>pageRequestDTO.getSize()){
+            tuples.remove(tuples.size()-1);
             hasNext=true;
         }
-
-        // 조회한 Followee Id 목록 가져오기
-        List<String> followeeIds=follows.stream().map(follow -> follow.getFollowee().getId()).toList();
 
         // 나의 유저 Id 가져오기
         String myUserId=null;
@@ -216,29 +215,33 @@ public class FollowServiceImpl implements FollowService {
         }
 
         // 조회한 팔로잉 목록 중에서 내가 팔로우한 유저의 Id 목록 가져오기
+        List<String> followeeIds=tuples.stream().map((tuple)-> tuple.get(follow.followee.id)).toList();
         List<String> followedFolloweeIds=(myUserId!=null)?
                 followRepository.findAllFollowedFolloweeIdByFolloweeIdsAndUserId(followeeIds, myUserId)
                 : new LinkedList<>();
 
         // DTO 변환
-        List<FolloweeReadAllResponseDTO> followeeReadAllResponseDTOS=follows.stream().map((follow)->{
-            UserInfo followee=follow.getFollowee();
+        List<FollowReadAllResponseDTO> followReadAllResponseDTOS =tuples.stream().map((tuple)->{
+            Long followId=tuple.get(follow.id);
+            String followeeId=tuple.get(follow.followee.id);
+            String followeeNickname=tuple.get(follow.followee.nickname);
+            String followeeProfileName=tuple.get(follow.followee.profileImage.filename);
 
             // 유저 프로필 DTO 변환
-            String profileName=(followee.getProfileImage()!=null)?
-                    followee.getProfileImage().getFilename() : UserProfileService.DEFAULT_PROFILE_NAME;
+            String profileName=(followeeProfileName!=null)? followeeProfileName : UserProfileService.DEFAULT_PROFILE_NAME;
             String profileImageURL=fileService.convertFilenameToUrl(profileName);
 
-            return FolloweeReadAllResponseDTO.builder()
-                    .id(followee.getId())
-                    .nickname(followee.getNickname())
+            return FollowReadAllResponseDTO.builder()
+                    .followId(followId)
+                    .userId(followeeId)
+                    .nickname(followeeNickname)
                     .profileImage(profileImageURL)
-                    .followed(followedFolloweeIds.contains(followee.getId()))
+                    .followed(followedFolloweeIds.contains(followeeId))
                     .build();
         }).toList();
 
-        PageResponseDTO<FolloweeReadAllResponseDTO> pageResponseDTO=PageResponseDTO.<FolloweeReadAllResponseDTO>builder()
-                .content(followeeReadAllResponseDTOS)
+        PageResponseDTO<FollowReadAllResponseDTO> pageResponseDTO=PageResponseDTO.<FollowReadAllResponseDTO>builder()
+                .content(followReadAllResponseDTOS)
                 .hasNext(hasNext)
                 .build();
 

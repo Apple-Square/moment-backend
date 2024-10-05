@@ -25,13 +25,24 @@ public class TagController {
 
     /**
      * 태그 검색 API
-     * @param pageRequestDTO 페이지 요청 정보
+     * @param size 페이지 크기
+     * @param cursor 페이지 커서
+     * @param keyword 검색 키워드
      * @return  (status) 200,
      *          (body)  태그 검색 성공 메세지,
      *                  태그 검색 결과
      */
     @GetMapping("")
-    public ResponseEntity<Map<String, Object>> search(PageRequestDTO pageRequestDTO){
+    public ResponseEntity<Map<String, Object>> search(@RequestParam(value = "size", required = false, defaultValue = "10") int size,
+                                                      @RequestParam(value = "cursor", required = false) String cursor,
+                                                      @RequestParam(value = "keyword", required = false) String keyword){
+        // 페이지 요청 설정
+        PageRequestDTO pageRequestDTO=PageRequestDTO.builder()
+                .size(size)
+                .cursor(cursor)
+                .keyword(keyword)
+                .build();
+
         // 태그 검색
         PageResponseDTO<TagReadResponseDTO> pageResponseDTO=tagService.search(pageRequestDTO);
 

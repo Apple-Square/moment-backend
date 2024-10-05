@@ -55,7 +55,10 @@ public class PostReadServiceImpl implements PostReadService {
         Sort sort= Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable= PageRequest.of(0, pageSize, sort);
 
-        Long cursor= pageRequestDTO.getCursor();
+        Long cursor=null;
+        if(pageRequestDTO.getCursor()!=null){
+            cursor= Long.parseLong(pageRequestDTO.getCursor());
+        }
 
         // 게시물 목록 조회
         List<Post> posts=postRepository.findAll(cursor, pageable);
@@ -89,7 +92,10 @@ public class PostReadServiceImpl implements PostReadService {
         Sort sort= Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable= PageRequest.of(0, pageSize, sort);
 
-        Long cursor= pageRequestDTO.getCursor();
+        Long cursor=null;
+        if(pageRequestDTO.getCursor()!=null){
+            cursor= Long.parseLong(pageRequestDTO.getCursor());
+        }
 
         // 게시글 썸네일 목록 조회
         List<Tuple> tuples=postRepository.findAllWithFirstFile(cursor, pageable);
@@ -131,7 +137,10 @@ public class PostReadServiceImpl implements PostReadService {
         Sort sort= Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable= PageRequest.of(0, pageSize, sort);
 
-        Long cursor= pageRequestDTO.getCursor();
+        Long cursor=null;
+        if(pageRequestDTO.getCursor()!=null){
+            cursor= Long.parseLong(pageRequestDTO.getCursor());
+        }
 
         // 특정 유저가 작성한 게시물 목록 조회
         List<Post> posts=postRepository.findAllByWriterId(userId, cursor, pageable);
@@ -166,7 +175,10 @@ public class PostReadServiceImpl implements PostReadService {
         Sort sort= Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable= PageRequest.of(0, pageSize, sort);
 
-        Long cursor= pageRequestDTO.getCursor();
+        Long cursor=null;
+        if(pageRequestDTO.getCursor()!=null){
+            cursor= Long.parseLong(pageRequestDTO.getCursor());
+        }
 
         // 특정 유저가 작성한 게시물 썸네일 목록 조회
         List<Tuple> tuples=postRepository.findAllWithFirstFileByWriterId(userId, cursor, pageable);
@@ -208,7 +220,10 @@ public class PostReadServiceImpl implements PostReadService {
         Sort sort= Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable= PageRequest.of(0, pageSize, sort);
 
-        Long cursor= pageRequestDTO.getCursor();
+        Long cursor=null;
+        if(pageRequestDTO.getCursor()!=null){
+            cursor= Long.parseLong(pageRequestDTO.getCursor());
+        }
 
         // 특정 유저가 좋아요 누른 게시물 목록 조회
         List<Post> posts=postRepository.findLikedPostAllByUserId(userId, cursor, pageable);
@@ -243,7 +258,10 @@ public class PostReadServiceImpl implements PostReadService {
         Sort sort= Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable= PageRequest.of(0, pageSize, sort);
 
-        Long cursor= pageRequestDTO.getCursor();
+        Long cursor=null;
+        if(pageRequestDTO.getCursor()!=null){
+            cursor= Long.parseLong(pageRequestDTO.getCursor());
+        }
 
         // 특정 유저가 좋아요 누른 게시물 썸네일 목록 조회
         List<Tuple> tuples=postRepository.findLikedPostAllWithFirstFileByUserId(userId, cursor, pageable);

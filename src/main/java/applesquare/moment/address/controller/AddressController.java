@@ -21,7 +21,7 @@ public class AddressController {
 
 
     @GetMapping("/address")
-    public ResponseEntity<Map<String, Object>> search(@RequestParam("keyword") String keyword){
+    public ResponseEntity<Map<String, Object>> search(@RequestParam(value = "keyword", required = true) String keyword){
         // 주소 검색
         AddressSearchResponseDTO addressSearchResponseDTO=addressService.searchAddress(keyword);
 

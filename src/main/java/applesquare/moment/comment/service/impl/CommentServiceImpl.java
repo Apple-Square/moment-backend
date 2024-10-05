@@ -147,7 +147,10 @@ public class CommentServiceImpl implements CommentService {
         Sort sort= Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable= PageRequest.of(0, pageSize, sort);
 
-        Long cursor= pageRequestDTO.getCursor();
+        Long cursor=null;
+        if(pageRequestDTO.getCursor()!=null){
+            cursor= Long.parseLong(pageRequestDTO.getCursor());
+        }
 
         // 특정 게시글의 댓글 목록 조회
         List<Tuple> tuples=commentRepository.findAllByPostId(postId, cursor, pageable);

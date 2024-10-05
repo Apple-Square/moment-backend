@@ -34,8 +34,8 @@ public class LocationController {
      */
     @GetMapping("")
     public ResponseEntity<Map<String, Object>> search(@RequestParam("keyword") String keyword,
-                                                      @RequestParam(value = "page", required = false) Integer page,
-                                                      @RequestParam(value = "size", required = false) Integer size) {
+                                                      @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+                                                      @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
         // DTO 구성
         KakaoLocationSearchRequestDTO kakaoLocationSearchRequestDTO=KakaoLocationSearchRequestDTO.builder()
                 .keyword(keyword)
