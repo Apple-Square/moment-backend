@@ -1,4 +1,4 @@
-package applesquare.moment.user.repository.custom;
+package applesquare.moment.user.repository;
 
 import applesquare.moment.user.model.UserInfo;
 

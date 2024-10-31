@@ -32,7 +32,7 @@ public class TagController {
      *          (body)  태그 검색 성공 메세지,
      *                  태그 검색 결과
      */
-    @GetMapping("")
+    @GetMapping("/search")
     public ResponseEntity<Map<String, Object>> search(@RequestParam(value = "size", required = false, defaultValue = "10") int size,
                                                       @RequestParam(value = "cursor", required = false) String cursor,
                                                       @RequestParam(value = "keyword", required = false) String keyword){

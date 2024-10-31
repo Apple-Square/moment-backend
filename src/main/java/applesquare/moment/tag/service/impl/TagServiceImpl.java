@@ -63,22 +63,23 @@ public class TagServiceImpl implements TagService {
     }
 
     /**
-     * (키워드에 따른) 태그 검색
+     * 키워드로 태그 검색
+     * - 검색 속성 : 태그 이름
+     * - 정렬 기준 : 인기순 (많이 참조된 순)
+     *
      * @param pageRequestDTO 페이지 요청 정보
-     * @return 검색 결과 목록
+     * @return 태그 목록
      */
     @Override
     public PageResponseDTO<TagReadResponseDTO> search(PageRequestDTO pageRequestDTO){
         // 입력 형식 검사
         String keyword=pageRequestDTO.getKeyword();
-        if(keyword==null){
+        if(keyword==null || keyword.isBlank()){
             throw new IllegalArgumentException("키워드를 입력해주세요.");
         }
 
         // 다음 페이지 존재 여부를 확인하기 위해 (size + 1)
         int pageSize=pageRequestDTO.getSize()+1;
-        Sort sort= Sort.by(Sort.Direction.DESC, "id");
-        Pageable pageable= PageRequest.of(0, pageSize, sort);
 
         Long cursor=null;
         if(pageRequestDTO.getCursor()!=null){
@@ -86,29 +87,17 @@ public class TagServiceImpl implements TagService {
         }
 
         // 키워드에 따른 태그 검색
-        List<Tuple> tuples=tagRepository.findByKeyword(keyword, cursor, pageable);
+        List<TagReadResponseDTO> tagReadResponseDTOS=tagRepository.searchByKeyword(keyword, cursor, pageSize);
 
         // hasNext 설정
         boolean hasNext=false;
-        if(tuples.size()>pageRequestDTO.getSize()){
-            tuples.remove(tuples.size()-1);
+        if(tagReadResponseDTOS.size()>pageRequestDTO.getSize()){
+            tagReadResponseDTOS.remove(tagReadResponseDTOS.size()-1);
             hasNext=true;
         }
 
-        // DTO 변환
-        List<TagReadResponseDTO> tagDTOs=tuples.stream().map((tuple)->{
-            Tag tag1=(Tag) tuple.get("tag");
-            long postCount=(long) tuple.get("postCount");
-
-            return TagReadResponseDTO.builder()
-                    .id(tag1.getId())
-                    .name(tag1.getName())
-                    .usageCount(postCount)
-                    .build();
-        }).toList();
-
         PageResponseDTO<TagReadResponseDTO> pageResponseDTO=PageResponseDTO.<TagReadResponseDTO>builder()
-                .content(tagDTOs)
+                .content(tagReadResponseDTOS)
                 .hasNext(hasNext)
                 .build();
 
@@ -116,8 +105,8 @@ public class TagServiceImpl implements TagService {
     }
 
     /**
-     * 인기 태그 조회
-     * @param days 며칠 전 기록부터 조회할 것인지
+     * 실시간 인기 태그 조회
+     * @param days 며칠 전 기록부터 조회할 것인지 (default: 1)
      * @param size 조회할 태그 개수
      * @return 인기 태그 목록
      */

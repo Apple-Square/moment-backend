@@ -1,4 +1,4 @@
-package applesquare.moment.follow.repository.impl;
+package applesquare.moment.follow.repository;
 
 import com.querydsl.core.Tuple;
 

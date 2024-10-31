@@ -1,6 +1,7 @@
-package applesquare.moment.user.repository.custom;
+package applesquare.moment.user.repository.impl;
 
 import applesquare.moment.user.model.UserInfo;
+import applesquare.moment.user.repository.CustomUserInfoRepository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import static applesquare.moment.user.model.QUserInfo.userInfo;
 @RequiredArgsConstructor
 public class CustomUserInfoRepositoryImpl implements CustomUserInfoRepository {
     private final JPAQueryFactory queryFactory;
+
     @Override
     public List<UserInfo> searchByKeyword(String keyword, String cursor, int pageSize){
         // 키워드에 따른 검색 조건
@@ -31,7 +33,7 @@ public class CustomUserInfoRepositoryImpl implements CustomUserInfoRepository {
         BooleanExpression cursorCondition=null;
         if(cursor!=null){
             // 서브 쿼리 정의
-            long cursorFollowCount = queryFactory
+            Long cursorFollowCount = queryFactory
                     .select(follow.count())
                     .from(userInfo)
                     .leftJoin(follow).on(follow.followee.id.eq(userInfo.id))
@@ -39,8 +41,12 @@ public class CustomUserInfoRepositoryImpl implements CustomUserInfoRepository {
                     .fetchOne();
 
             // 팔로워 수가 커서 데이터의 팔로워 수보다 작거나, 같으면서 사용자 ID가 더 크다면
-            cursorCondition=follow.count().lt(cursorFollowCount)
-                    .or(follow.count().eq(cursorFollowCount).and(userInfo.id.gt(cursor)));
+            if(cursorFollowCount!=null){
+                cursorCondition=follow.count().lt(cursorFollowCount)
+                        .or(follow.count().eq(cursorFollowCount).and(userInfo.id.gt(cursor)));
+            }else{
+                throw new IllegalArgumentException("존재하지 않는 커서입니다. (cursor="+cursor+")" );
+            }
         }
 
         // 메인 쿼리 작성

@@ -1,7 +1,6 @@
 package applesquare.moment.follow.repository;
 
 import applesquare.moment.follow.model.Follow;
-import applesquare.moment.follow.repository.impl.CustomFollowRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

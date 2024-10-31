@@ -1,5 +1,6 @@
 package applesquare.moment.follow.repository.impl;
 
+import applesquare.moment.follow.repository.CustomFollowRepository;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
