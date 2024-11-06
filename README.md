@@ -44,50 +44,44 @@
 
 <br/>
 
+## 📒 API 명세서
+https://nickel-confidence-5de.notion.site/API-008726751e004642976ff983cf98c5ee
+
+<br/>
+
 ## ✅ 주요 기능 소개
 
 ### 🗝️ JWT 인증
-![image](https://github.com/user-attachments/assets/10332676-1bd0-4518-a50c-8f4aa26db5d4)
+![image](https://github.com/user-attachments/assets/0326b2ae-c418-46e1-9091-5eaf5d545377)
 
-<br/>
 
 ### 🌐 소셜 로그인 (kakao, naver)
-![image](https://github.com/user-attachments/assets/e81a23d7-0038-459d-bd29-963c265f9ea3)
+![image](https://github.com/user-attachments/assets/4a205b52-dc6c-4f15-a6c7-b87acb563397)
 
-<br/>
 
 ### 🎥 게시물 (쇼츠)
-![image](https://github.com/user-attachments/assets/c88e7ff2-d8c4-4b55-8889-b672ee01b8a3)
+![image](https://github.com/user-attachments/assets/8061a0b2-c856-4a7e-b446-65efe9807236)
+![image](https://github.com/user-attachments/assets/c88df675-5c4b-447d-83eb-a0282898e466)
 
-<br/>
 
 ### 💬 댓글
-![image](https://github.com/user-attachments/assets/623a3cfc-a2f4-4726-a4ef-9551ef9f1171)
+![image](https://github.com/user-attachments/assets/9598e3f3-50cd-42c7-91ce-7e05a5c84f92)
 
-<br/>
 
 ### 🏷️ 해시 태그
-![image](https://github.com/user-attachments/assets/52718f79-b2ea-4ba2-8d2a-8323f60f06e5)
+![image](https://github.com/user-attachments/assets/230cb8f0-fb69-40d4-8262-dc9e50e44bca)
 
-<br/>
 
 ### 👤 유저 정보 관리
-![image](https://github.com/user-attachments/assets/251643bb-f3ed-4a06-9694-2ba6cde90d60)
+![image](https://github.com/user-attachments/assets/3480da58-9dad-4821-9b29-574b48f70e9a)
 
-<br/>
 
 ### 🤝 팔로우
-![image](https://github.com/user-attachments/assets/a3429c92-60f9-48de-8cb1-d1b5730e2cde)
+![image](https://github.com/user-attachments/assets/d915da8e-5e4d-42ca-94de-b5a238560e0d)
 
-<br/>
 
 ### 🗺️ 위치 기반 검색
-![image](https://github.com/user-attachments/assets/ede2da79-fd73-4bec-9223-61129e48b288)
-
-<br/>
-
-## 📒 API 명세서
-https://nickel-confidence-5de.notion.site/API-008726751e004642976ff983cf98c5ee
+![image](https://github.com/user-attachments/assets/dd4687a9-1760-4388-b49e-ab99f282dcce)
 
 <br/>
 
