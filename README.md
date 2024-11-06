@@ -1,6 +1,5 @@
 # 🎞️ Moment
 
-### 🍎 [사과는 애플] 팀의 첫번째 프로젝트
 
 ![image](https://github.com/user-attachments/assets/0d2f156e-7473-4ac0-a0db-eb541db2c553)
 
@@ -10,7 +9,12 @@
 
 <br/>
 
+## 🖥️ 백엔드 API 서버
+
+
 **⏱️ 개발 기간** : 2024년 8월 12일 ~ 2024년 9월 30일 **(개발중)**
+
+**🔗 프론트 엔드 Repository : https://github.com/Apple-Square/moment-frontend**
 
 <br/>
 
@@ -49,7 +53,7 @@ https://nickel-confidence-5de.notion.site/API-008726751e004642976ff983cf98c5ee
 
 <br/>
 
-## ✅ 주요 기능 소개
+## ✅ 주요 기능
 
 ### 🗝️ JWT 인증
 ![image](https://github.com/user-attachments/assets/0326b2ae-c418-46e1-9091-5eaf5d545377)
@@ -91,7 +95,7 @@ https://nickel-confidence-5de.notion.site/API-008726751e004642976ff983cf98c5ee
 <br/>
 <br/>
 
-## 👻 팀원 소개
+## 🍎 사과는 애플 | 팀원 소개
 |<img src="https://github.com/user-attachments/assets/9856718a-1113-42f4-a9fd-4efebbcee36c" width="180">|<img src="https://github.com/user-attachments/assets/7033ddfe-9613-41ae-b7f1-55f8138d02cd" width="180">|<img src="https://github.com/user-attachments/assets/180c06ef-e55a-48c2-ab2a-fb01e2ee17ea" width="180">|
 |---|---|---|
 |[**조현아 (BE)**](https://github.com/tenius10)|[**최건우 (FE)**](https://github.com/rjsdn031)|[**최현준 (FE)**](https://github.com/Hyeonjun0527)|
