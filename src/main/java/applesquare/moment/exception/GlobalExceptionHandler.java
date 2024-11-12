@@ -1,5 +1,9 @@
 package applesquare.moment.exception;
 
+import applesquare.moment.email.exception.EmailValidationException;
+import applesquare.moment.email.exception.MailSendException;
+import applesquare.moment.file.exception.FileTransferException;
+import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -114,6 +118,22 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<Map<String, Object>> handleMissingServletRequestParameterException(MissingServletRequestParameterException e){
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap.getMap());
+    }
+
+    /**
+     * 이메일 관련 예외 처리
+     * @param e 이메일 관련 Exception
+     * @return 400 (Bad Request)
+     */
+    @ExceptionHandler({
+            EmailValidationException.class,
+            MailSendException.class,
+            MessagingException.class
+    })
+    public ResponseEntity<Map<String, Object>> handleMailException(Exception e){
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap.getMap());

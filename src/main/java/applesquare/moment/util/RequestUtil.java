@@ -30,7 +30,7 @@ public class RequestUtil {
      * @param cookieName 쿠키 이름
      * @return 쿠키 값
      */
-    private static String getValueFromCookies(Cookie[] cookies, String cookieName){
+    public static String getValueFromCookies(Cookie[] cookies, String cookieName){
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(cookieName)) {

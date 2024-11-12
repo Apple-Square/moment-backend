@@ -14,8 +14,8 @@ public class StateServiceImpl implements StateService {
     private final RedisRepository redisRepository;
 
     @Override
-    public void create(String state){
-        redisRepository.saveWithTimeout(RedisKeyType.STATE, state, "",TIMEOUT_MINUTE, TimeUnit.MINUTES);
+    public void create(String state, long ttl, TimeUnit timeUnit){
+        redisRepository.saveWithTTL(RedisKeyType.STATE, state, "", ttl, timeUnit);
     }
 
     @Override

@@ -6,6 +6,8 @@ import applesquare.moment.auth.dto.UserCreateRequestDTO;
 import applesquare.moment.auth.model.UserAccount;
 import applesquare.moment.auth.repository.UserAccountRepository;
 import applesquare.moment.auth.service.AuthService;
+import applesquare.moment.common.service.StateService;
+import applesquare.moment.email.exception.EmailValidationException;
 import applesquare.moment.exception.DuplicateDataException;
 import applesquare.moment.user.model.UserInfo;
 import applesquare.moment.user.repository.UserInfoRepository;
@@ -24,6 +26,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserInfoRepository userInfoRepository;
     private final PasswordEncoder encoder;
     private final AddressService addressService;
+    private final StateService stateService;
 
 
     /**
@@ -31,7 +34,7 @@ public class AuthServiceImpl implements AuthService {
      * @param userCreateRequestDTO 회원가입 정보
      */
     @Override
-    public void createUser(UserCreateRequestDTO userCreateRequestDTO){
+    public void createUser(UserCreateRequestDTO userCreateRequestDTO, String emailState){
         // 중복 검사
         String nickname= userCreateRequestDTO.getNickname();
         String username= userCreateRequestDTO.getUsername();
@@ -46,11 +49,11 @@ public class AuthServiceImpl implements AuthService {
             throw new DuplicateDataException("이미 사용 중인 이메일입니다. (email = "+email+")");
         }
 
-        // 이메일 유효성 검사
-        /*
-            실제로 존재하는 본인 소유의 이메일이 맞는지 확인
-         */
-
+        // 이메일 인증 상태 검사
+        boolean emailStateValid=stateService.exists(emailState);
+        if(!emailStateValid){
+            throw new EmailValidationException("인증 상태를 확인할 수 없습니다.");
+        }
 
         // 주소 유효성 검사 (실제로 존재하는 주소인지 검사)
         String address=null;
@@ -88,6 +91,9 @@ public class AuthServiceImpl implements AuthService {
 
         // UserAccount, UserInfo는 OneToOne으로 연결되어 있기 때문에 UserAccount만 저장
         userAccountRepository.save(userAccount);
+
+        // 이메일 인증 상태 제거하기 (일회용)
+        stateService.delete(emailState);
     }
 
     /**

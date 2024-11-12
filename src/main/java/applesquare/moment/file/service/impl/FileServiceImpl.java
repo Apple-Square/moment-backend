@@ -1,6 +1,6 @@
 package applesquare.moment.file.service.impl;
 
-import applesquare.moment.exception.FileTransferException;
+import applesquare.moment.file.exception.FileTransferException;
 import applesquare.moment.file.model.StorageFile;
 import applesquare.moment.file.repository.StorageFileRepository;
 import applesquare.moment.file.service.CloudinaryService;

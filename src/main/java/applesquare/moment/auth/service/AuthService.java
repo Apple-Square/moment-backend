@@ -9,7 +9,7 @@ public interface AuthService {
     int MAX_PASSWORD_LENGTH=20;
 
 
-    void createUser(UserCreateRequestDTO userCreateRequestDTO);
+    void createUser(UserCreateRequestDTO userCreateRequestDTO, String emailState);
     boolean isUniqueUsername(String username);
     boolean isUniqueEmail(String email);
 }

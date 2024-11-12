@@ -24,6 +24,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Log4j2
 @RestController
@@ -57,7 +58,7 @@ public class NaverOAuthController{
         String encodedState= URLEncoder.encode(state, StandardCharsets.UTF_8);
 
         // Redis에 CSRF 방지 토큰 등록
-        stateService.create(encodedState);
+        stateService.create(encodedState, 10, TimeUnit.MINUTES);
 
         // HTTP Header 생성
         HttpHeaders headers=new HttpHeaders();

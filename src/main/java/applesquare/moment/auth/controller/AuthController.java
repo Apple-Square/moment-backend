@@ -6,6 +6,7 @@ import applesquare.moment.auth.dto.UserCreateRequestDTO;
 import applesquare.moment.auth.dto.UsernameValidateRequestDTO;
 import applesquare.moment.auth.service.AuthService;
 import applesquare.moment.auth.service.TokenBlacklistService;
+import applesquare.moment.email.service.EmailValidationService;
 import applesquare.moment.exception.DuplicateDataException;
 import applesquare.moment.exception.ResponseMap;
 import applesquare.moment.exception.TokenError;
@@ -44,17 +45,17 @@ public class AuthController {
      *          (body) 회원가입 성공 메세지
      */
     @PostMapping(value="/signup", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> signup(@Valid @RequestBody UserCreateRequestDTO userCreateRequestDTO){
+    public ResponseEntity<Map<String, Object>> signup(@Valid @RequestBody UserCreateRequestDTO userCreateRequestDTO, HttpServletRequest request){
+        String emailState=RequestUtil.getValueFromCookies(request.getCookies(), EmailValidationService.EMAIL_STATE_COOKIE);
+
         // 사용자 계정 생성
-        authService.createUser(userCreateRequestDTO);
+        authService.createUser(userCreateRequestDTO, emailState);
 
         // 응답 생성
         ResponseMap responseMap =new ResponseMap();
         responseMap.put("message", "회원가입에 성공했습니다.");
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(responseMap.getMap());
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseMap.getMap());
     }
 
     /**
