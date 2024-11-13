@@ -1,7 +1,7 @@
 package applesquare.moment.user.service.impl;
 
+import applesquare.moment.auth.exception.TokenException;
 import applesquare.moment.common.service.SecurityService;
-import applesquare.moment.exception.TokenException;
 import applesquare.moment.file.service.FileService;
 import applesquare.moment.follow.repository.FollowRepository;
 import applesquare.moment.post.repository.PostRepository;

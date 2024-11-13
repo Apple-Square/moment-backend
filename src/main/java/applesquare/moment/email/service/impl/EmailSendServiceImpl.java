@@ -25,7 +25,7 @@ public class EmailSendServiceImpl implements EmailSendService {
             // 메일 처리기 설정
             mailHandler.setTo(mailDTO.getToEmail());  // 받는 사람 이메일 주소
             mailHandler.setSubject(mailDTO.getTitle());  // 메일 제목
-            mailHandler.setText(mailDTO.getMessage(), false);  // 메일 내용
+            mailHandler.setText(mailDTO.getMessage(), mailDTO.isUseHtml());  // 메일 내용
 
             // 메일 전송
             mailHandler.send();

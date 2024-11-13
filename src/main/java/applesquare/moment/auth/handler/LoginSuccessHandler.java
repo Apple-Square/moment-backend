@@ -1,9 +1,9 @@
 package applesquare.moment.auth.handler;
 
+import applesquare.moment.auth.exception.TokenError;
+import applesquare.moment.auth.exception.TokenException;
 import applesquare.moment.auth.security.UserDetailsImpl;
-import applesquare.moment.exception.ResponseMap;
-import applesquare.moment.exception.TokenError;
-import applesquare.moment.exception.TokenException;
+import applesquare.moment.common.exception.ResponseMap;
 import applesquare.moment.user.dto.UserProfileReadResponseDTO;
 import applesquare.moment.user.service.UserProfileService;
 import applesquare.moment.util.JwtUtil;

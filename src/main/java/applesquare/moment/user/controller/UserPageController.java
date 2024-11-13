@@ -1,6 +1,6 @@
 package applesquare.moment.user.controller;
 
-import applesquare.moment.exception.ResponseMap;
+import applesquare.moment.common.exception.ResponseMap;
 import applesquare.moment.user.dto.UserPageReadResponseDTO;
 import applesquare.moment.user.service.UserPageService;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package applesquare.moment.exception;
+package applesquare.moment.common.exception;
 
 import applesquare.moment.util.JsonUtil;
 import lombok.Getter;
@@ -10,7 +10,7 @@ import java.util.Map;
 
 @Getter
 public class ResponseMap {
-    private Map<String, Object> map;
+    private final Map<String, Object> map;
 
     public ResponseMap() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");

@@ -19,4 +19,6 @@ public class MailDTO {
     @NotNull
     @NotBlank
     private String message;
+    @Builder.Default
+    private boolean useHtml=false;
 }

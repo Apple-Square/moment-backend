@@ -1,4 +1,4 @@
-package applesquare.moment.email.dto;
+package applesquare.moment.auth.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -12,9 +12,9 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmailCodeRequestDTO {
+public class AccountRecoveryRequestDTO {
     @NotNull
     @NotBlank
-    @Email(message = "잘못된 형식의 이메일입니다.")
+    @Email
     private String email;
 }

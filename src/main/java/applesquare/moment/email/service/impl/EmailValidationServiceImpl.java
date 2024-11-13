@@ -1,5 +1,6 @@
 package applesquare.moment.email.service.impl;
 
+import applesquare.moment.common.exception.StateExpiredException;
 import applesquare.moment.email.dto.MailDTO;
 import applesquare.moment.email.exception.EmailValidationException;
 import applesquare.moment.email.service.EmailSendService;
@@ -59,7 +60,7 @@ public class EmailValidationServiceImpl implements EmailValidationService {
         }
         if(originalCode==null){
             // Redis에 인증 코드가 존재하지 않는다면, 에러 던지기
-            throw new EmailValidationException("잘못된 or 만료된 인증 코드입니다.");
+            throw new StateExpiredException("만료된 인증 코드입니다.");
         }
         if(!code.equals(originalCode)) {
             throw new EmailValidationException("잘못된 인증 코드입니다.");

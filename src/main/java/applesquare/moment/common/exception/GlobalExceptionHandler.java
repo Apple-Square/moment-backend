@@ -1,5 +1,6 @@
-package applesquare.moment.exception;
+package applesquare.moment.common.exception;
 
+import applesquare.moment.auth.exception.TokenException;
 import applesquare.moment.email.exception.EmailValidationException;
 import applesquare.moment.email.exception.MailSendException;
 import applesquare.moment.file.exception.FileTransferException;
@@ -227,6 +228,19 @@ public class GlobalExceptionHandler {
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", "데이터 무결성을 위반했습니다.");
         return ResponseEntity.status(HttpStatus.CONFLICT).body(responseMap.getMap());
+    }
+
+
+    /**
+     * 상태가 만료된 경우 발생하는 예외 처리
+     * @param e StateExpiredException
+     * @return 410 (Gone)
+     */
+    @ExceptionHandler(StateExpiredException.class)
+    public ResponseEntity<Map<String,Object>> handleStateExpiredException(StateExpiredException e){
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", e.getMessage());
+        return ResponseEntity.status(HttpStatus.GONE).body(responseMap.getMap());
     }
 
     /**

@@ -1,11 +1,12 @@
 package applesquare.moment.email.controller;
 
+import applesquare.moment.common.exception.ResponseMap;
 import applesquare.moment.common.service.StateService;
 import applesquare.moment.email.dto.EmailCodeRequestDTO;
 import applesquare.moment.email.dto.EmailValidateRequestDTO;
 import applesquare.moment.email.service.EmailValidationService;
-import applesquare.moment.exception.ResponseMap;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.server.Cookie;
 import org.springframework.http.*;
@@ -34,7 +35,7 @@ public class EmailValidationController {
      *                      (body) 발급 성공 메세지
      */
     @PostMapping(value = "/code", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> getCode(@RequestBody EmailCodeRequestDTO emailCodeRequestDTO){
+    public ResponseEntity<Map<String, Object>> getCode(@Valid @RequestBody EmailCodeRequestDTO emailCodeRequestDTO){
         // 이메일 인증 코드 발급하기
         emailValidationService.storeAndSendEmailCode(emailCodeRequestDTO.getEmail());
 
@@ -53,7 +54,7 @@ public class EmailValidationController {
      *                    (body) 이메일 유효성 여부
      */
     @PostMapping(value = "/code/validate", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void validateCode(@RequestBody EmailValidateRequestDTO emailValidateRequestDTO, HttpServletResponse response) throws IOException {
+    public void validateCode(@Valid @RequestBody EmailValidateRequestDTO emailValidateRequestDTO, HttpServletResponse response) throws IOException {
         String email=emailValidateRequestDTO.getEmail();
         String code=emailValidateRequestDTO.getCode();
 
@@ -66,7 +67,7 @@ public class EmailValidationController {
 
         // 서버에 이메일 인증이 완료되었다는 state 생성
         String emailState= UUID.randomUUID().toString();
-        stateService.create(emailState, EmailValidationService.EMAIL_STATE_TTL_MINUTE, TimeUnit.MINUTES);
+        stateService.create(emailState, email, EmailValidationService.EMAIL_STATE_TTL_MINUTE, TimeUnit.MINUTES);
 
         // 응답 생성
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

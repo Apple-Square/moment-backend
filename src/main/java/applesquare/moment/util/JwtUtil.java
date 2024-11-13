@@ -1,7 +1,7 @@
 package applesquare.moment.util;
 
-import applesquare.moment.exception.TokenError;
-import applesquare.moment.exception.TokenException;
+import applesquare.moment.auth.exception.TokenError;
+import applesquare.moment.auth.exception.TokenException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

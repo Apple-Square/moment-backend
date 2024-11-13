@@ -2,7 +2,7 @@ package applesquare.moment.comment.controller;
 
 import applesquare.moment.comment.dto.CommentUpdateRequestDTO;
 import applesquare.moment.comment.service.CommentService;
-import applesquare.moment.exception.ResponseMap;
+import applesquare.moment.common.exception.ResponseMap;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

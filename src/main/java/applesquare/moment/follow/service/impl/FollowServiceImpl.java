@@ -1,10 +1,10 @@
 package applesquare.moment.follow.service.impl;
 
+import applesquare.moment.auth.exception.TokenException;
 import applesquare.moment.common.dto.PageRequestDTO;
 import applesquare.moment.common.dto.PageResponseDTO;
+import applesquare.moment.common.exception.DuplicateDataException;
 import applesquare.moment.common.service.SecurityService;
-import applesquare.moment.exception.DuplicateDataException;
-import applesquare.moment.exception.TokenException;
 import applesquare.moment.file.service.FileService;
 import applesquare.moment.follow.dto.FollowReadAllResponseDTO;
 import applesquare.moment.follow.model.Follow;

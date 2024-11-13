@@ -2,7 +2,7 @@ package applesquare.moment.follow.controller;
 
 import applesquare.moment.common.dto.PageRequestDTO;
 import applesquare.moment.common.dto.PageResponseDTO;
-import applesquare.moment.exception.ResponseMap;
+import applesquare.moment.common.exception.ResponseMap;
 import applesquare.moment.follow.dto.FollowReadAllResponseDTO;
 import applesquare.moment.follow.service.FollowService;
 import lombok.RequiredArgsConstructor;

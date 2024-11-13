@@ -5,7 +5,7 @@ import applesquare.moment.comment.dto.CommentReadAllResponseDTO;
 import applesquare.moment.comment.service.CommentService;
 import applesquare.moment.common.dto.PageRequestDTO;
 import applesquare.moment.common.dto.PageResponseDTO;
-import applesquare.moment.exception.ResponseMap;
+import applesquare.moment.common.exception.ResponseMap;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

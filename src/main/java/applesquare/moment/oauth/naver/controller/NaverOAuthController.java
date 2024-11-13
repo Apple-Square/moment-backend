@@ -1,7 +1,7 @@
 package applesquare.moment.oauth.naver.controller;
 
+import applesquare.moment.common.exception.ResponseMap;
 import applesquare.moment.common.service.StateService;
-import applesquare.moment.exception.ResponseMap;
 import applesquare.moment.oauth.service.OAuthService;
 import applesquare.moment.user.dto.UserProfileReadResponseDTO;
 import applesquare.moment.util.JwtUtil;
@@ -43,6 +43,8 @@ public class NaverOAuthController{
     @Value("${naver.oauth.redirect-uri}")
     private String naverOauthRedirectUri;
 
+    private final String NAVER_STATE_METADATA="naver-login-redirect";
+
 
     /**
      * 네이버 로그인 API
@@ -58,7 +60,7 @@ public class NaverOAuthController{
         String encodedState= URLEncoder.encode(state, StandardCharsets.UTF_8);
 
         // Redis에 CSRF 방지 토큰 등록
-        stateService.create(encodedState, 10, TimeUnit.MINUTES);
+        stateService.create(encodedState, NAVER_STATE_METADATA, 10, TimeUnit.MINUTES);
 
         // HTTP Header 생성
         HttpHeaders headers=new HttpHeaders();
@@ -95,7 +97,8 @@ public class NaverOAuthController{
                                                         @RequestParam(value = "error", required = false) String error,
                                                         @RequestParam(value = "error_description", required = false) String errorDescription){
         // CSRF 토큰 확인
-        if(!stateService.exists(state)){
+        String metaData=stateService.getMetaData(state);
+        if(metaData==null || !metaData.equals(NAVER_STATE_METADATA)){
             // state 값이 다르다면
             throw new AccessDeniedException("유효하지 않은 요청입니다.");
         }

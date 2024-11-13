@@ -1,6 +1,6 @@
 package applesquare.moment.like.controller;
 
-import applesquare.moment.exception.ResponseMap;
+import applesquare.moment.common.exception.ResponseMap;
 import applesquare.moment.like.service.PostLikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

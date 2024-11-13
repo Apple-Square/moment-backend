@@ -1,7 +1,7 @@
 package applesquare.moment.oauth.kakao.controller;
 
 
-import applesquare.moment.exception.ResponseMap;
+import applesquare.moment.common.exception.ResponseMap;
 import applesquare.moment.oauth.service.OAuthService;
 import applesquare.moment.user.dto.UserProfileReadResponseDTO;
 import applesquare.moment.util.JwtUtil;

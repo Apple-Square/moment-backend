@@ -1,16 +1,15 @@
 package applesquare.moment.auth.controller;
 
-import applesquare.moment.auth.dto.EmailValidateRequestDTO;
-import applesquare.moment.auth.dto.NicknameValidateRequestDTO;
-import applesquare.moment.auth.dto.UserCreateRequestDTO;
-import applesquare.moment.auth.dto.UsernameValidateRequestDTO;
+import applesquare.moment.auth.dto.*;
+import applesquare.moment.auth.exception.TokenError;
+import applesquare.moment.auth.exception.TokenException;
 import applesquare.moment.auth.service.AuthService;
 import applesquare.moment.auth.service.TokenBlacklistService;
+import applesquare.moment.common.exception.DuplicateDataException;
+import applesquare.moment.common.exception.ResponseMap;
+import applesquare.moment.common.exception.StateExpiredException;
+import applesquare.moment.common.service.StateService;
 import applesquare.moment.email.service.EmailValidationService;
-import applesquare.moment.exception.DuplicateDataException;
-import applesquare.moment.exception.ResponseMap;
-import applesquare.moment.exception.TokenError;
-import applesquare.moment.exception.TokenException;
 import applesquare.moment.user.service.UserInfoService;
 import applesquare.moment.util.JwtUtil;
 import applesquare.moment.util.RequestUtil;
@@ -35,6 +34,7 @@ public class AuthController {
     private final AuthService authService;
     private final UserInfoService userInfoService;
     private final TokenBlacklistService tokenBlacklistService;
+    private final StateService stateService;
     private final JwtUtil jwtUtil;
 
 
@@ -51,12 +51,58 @@ public class AuthController {
         // 사용자 계정 생성
         authService.createUser(userCreateRequestDTO, emailState);
 
-        // 응답 생성
+        // 응답 구성
         ResponseMap responseMap =new ResponseMap();
         responseMap.put("message", "회원가입에 성공했습니다.");
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseMap.getMap());
     }
+
+    /**
+     * 계정 복구 메일 전송 API
+     * @param accountRecoveryRequestDTO 계정 복구에 필요한 정보 (이메일)
+     * @return  (status) 200
+     *                  (body) 계정 복구 메일 전송 성공 메세지
+     */
+    @PostMapping(value = "/account/recovery", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> findAccount(@Valid @RequestBody AccountRecoveryRequestDTO accountRecoveryRequestDTO){
+        // 계정 복구 메일 전송
+        authService.sendAccountRecoveryEmail(accountRecoveryRequestDTO.getEmail());
+
+        // 응답 구성
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", "계정 복구 메일을 전송했습니다. (유효하지 않은 메일인 경우 전송하지 않습니다)");
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseMap.getMap());
+    }
+
+    /**
+     * 비밀번호 재설정 API
+     * @param passwordResetRequestDTO 비밀번호 재설정에 필요한 정보 (토큰, 새로운 비밀번호)
+     * @return  (status) 200
+     *                  (body) 비밀번호 변경 성공 메세지
+     */
+    @PatchMapping(value = "/password/reset", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> resetPassword(@Valid @RequestBody PasswordResetRequestDTO passwordResetRequestDTO){
+        // 이메일 인증 상태 검사
+        String token= passwordResetRequestDTO.getToken();
+        String username=stateService.getMetaData(token);
+        if(username==null){
+            throw new StateExpiredException("만료된 토큰입니다.");
+        }
+
+        // 비밀번호 재설정
+        authService.resetPassword(username, passwordResetRequestDTO.getNewPassword());
+
+        stateService.delete(token);
+
+        // 응답 구성
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", "비밀번호가 성공적으로 변경되었습니다.");
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseMap.getMap());
+    }
+
 
     /**
      * 토큰 재발급 API
@@ -133,7 +179,7 @@ public class AuthController {
             throw new DuplicateDataException("이미 존재하는 아이디입니다. (id = "+username+")");
         }
 
-        // 응답 생성
+        // 응답 구성
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", "사용 가능한 아이디입니다.");
         responseMap.put("available", true);
@@ -164,7 +210,7 @@ public class AuthController {
             throw new DuplicateDataException("이미 사용 중인 이메일입니다. (email = "+email+")");
         }
 
-        // 응답 생성
+        // 응답 구성
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", "사용 가능한 이메일입니다.");
         responseMap.put("available", true);
@@ -195,7 +241,7 @@ public class AuthController {
             throw new DuplicateDataException("이미 존재하는 닉네임입니다. (nickname = "+nickname+")");
         }
 
-        // 응답 생성
+        // 응답 구성
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", "사용 가능한 닉네임입니다.");
         responseMap.put("available", true);

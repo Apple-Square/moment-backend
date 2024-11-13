@@ -6,17 +6,24 @@ import applesquare.moment.auth.dto.UserCreateRequestDTO;
 import applesquare.moment.auth.model.UserAccount;
 import applesquare.moment.auth.repository.UserAccountRepository;
 import applesquare.moment.auth.service.AuthService;
+import applesquare.moment.common.exception.DuplicateDataException;
 import applesquare.moment.common.service.StateService;
+import applesquare.moment.email.dto.MailDTO;
 import applesquare.moment.email.exception.EmailValidationException;
-import applesquare.moment.exception.DuplicateDataException;
+import applesquare.moment.email.service.EmailSendService;
 import applesquare.moment.user.model.UserInfo;
 import applesquare.moment.user.repository.UserInfoRepository;
 import applesquare.moment.user.service.UserInfoService;
 import applesquare.moment.util.StringUtil;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Transactional
@@ -27,6 +34,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder encoder;
     private final AddressService addressService;
     private final StateService stateService;
+    private final EmailSendService emailSendService;
 
 
     /**
@@ -50,7 +58,8 @@ public class AuthServiceImpl implements AuthService {
         }
 
         // 이메일 인증 상태 검사
-        boolean emailStateValid=stateService.exists(emailState);
+        String stateMetaData=stateService.getMetaData(emailState);
+        boolean emailStateValid=stateMetaData!=null && stateMetaData.equals(email);
         if(!emailStateValid){
             throw new EmailValidationException("인증 상태를 확인할 수 없습니다.");
         }
@@ -94,6 +103,62 @@ public class AuthServiceImpl implements AuthService {
 
         // 이메일 인증 상태 제거하기 (일회용)
         stateService.delete(emailState);
+    }
+
+    /**
+     * 계정 복구 메일 전송
+     * @param email 이메일
+     */
+    @Override
+    public void sendAccountRecoveryEmail(String email){
+        // 이메일로 ID(=username) 찾기
+        Optional<UserAccount> userAccountOptional = userAccountRepository.findByEmail(email);
+        if(userAccountOptional.isEmpty()){
+            // 만약 등록되지 않은 이메일이라면, 그냥 나가기
+            // 예외를 던지지 않는 이유 : 해당 이메일을 사용하는 유저가 있는지 알려주는 것이 공격자들에게 힌트가 될 수 있기 때문
+            return;
+        }
+        String username=userAccountOptional.get().getUsername();
+
+        // PW 재설정 URL에 붙힐 토큰 생성
+        String token= UUID.randomUUID().toString();
+        stateService.create(token, username, PW_RESET_TOKEN_TTL_MINUTE, TimeUnit.MINUTES);
+
+        // 계정 복구 메일 전송
+        MailDTO mailDTO=MailDTO.builder()
+                .toEmail(email)
+                .title("[MOMENT] 계정 복구 메일")
+                .message(
+                        "안녕하세요.<br/><br/>" +
+                        "회원님의 아이디는 " + username + " 입니다.<br/><br/>" +
+                        "혹시 비밀번호를 모르시겠다면, 아래 링크를 이용해서 초기화해주세요.<br/><br/>" +
+                        "<a href=\""+PW_RESET_URL+"?token=" + token + "\">비밀번호 재설정하러 가기</a>"
+                )
+                .useHtml(true)
+                .build();
+
+        emailSendService.send(mailDTO);
+    }
+
+    /**
+     * 비밀번호 재설정
+     * @param newPassword 새로운 비밀번호
+     */
+    @Override
+    public void resetPassword(String username, String newPassword){
+        UserAccount oldAccount=userAccountRepository.findByUsername(username)
+                .orElseThrow(()-> new EntityNotFoundException("회원 정보를 찾을 수 없습니다."));
+
+        // 비밀번호 해시값 생성
+        String encodedPassword=encoder.encode(newPassword);
+
+        // 비밀번호 변경 (pw는 반드시 해시값을 넣어줘야 함)
+        UserAccount newAccount=oldAccount.toBuilder()
+                .password(encodedPassword)
+                .build();
+
+        // DB 저장
+        userAccountRepository.save(newAccount);
     }
 
     /**

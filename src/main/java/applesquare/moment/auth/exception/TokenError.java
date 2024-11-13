@@ -1,4 +1,4 @@
-package applesquare.moment.exception;
+package applesquare.moment.auth.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

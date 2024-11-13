@@ -1,10 +1,10 @@
 package applesquare.moment.post.service.impl;
 
+import applesquare.moment.auth.exception.TokenException;
 import applesquare.moment.comment.repository.CommentRepository;
 import applesquare.moment.common.dto.PageRequestDTO;
 import applesquare.moment.common.dto.PageResponseDTO;
 import applesquare.moment.common.service.SecurityService;
-import applesquare.moment.exception.TokenException;
 import applesquare.moment.file.model.MediaType;
 import applesquare.moment.file.model.StorageFile;
 import applesquare.moment.file.service.FileService;

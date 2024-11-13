@@ -1,6 +1,6 @@
 package applesquare.moment.post.controller;
 
-import applesquare.moment.exception.ResponseMap;
+import applesquare.moment.common.exception.ResponseMap;
 import applesquare.moment.post.dto.PostCreateRequestDTO;
 import applesquare.moment.post.dto.PostUpdateRequestDTO;
 import applesquare.moment.post.service.PostManagementService;
