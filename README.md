@@ -99,7 +99,7 @@ https://nickel-confidence-5de.notion.site/API-008726751e004642976ff983cf98c5ee
 |<img src="https://github.com/user-attachments/assets/9856718a-1113-42f4-a9fd-4efebbcee36c" width="180">|<img src="https://github.com/user-attachments/assets/7033ddfe-9613-41ae-b7f1-55f8138d02cd" width="180">|<img src="https://github.com/user-attachments/assets/180c06ef-e55a-48c2-ab2a-fb01e2ee17ea" width="180">|
 |---|---|---|
 |[**조현아 (BE)**](https://github.com/tenius10)|[**최건우 (FE)**](https://github.com/rjsdn031)|[**최현준 (FE)**](https://github.com/Hyeonjun0527)|
-|▪️ **백엔드 API 개발**<br/>(인증, 소셜 로그인,피드, <br/>쇼츠, 댓글, 태그, 유저 <br/>정보, 팔로우, 위치 검색)|▪️ **피드**<br/>▪️ **쇼츠**<br/>▪️ **댓글**<br/>▪️ **태그**|▪️ **전역 상태 관리**(Redux)<br/>▪️ **인증**<br/>▪️ **유저 프로필**<br/>▪️ **팔로우**|
+|▪️ **백엔드 API 개발**<br/>(인증, 소셜 로그인,피드, <br/>쇼츠, 댓글, 태그, 유저 <br/>정보, 팔로우, 위치 검색)|▪️ **피드**<br/>▪️ **모먼트(쇼츠)**<br/>▪️ **댓글**<br/>▪️ **UI/UX**|▪️ **인증**<br/>▪️ **회원 관리**<br/>▪️ **채팅 관리**<br/>▪️ **UI/UX**|
 
 <br/>
 
