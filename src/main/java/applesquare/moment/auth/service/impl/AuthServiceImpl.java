@@ -59,8 +59,7 @@ public class AuthServiceImpl implements AuthService {
 
         // 이메일 인증 상태 검사
         String stateMetaData=stateService.getMetaData(emailState);
-        boolean emailStateValid=stateMetaData!=null && stateMetaData.equals(email);
-        if(!emailStateValid){
+        if(stateMetaData==null || !stateMetaData.equals(email)){
             throw new EmailValidationException("인증 상태를 확인할 수 없습니다.");
         }
 
