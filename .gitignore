@@ -38,3 +38,6 @@ out/
 
 ### Test Code ###
 !**/src/test/
+
+### Application Properties ###
+src/main/resources/application.properties
