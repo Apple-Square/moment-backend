@@ -31,6 +31,9 @@ jobs:
                   # application.properties에 대한 권한 제한
                   chmod 600 src/main/resources/application.properties
                   
+                  # gradlew에 실행 권한 부여
+                  chmod +x ./gradlew
+                  
                   # 프로젝트 빌드
                   echo "Building application..."
                   ./gradlew clean build
