@@ -5,6 +5,7 @@ import java.security.SecureRandom;
 public class StringUtil {
     private static final SecureRandom RANDOM = new SecureRandom();
     public static final String USER_ID_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    public static final String NUMBERS="0123456789";
     /**
      * 주어진 길이의 랜덤 문자열 생성
      * @param length 문자열 길이

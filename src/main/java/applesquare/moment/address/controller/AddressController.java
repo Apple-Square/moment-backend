@@ -2,7 +2,7 @@ package applesquare.moment.address.controller;
 
 import applesquare.moment.address.dto.AddressSearchResponseDTO;
 import applesquare.moment.address.service.AddressService;
-import applesquare.moment.exception.ResponseMap;
+import applesquare.moment.common.exception.ResponseMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

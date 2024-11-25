@@ -1,5 +1,6 @@
-package applesquare.moment.exception;
+package applesquare.moment.auth.exception;
 
+import applesquare.moment.common.exception.ResponseMap;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package applesquare.moment.exception;
+package applesquare.moment.common.exception;
 
 public class DuplicateDataException extends RuntimeException {
     public DuplicateDataException(String message){

@@ -1,6 +1,6 @@
 package applesquare.moment.auth.handler;
 
-import applesquare.moment.exception.ResponseMap;
+import applesquare.moment.common.exception.ResponseMap;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

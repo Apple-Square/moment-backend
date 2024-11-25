@@ -1,5 +1,6 @@
 package applesquare.moment.comment.service.impl;
 
+import applesquare.moment.auth.exception.TokenException;
 import applesquare.moment.comment.dto.CommentCreateRequestDTO;
 import applesquare.moment.comment.dto.CommentReadAllResponseDTO;
 import applesquare.moment.comment.dto.CommentUpdateRequestDTO;
@@ -9,7 +10,6 @@ import applesquare.moment.comment.service.CommentService;
 import applesquare.moment.common.dto.PageRequestDTO;
 import applesquare.moment.common.dto.PageResponseDTO;
 import applesquare.moment.common.service.SecurityService;
-import applesquare.moment.exception.TokenException;
 import applesquare.moment.like.repository.CommentLikeRepository;
 import applesquare.moment.post.model.Post;
 import applesquare.moment.post.repository.PostRepository;

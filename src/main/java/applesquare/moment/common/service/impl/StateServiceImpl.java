@@ -14,8 +14,8 @@ public class StateServiceImpl implements StateService {
     private final RedisRepository redisRepository;
 
     @Override
-    public void create(String state){
-        redisRepository.saveWithTimeout(RedisKeyType.STATE, state, "",TIMEOUT_MINUTE, TimeUnit.MINUTES);
+    public void create(String state, String metaData, long ttl, TimeUnit timeUnit){
+        redisRepository.saveWithTTL(RedisKeyType.STATE, state, metaData, ttl, timeUnit);
     }
 
     @Override
@@ -24,7 +24,9 @@ public class StateServiceImpl implements StateService {
     }
 
     @Override
-    public boolean exists(String state){
-        return redisRepository.exists(RedisKeyType.STATE, state);
+    public String getMetaData(String state){
+        Object value=redisRepository.get(RedisKeyType.STATE, state);
+        if(value==null) return null;
+        else return (String)value;
     }
 }

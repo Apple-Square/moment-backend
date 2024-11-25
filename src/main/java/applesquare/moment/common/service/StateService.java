@@ -1,9 +1,9 @@
 package applesquare.moment.common.service;
 
-public interface StateService {
-    int TIMEOUT_MINUTE=10;
+import java.util.concurrent.TimeUnit;
 
-    void create(String state);
+public interface StateService {
+    void create(String state, String metaData, long ttl, TimeUnit timeUnit);
     void delete(String state);
-    boolean exists(String state);
+    String getMetaData(String state);
 }

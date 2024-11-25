@@ -1,7 +1,7 @@
 package applesquare.moment.like.service.impl;
 
+import applesquare.moment.common.exception.DuplicateDataException;
 import applesquare.moment.common.service.SecurityService;
-import applesquare.moment.exception.DuplicateDataException;
 import applesquare.moment.like.model.PostLike;
 import applesquare.moment.like.model.PostLikeKey;
 import applesquare.moment.like.repository.PostLikeRepository;

@@ -1,7 +1,7 @@
 package applesquare.moment.location.controller;
 
 import applesquare.moment.common.dto.PageResponseDTO;
-import applesquare.moment.exception.ResponseMap;
+import applesquare.moment.common.exception.ResponseMap;
 import applesquare.moment.location.dto.KakaoLocationSearchRequestDTO;
 import applesquare.moment.location.dto.LocationSearchResponseDTO;
 import applesquare.moment.location.service.LocationService;

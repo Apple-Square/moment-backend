@@ -21,7 +21,7 @@ public class TokenBlacklistServiceImpl implements TokenBlacklistService {
     @Override
     public void blacklist(String token, String reason){
         long remainingMilliSec=jwtUtil.getRemainingMilliSecFromToken(token);
-        redisRepository.saveWithTimeout(RedisKeyType.BLACKLIST, token, reason, remainingMilliSec, TimeUnit.MILLISECONDS);
+        redisRepository.saveWithTTL(RedisKeyType.BLACKLIST, token, reason, remainingMilliSec, TimeUnit.MILLISECONDS);
     }
 
     @Override
