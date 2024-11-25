@@ -14,14 +14,21 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v2
 
-            # 2. 프로젝트 빌드
+            # 2. JDK 설정 (Java 17 설치)
+            - name: Set up JDK 17
+              uses: actions/setup-java@v3
+              with:
+                  java-version: '17'
+                  distribution: 'temurin' # 또는 'zulu', 'adopt'
+
+            # 3. 프로젝트 빌드
             - name: Build application
               env:
                   APPLICATION_PROPERTIES: ${{ secrets.APPLICATION_PROPERTIES }}
               run: |
                   # src/main/resources 디렉토리 생성 (존재하지 않을 경우)
                   mkdir -p src/main/resources
-    
+                  
                   # echo 실행 중 오류가 발생해도 민감한 정보가 로그에 남지 않도록 처리
                   set -o pipefail
                   
@@ -41,7 +48,7 @@ jobs:
                   # 빌드 성공 후, application.properties 삭제
                   rm -f src/main/resources/application.properties
 
-            # 3. Docker 이미지 빌드 및 푸시
+            # 4. Docker 이미지 빌드 및 푸시
             - name: Build and Push Docker Image
               env:
                   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
@@ -52,7 +59,7 @@ jobs:
                   echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
                   docker push teniuscom/moment-backend-server:latest
 
-            # 4. docker-compose.yml 파일 EC2로 전송
+            # 5. docker-compose.yml 파일 EC2로 전송
             - name: Upload Docker Compose to EC2
               env:
                   EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}    # 비밀 키를 Github Secrets에 저장해 두어야 합니다.
@@ -65,7 +72,7 @@ jobs:
                   # Docker Compose 파일 전송
                   scp -i private_key.pem -o StrictHostKeyChecking=no docker-compose.yml $EC2_USER@$EC2_HOST:/home/ubuntu
 
-            # 5. EC2에서 Docker Compose 실행
+            # 6. EC2에서 Docker Compose 실행
             - name: Deploy on EC2
               env:
                   EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
