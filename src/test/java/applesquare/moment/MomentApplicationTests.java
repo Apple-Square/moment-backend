@@ -9,5 +9,4 @@ class MomentApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }

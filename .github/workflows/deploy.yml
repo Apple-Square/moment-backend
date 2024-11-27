@@ -25,18 +25,22 @@ jobs:
             - name: Build application
               env:
                   APPLICATION_PROPERTIES: ${{ secrets.APPLICATION_PROPERTIES }}
+                  TEST_APPLICATION_PROPERTIES: ${{ secrets.TEST_APPLICATION_PROPERTIES }}
               run: |
                   # src/main/resources 디렉토리 생성 (존재하지 않을 경우)
                   mkdir -p src/main/resources
+                  mkdir -p src/test/resources
                   
                   # echo 실행 중 오류가 발생해도 민감한 정보가 로그에 남지 않도록 처리
                   set -o pipefail
                   
                   # 프로젝트에 application.properties 추가
                   echo "$APPLICATION_PROPERTIES" > src/main/resources/application.properties
+                  echo "$TEST_APPLICATION_PROPERTIES" > src/test/resources/application.properties
                   
                   # application.properties에 대한 권한 제한
                   chmod 600 src/main/resources/application.properties
+                  chmod 600 src/test/resources/application.properties
                   
                   # gradlew에 실행 권한 부여
                   chmod +x ./gradlew
@@ -47,6 +51,7 @@ jobs:
                   
                   # 빌드 성공 후, application.properties 삭제
                   rm -f src/main/resources/application.properties
+                  rm -f src/test/resources/application.properties
 
             # 4. Docker 이미지 빌드 및 푸시
             - name: Build and Push Docker Image
