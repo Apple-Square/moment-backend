@@ -5,7 +5,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # 3. Gradle 또는 Maven으로 빌드된 JAR 파일을 컨테이너로 복사
-COPY build/libs/*SNAPSHOT.jar app.jar
+COPY *SNAPSHOT.jar app.jar
 
 # 4. Spring Boot 애플리케이션에서 사용하는 포트 개방
 EXPOSE 8080
