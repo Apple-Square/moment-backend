@@ -1,0 +1,12 @@
+# Gradle cache
+.gradle/
+build/
+
+# IDE settings
+*.iml
+.idea/
+*.class
+
+# Logs and temp files
+*.log
+*.tmp
