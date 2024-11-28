@@ -73,11 +73,17 @@ jobs:
                   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
               run: |
                   echo "Building Docker Image..."
-                  docker build -t my-docker-repo/moment-backend-server:latest .
-                  # Docker 빌드 컨텍스트 확인
-                  ls -la
+                  
+                   # Docker 이미지 빌드
+                  docker build -t teniuscom/moment-backend-server:latest .
+                  
+                  # Docker 이미지 확인 (빌드된 이미지 확인)
+                  docker images
+                  
                   echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-                  docker push my-docker-repo/moment-backend-server:latest
+                  
+                  # 태그 확인 및 푸시
+                  docker push teniuscom/moment-backend-server:latest
 
             # 5. docker-compose.yml 파일 EC2로 전송
             - name: Upload Docker Compose to EC2
