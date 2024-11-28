@@ -74,6 +74,8 @@ jobs:
               run: |
                   echo "Building Docker Image..."
                   docker build -t my-docker-repo/moment-backend-server:latest .
+                  # Docker 빌드 컨텍스트 확인
+                  ls -la
                   echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
                   docker push my-docker-repo/moment-backend-server:latest
 
