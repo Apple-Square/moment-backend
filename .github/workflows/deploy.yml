@@ -104,8 +104,8 @@ jobs:
                   echo "MYSQL_PASSWORD=${MYSQL_PASSWORD}" >> .env
                   
                   # Docker Compose 및 .env 파일 전송
-                  scp -i private_key.pem -o StrictHostKeyChecking=no docker-compose.yml $EC2_USER@$EC2_HOST:/home/ubuntu
-                  scp -i private_key.pem -o StrictHostKeyChecking=no .env $EC2_USER@$EC2_HOST:/home/ubuntu
+                  scp -i private_key.pem -o StrictHostKeyChecking=no docker-compose.yml $EC2_USER@$EC2_HOST:/home/ubuntu/moment
+                  scp -i private_key.pem -o StrictHostKeyChecking=no .env $EC2_USER@$EC2_HOST:/home/ubuntu/moment
 
             # 6. EC2에서 Docker Compose 실행
             - name: Deploy on EC2
