@@ -12,7 +12,8 @@ services:
         ports:
             - "3306:3306"
         volumes:
-            - mysql_data:/var/lib/mysql
+            - mysql_data:/var/lib/mysql    # 데이터 저장 볼륨
+            - ./mysql-init:/docker-entrypoint-initdb.d    # 초기화 스크립트
         networks:
             - app-network
 
@@ -42,7 +43,7 @@ services:
             - app-network
 
 volumes:
-    mysql_data:
+    mysql_data:  # 이름 있는 볼륨 (/var/lib/docker/volumes/ 하위에 저장)
 
 networks:
     app-network:
