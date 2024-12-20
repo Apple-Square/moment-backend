@@ -80,6 +80,7 @@ jobs:
                   # Docker 이미지 확인 (빌드된 이미지 확인)
                   docker images
                   
+                  # Docker Hub 로그인
                   echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
                   
                   # 태그 확인 및 푸시
@@ -113,6 +114,8 @@ jobs:
                   EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
                   EC2_USER: ${{ secrets.EC2_USER }}
                   EC2_HOST: ${{ secrets.EC2_HOST }}
+                  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+                  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
               run: |
                   # EC2 key pair 준비
                   echo "${{ secrets.EC2_PRIVATE_KEY }}" > private_key.pem
@@ -129,6 +132,9 @@ jobs:
                   else
                       echo "Docker service is already running."
                   fi
+                  
+                  # Docker Hub 로그인
+                  echo "$DOCKER_PASSWORD" | sudo docker login -u "$DOCKER_USERNAME" --password-stdin
                   
                   # Docker 이미지 Pull
                   docker-compose pull
