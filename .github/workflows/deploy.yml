@@ -135,6 +135,8 @@ jobs:
                   
                   # Docker Hub 로그인
                   echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+                  sudo docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+                  sudo docker info
                   
                   # Docker 이미지 Pull
                   docker-compose pull
