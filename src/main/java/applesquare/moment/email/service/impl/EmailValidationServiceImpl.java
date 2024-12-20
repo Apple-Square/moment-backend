@@ -34,6 +34,9 @@ public class EmailValidationServiceImpl implements EmailValidationService {
         // 랜덤 인증 코드 발급
         String code= StringUtil.generateRandomString(StringUtil.NUMBERS,  EMAIL_CODE_LEN);
 
+        // Redis에 상태 저장
+        redisRepository.saveWithTTL(RedisKeyType.EMAIL_CODE, email, code, EMAIL_CODE_TTL_MINUTE, TimeUnit.MINUTES);
+
         // 이메일로 인증 코드를 전송하는 메서드
         MailDTO mailDTO=MailDTO.builder()
                 .toEmail(email)
@@ -41,9 +44,6 @@ public class EmailValidationServiceImpl implements EmailValidationService {
                 .message("인증 코드 : "+code)
                 .build();
         emailSendService.send(mailDTO);
-
-        // Redis에 상태 저장
-        redisRepository.saveWithTTL(RedisKeyType.EMAIL_CODE, email, code, EMAIL_CODE_TTL_MINUTE, TimeUnit.MINUTES);
     }
 
     /**

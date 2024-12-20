@@ -13,7 +13,7 @@ services:
             - "3306:3306"
         volumes:
             - mysql_data:/var/lib/mysql    # 데이터 저장 볼륨
-            - ./mysql-init:/docker-entrypoint-initdb.d    # 초기화 스크립트
+            - /home/ubuntu/mysql-init:/docker-entrypoint-initdb.d    # 초기화 스크립트
         networks:
             - app-network
 
@@ -39,6 +39,9 @@ services:
         depends_on:
             - mysql
             - redis
+        volumes:
+            # 로컬 디렉터리를 컨테이너 내부에 마운트
+            - /home/ubuntu/storage:/home/ubuntu/storage    # 파일 저장소
         networks:
             - app-network
 
