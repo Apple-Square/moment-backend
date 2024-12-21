@@ -14,7 +14,7 @@ import org.hibernate.annotations.BatchSize;
 
 import java.util.List;
 
-@Entity(name = "Post")
+@Entity
 @Getter
 @Builder(toBuilder = true)
 @NoArgsConstructor

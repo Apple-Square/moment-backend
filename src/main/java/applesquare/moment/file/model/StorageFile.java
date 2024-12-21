@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity(name = "StorageFile")
+@Entity
 @Getter
 @Builder(toBuilder = true)
 @NoArgsConstructor

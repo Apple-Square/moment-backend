@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity(name = "SocialUserAccount")
+@Entity
 @Getter
 @Builder
 @NoArgsConstructor
