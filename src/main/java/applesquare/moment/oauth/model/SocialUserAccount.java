@@ -17,8 +17,10 @@ import lombok.NoArgsConstructor;
 @Table(name = "social_user_account")
 public class SocialUserAccount extends BaseEntity {
     @Id
+    @Column(name = "social_type", nullable = false)
     private String socialType;
     @Id
+    @Column(name = "social_id", nullable = false)
     private String socialId;  // OAuth 제공 업체의 유저 ID
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="user_info_id", nullable = false, updatable = false)

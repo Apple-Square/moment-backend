@@ -17,14 +17,15 @@ import lombok.NoArgsConstructor;
 public class StorageFile extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
-    @Column(nullable = false, updatable = false)
+    @Column(name = "filename", nullable = false, updatable = false)
     private String filename;
-    @Column(nullable = false, updatable = false)
+    @Column(name = "original_filename", nullable = false, updatable = false)
     private String originalFilename;
-    @Column(nullable = false, updatable = false)
+    @Column(name = "content_type", nullable = false, updatable = false)
     private String contentType;
-    @Column(nullable=false, updatable = false)
+    @Column(name = "file_size", nullable=false, updatable = false)
     private Long fileSize;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "uploader_id", nullable = false, updatable = false)

@@ -19,8 +19,9 @@ import lombok.NoArgsConstructor;
 public class Comment extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
-    @Column(length = CommentService.MAX_CONTENT_LENGTH, nullable = false, updatable = true)
+    @Column(name = "content", length = CommentService.MAX_CONTENT_LENGTH, nullable = false, updatable = true)
     private String content;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "writer_id", nullable = false, updatable = false)

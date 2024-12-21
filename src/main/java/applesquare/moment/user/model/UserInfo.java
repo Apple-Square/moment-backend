@@ -22,23 +22,24 @@ import java.time.LocalDate;
 })
 public class UserInfo extends BaseEntity {
     @Id
-    @Column(length= UserInfoService.USER_ID_LENGTH, nullable = false, updatable = false)
+    @Column(name = "id", length= UserInfoService.USER_ID_LENGTH, nullable = false, updatable = false)
     private String id;
-    @Column(length= UserInfoService.MAX_NICKNAME_LENGTH, nullable = false, updatable = true)
+    @Column(name = "nickname", length= UserInfoService.MAX_NICKNAME_LENGTH, nullable = false, updatable = true)
     private String nickname;
-    @Column(nullable=true, updatable=true)
+    @Column(name = "birth", nullable=true, updatable=true)
     private LocalDate birth;
     @Enumerated(EnumType.STRING)
-    @Column(nullable=true, updatable=true)
+    @Column(name = "gender", nullable=true, updatable=true)
     private Gender gender;
-    @Column(nullable=true, updatable = true)
+    @Column(name = "address", nullable=true, updatable = true)
     private String address;
     @Builder.Default
-    @Column(nullable = false, updatable = true)
+    @Column(name = "intro", nullable = false, updatable = true)
     private String intro="";
     @OneToOne(cascade = CascadeType.ALL,
             orphanRemoval = true)
-    @JoinColumn(nullable = true, updatable = true)
+    @JoinColumn(name = "profile_image_id", nullable = true, updatable = true)
     private StorageFile profileImage;
+    @Column(name = "social")
     private boolean social;
 }

@@ -19,8 +19,9 @@ import java.util.List;
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
-    @Column(length = TagService.MAX_TAG_NAME_LENGTH, nullable = false, updatable = false)
+    @Column(name = "name", length = TagService.MAX_TAG_NAME_LENGTH, nullable = false, updatable = false)
     private String name;
     @ManyToMany(mappedBy = "tags", fetch = FetchType.LAZY)
     private List<Post> posts;
