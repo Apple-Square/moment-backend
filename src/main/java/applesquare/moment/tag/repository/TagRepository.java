@@ -33,7 +33,7 @@ public interface TagRepository extends JpaRepository<Tag, Long>, CustomTagReposi
     @Query(value = "SELECT p.id AS postId, t.name AS tagName " +
             "FROM post p " +
             "INNER JOIN post_tags pt ON p.id = pt.post_id " +
-            "LEFT JOIN Tag t ON pt.tag_id = t.id " +
+            "LEFT JOIN tag t ON pt.tag_id = t.id " +
             "WHERE p.id IN :postIds " +
             "ORDER BY p.id, pt.tag_order", nativeQuery = true)
     List<Tuple> findTagAllByPostIds(@Param("postIds") List<Long> postIds);
