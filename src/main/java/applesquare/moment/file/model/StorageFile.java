@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "storage_file")
 public class StorageFile extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
