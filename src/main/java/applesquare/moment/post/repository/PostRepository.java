@@ -45,7 +45,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "SELECT p.id AS postId, " +
                 "sf.filename AS filename, " +
                 "sf.content_type AS contentType " +
-            "FROM Post p " +
+            "FROM post p " +
             "INNER JOIN post_files pf ON pf.post_id=p.id " +
             "INNER JOIN storage_file sf ON pf.file_id=sf.id " +
             "WHERE p.writer_id=:writerId " +
@@ -71,7 +71,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "SELECT p.id AS postId, " +
                 "sf.filename AS filename, " +
                 "sf.content_type AS contentType " +
-            "FROM Post p " +
+            "FROM post p " +
             "INNER JOIN post_files pf ON pf.post_id=p.id " +
             "INNER JOIN storage_file sf ON pf.file_id=sf.id " +
             "INNER JOIN post_like pl " +
@@ -109,7 +109,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "SELECT p.id AS postId, " +
                 "p.view_count AS viewCount, " +
                 "sf.filename AS filename " +
-            "FROM Post p " +
+            "FROM post p " +
             "INNER JOIN post_files pf ON pf.post_id=p.id " +
             "INNER JOIN storage_file sf ON pf.file_id=sf.id " +
             "WHERE p.writer_id=:writerId " +

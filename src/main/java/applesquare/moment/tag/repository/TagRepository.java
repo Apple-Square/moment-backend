@@ -31,7 +31,7 @@ public interface TagRepository extends JpaRepository<Tag, Long>, CustomTagReposi
                                 Pageable pageable);
 
     @Query(value = "SELECT p.id AS postId, t.name AS tagName " +
-            "FROM Post p " +
+            "FROM post p " +
             "INNER JOIN post_tags pt ON p.id = pt.post_id " +
             "LEFT JOIN Tag t ON pt.tag_id = t.id " +
             "WHERE p.id IN :postIds " +
