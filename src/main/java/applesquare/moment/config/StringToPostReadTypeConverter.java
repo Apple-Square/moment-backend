@@ -9,6 +9,10 @@ public class StringToPostReadTypeConverter implements Converter<String, PostRead
 
     @Override
     public PostReadType convert(String source) {
-        return PostReadType.valueOf(source.toUpperCase());
+        if (source == null || source.trim().isEmpty()) {
+            // source 값이 들어오지 않았다면, 기본 설정 DETAIL 사용
+            return PostReadType.DETAIL;
+        }
+        return PostReadType.valueOf(source.trim().toUpperCase());
     }
 }
