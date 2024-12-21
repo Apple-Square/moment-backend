@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Entity
+@Entity(name = "Tag")
 @Getter
 @Builder
 @NoArgsConstructor
