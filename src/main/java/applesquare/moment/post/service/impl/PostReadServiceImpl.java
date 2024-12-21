@@ -371,6 +371,9 @@ public class PostReadServiceImpl implements PostReadService {
             // 미디어 타입 조회
             MediaType mediaType=null;
             if(files.size()>0){
+                log.info("********************** files = "+files);
+                log.info("********************** files.get(0) = "+files.get(0));
+                log.info("********************** files .get(0).getContentType() = "+files.get(0).getContentType());
                 mediaType=FileService.convertContentTypeToMediaType(files.get(0).getContentType());
             }
 
