@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @IdClass(SocialUserAccountKey.class)
+@Table(name = "social_user_account")
 public class SocialUserAccount extends BaseEntity {
     @Id
     private String socialType;
