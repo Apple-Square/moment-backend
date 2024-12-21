@@ -14,8 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "user_account",
-        uniqueConstraints = {
+@Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = "email")
 })
 public class UserAccount extends BaseEntity {

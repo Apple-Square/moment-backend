@@ -16,8 +16,7 @@ import java.time.LocalDate;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "user_info",
-        uniqueConstraints = {
+@Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = "nickname")
 })
 public class UserInfo extends BaseEntity {
