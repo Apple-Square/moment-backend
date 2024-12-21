@@ -41,7 +41,7 @@ public interface FileService {
      * @return MediaType 열거형
      */
     static MediaType convertContentTypeToMediaType(String contentType){
-        if(contentType==null) throw new IllegalArgumentException("contentType이 null입니다.");
+        if(contentType==null || contentType.isBlank()) throw new IllegalArgumentException("contentType이 비어있습니다.");
         if(contentType.startsWith(CONTENT_TYPE_IMAGE_PREFIX)) return MediaType.IMAGE;
         else if(contentType.startsWith(CONTENT_TYPE_VIDEO_PREFIX)) return MediaType.VIDEO;
         else throw new IllegalArgumentException("mediaType으로 변경할 수 없는 contentType입니다. (contentType="+contentType+")");
