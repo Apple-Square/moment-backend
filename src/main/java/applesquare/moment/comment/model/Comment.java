@@ -10,7 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity
+@Entity(name = "Comment ")
 @Getter
 @Builder(toBuilder = true)
 @NoArgsConstructor
