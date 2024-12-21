@@ -9,13 +9,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity(name = "UserAccount")
+@Entity
 @Getter
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "user_account",
-        uniqueConstraints = {
+@Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = "email")
 })
 public class UserAccount extends BaseEntity {

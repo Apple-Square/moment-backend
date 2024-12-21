@@ -8,13 +8,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity(name = "SocialUserAccount")
+@Entity
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @IdClass(SocialUserAccountKey.class)
-@Table(name = "social_user_account")
 public class SocialUserAccount extends BaseEntity {
     @Id
     private String socialType;

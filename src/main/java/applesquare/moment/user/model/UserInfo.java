@@ -11,13 +11,12 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-@Entity(name = "UserInfo")
+@Entity
 @Getter
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "user_info",
-        uniqueConstraints = {
+@Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = "nickname")
 })
 public class UserInfo extends BaseEntity {

@@ -14,12 +14,11 @@ import org.hibernate.annotations.BatchSize;
 
 import java.util.List;
 
-@Entity(name = "Post")
+@Entity
 @Getter
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "post")
 public class Post extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

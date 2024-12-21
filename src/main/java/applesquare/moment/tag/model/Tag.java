@@ -10,12 +10,11 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Entity(name = "Tag")
+@Entity
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "tag")
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
