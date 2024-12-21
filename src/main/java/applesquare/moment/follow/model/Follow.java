@@ -17,11 +17,12 @@ import lombok.NoArgsConstructor;
 public class Follow extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, updatable = false)
+    @JoinColumn(name = "follower_id", nullable = false, updatable = false)
     private UserInfo follower;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, updatable = false)
+    @JoinColumn(name = "followee_id", nullable = false, updatable = false)
     private UserInfo followee;
 }

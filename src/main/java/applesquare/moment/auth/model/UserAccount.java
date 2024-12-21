@@ -20,11 +20,11 @@ import lombok.NoArgsConstructor;
 })
 public class UserAccount extends BaseEntity {
     @Id
-    @Column(length = AuthService.MAX_USERNAME_LENGTH, nullable = false, updatable=false)
+    @Column(name = "username", length = AuthService.MAX_USERNAME_LENGTH, nullable = false, updatable=false)
     private String username;
-    @Column(nullable = false, updatable = true)
+    @Column(name = "password", nullable = false, updatable = true)
     private String password;
-    @Column(nullable = false, updatable = true)
+    @Column(name = "email", nullable = false, updatable = true)
     private String email;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="user_info_id", nullable = false, updatable = false)

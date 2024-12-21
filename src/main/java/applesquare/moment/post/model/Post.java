@@ -23,19 +23,20 @@ import java.util.List;
 public class Post extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
-    @Column(length = PostManagementService.MAX_CONTENT_LENGTH, nullable = true, updatable = true)
+    @Column(name = "content", length = PostManagementService.MAX_CONTENT_LENGTH, nullable = true, updatable = true)
     private String content;
-    @Column(nullable = false, updatable = true)
+    @Column(name = "view_count", nullable = false, updatable = true)
     private long viewCount;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="writer_id", nullable = false, updatable = false)
     private UserInfo writer;
-    @Column(nullable = true, updatable = true)
+    @Column(name = "address", nullable = true, updatable = true)
     private String address;
-    @Column(nullable = true, updatable = true)
+    @Column(name = "x", nullable = true, updatable = true)
     private Double x;  // 경도
-    @Column(nullable = true, updatable = true)
+    @Column(name = "y", nullable = true, updatable = true)
     private Double y;  // 위도
     @OneToMany(fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
