@@ -58,7 +58,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource(){
         // 접근 허용할 도메인, 메서드, 헤더 설정
         CorsConfiguration configuration=new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Arrays.asList("*"));  // 프론트 서버 도메인
+        configuration.setAllowedOriginPatterns(Arrays.asList("https://www.applesquare.click"));  // 프론트 서버 도메인
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
