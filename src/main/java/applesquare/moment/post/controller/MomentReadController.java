@@ -16,7 +16,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class MomentController {
+public class MomentReadController {
     private final MomentReadService momentReadService;
 
 

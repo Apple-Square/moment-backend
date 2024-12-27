@@ -3,15 +3,13 @@ package applesquare.moment.post.dto;
 import applesquare.moment.file.model.MediaType;
 import applesquare.moment.user.dto.UserProfileReadResponseDTO;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
+@Setter
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
