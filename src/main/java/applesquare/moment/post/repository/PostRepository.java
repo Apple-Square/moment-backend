@@ -13,6 +13,7 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Long>, CustomPostRepository {
     long countByWriterId(String userId);
 
+
     // 게시물 목록 조회 (커서 페이징)
     @EntityGraph(attributePaths = {"files"})
     @Query("SELECT p " +

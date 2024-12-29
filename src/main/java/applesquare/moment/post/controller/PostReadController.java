@@ -21,6 +21,23 @@ public class PostReadController {
 
 
     /**
+     * 특정 게시물 조회 API
+     * @param postId 게시물 ID
+     * @return 게시물 상세 정보
+     */
+    @GetMapping("/posts/{postId}")
+    public ResponseEntity<Map<String, Object>> readOne(@PathVariable Long postId){
+        PostDetailReadAllResponseDTO postDetailDTO=postReadService.read(postId);
+
+        // 응답 객체 구성
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("post", postDetailDTO);
+        responseMap.put("message", "게시글 조회에 성공했습니다.");
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseMap.getMap());
+    }
+
+    /**
      * 게시물 목록 조회 API
      * @param type 게시물 조회 타입
      * @param size 페이지 크기

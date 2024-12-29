@@ -6,6 +6,8 @@ import applesquare.moment.post.dto.PostDetailReadAllResponseDTO;
 import applesquare.moment.post.dto.PostThumbnailReadAllResponseDTO;
 
 public interface PostReadService {
+    PostDetailReadAllResponseDTO read(Long postId);
+
     // 추천 게시물 목록 조회
     PageResponseDTO<PostDetailReadAllResponseDTO> readDetailAll(PageRequestDTO pageRequestDTO);
     PageResponseDTO<PostThumbnailReadAllResponseDTO> readThumbnailAll(PageRequestDTO pageRequestDTO);
