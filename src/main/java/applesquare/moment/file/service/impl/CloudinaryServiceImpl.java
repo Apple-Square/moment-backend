@@ -7,11 +7,16 @@ import com.cloudinary.EagerTransformation;
 import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -24,6 +29,7 @@ import java.util.concurrent.CompletableFuture;
 @Service
 @RequiredArgsConstructor
 public class CloudinaryServiceImpl implements CloudinaryService {
+    private final RestTemplate restTemplate;
     private final Cloudinary cloudinary;
 
     @Override
@@ -59,9 +65,20 @@ public class CloudinaryServiceImpl implements CloudinaryService {
             // 변환된 파일 URL 추출
             List<Map<String, Object>> eagerResults = (List<Map<String, Object>>) uploadResult.get("eager");
             String transformedUrl = (String) eagerResults.get(0).get("secure_url");
+            String decodedURL = URLDecoder.decode(transformedUrl, "UTF-8");
 
             // 파일 다운로드 및 저장
-            byte[] fileBytes = new RestTemplate().getForObject(transformedUrl, byte[].class);
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Accept", "video/mp4");    // 동영상 데이터 수락
+
+            HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+            ResponseEntity<byte[]> response = restTemplate.exchange(
+                    decodedURL,    // 요청 URL
+                    HttpMethod.GET,    // HTTP 메서드
+                    requestEntity,    // 요청 헤더 및 엔터티
+                    byte[].class    // 응답 타입 (바이너리 데이터)
+            );
+            byte[] fileBytes=response.getBody();
 
             // 썸네일 영상의 비트 배열 반환
             return fileBytes;

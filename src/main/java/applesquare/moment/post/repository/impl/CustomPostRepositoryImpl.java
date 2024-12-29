@@ -86,4 +86,67 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
                 .limit(size)
                 .fetch();
     }
+
+    /**
+     * 태그로 게시물 검색
+     * - 검색 속성 : 태그명
+     * - 정렬 기준 : 최신순
+     *
+     * @param keyword 검색 키워드
+     * @param cursor 페이지 커서
+     * @param size 페이지 크기
+     * @return  검색 조건에 부합하는 Post ID 목록
+     */
+    @Override
+    public List<Long> searchPostIdsByTag(String keyword, Long cursor, int size){
+        // 검색 조건에 부합하는 게시물 ID 조회
+        BooleanExpression cursorCondition=null;
+        if(cursor!=null){
+            cursorCondition=post.id.lt(cursor);
+        }
+        BooleanExpression keywordCondition=tag.name.contains(keyword);
+
+        return queryFactory
+                .selectDistinct(post.id)
+                .from(post)
+                .leftJoin(post.tags, tag)
+                .leftJoin(post.writer, userInfo)
+                .where(keywordCondition.and(cursorCondition))
+                .orderBy(post.id.desc())
+                .limit(size)
+                .fetch();
+    }
+
+    /**
+     * 태그로 모먼트 검색
+     * - 검색 속성 : 태그명
+     * - 정렬 기준 : 최신순
+     *
+     * @param keyword 검색 키워드
+     * @param cursor 페이지 커서
+     * @param size 페이지 크기
+     * @return 검색 조건에 부합하는 모먼트 목록
+     */
+    @Override
+    public List<Long> searchMomentIdsByTag(String keyword, Long cursor, int size){
+        // 검색 조건에 부합하는 게시물 ID 조회
+        BooleanExpression cursorCondition=null;
+        if(cursor!=null){
+            cursorCondition=post.id.lt(cursor);
+        }
+
+        return queryFactory
+                .selectDistinct(post.id)
+                .from(post)
+                .leftJoin(post.tags, tag)
+                .leftJoin(post.files, storageFile)
+                .leftJoin(post.writer, userInfo)
+                .where(storageFile.contentType.startsWith("video")
+                        .and(tag.name.contains(keyword))
+                        .and(cursorCondition)
+                )
+                .orderBy(post.id.desc())
+                .limit(size)
+                .fetch();
+    }
 }

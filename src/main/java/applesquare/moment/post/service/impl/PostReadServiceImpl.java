@@ -9,6 +9,7 @@ import applesquare.moment.post.model.Post;
 import applesquare.moment.post.repository.PostRepository;
 import applesquare.moment.post.service.PostReadService;
 import applesquare.moment.post.service.PostReadSupport;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -27,6 +28,22 @@ public class PostReadServiceImpl implements PostReadService {
     private final PostRepository postRepository;
     private final FileService fileService;
 
+
+    /**
+     * 특정 게시물 조회
+     * @param postId 게시물 ID
+     * @return 게시물 세부사항
+     */
+    @Override
+    public PostDetailReadAllResponseDTO read(Long postId){
+        Post post=postRepository.findById(postId)
+                .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 게시글입니다. (id = "+postId+")"));
+
+        // 조회된 게시물 기반으로, 게시물 정보 이외에 태그, 댓글, 좋아요 정보 가져오기
+        PostDetailReadAllResponseDTO postDetailDTO=postReadSupport.readPostDetailAllByPosts(List.of(post)).get(0);
+
+        return postDetailDTO;
+    }
 
     /**
      * 게시물 세부사항 목록 조회 (커서 페이징)
