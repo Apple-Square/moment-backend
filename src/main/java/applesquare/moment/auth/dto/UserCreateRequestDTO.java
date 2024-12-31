@@ -22,7 +22,7 @@ import java.time.LocalDate;
 public class UserCreateRequestDTO {
     @NotNull
     @Size(min= UserInfoService.MIN_NICKNAME_LENGTH, max=UserInfoService.MAX_NICKNAME_LENGTH)
-    @Pattern(regexp = Validator.NICKNAME_PATTERN, message = "한글, 알파벳 대소문자, 숫자, 밑줄 (_), 하이픈 (-)만 입력 가능합니다.")
+    @Pattern(regexp = Validator.NICKNAME_PATTERN, message = "한글, 알파벳 대소문자, 숫자, 밑줄 (_), 하이픈 (-), 연속 길이 1인 중간 공백( )만 입력 가능합니다.")
     private String nickname;
     @NotNull
     @Size(min= AuthService.MIN_USERNAME_LENGTH, max = AuthService.MAX_USERNAME_LENGTH)
@@ -34,7 +34,6 @@ public class UserCreateRequestDTO {
     private String password;
     private LocalDate birth;
     private Gender gender;
-    @NotNull
     @Email
     private String email;
     private String address;
