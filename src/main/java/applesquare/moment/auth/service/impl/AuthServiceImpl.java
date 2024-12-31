@@ -17,6 +17,7 @@ import applesquare.moment.user.service.UserInfoService;
 import applesquare.moment.util.StringUtil;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,9 @@ public class AuthServiceImpl implements AuthService {
     private final AddressService addressService;
     private final StateService stateService;
     private final EmailSendService emailSendService;
+
+    @Value("${moment.front.reset-password}")
+    private final String PW_RESET_URL;
 
 
     /**

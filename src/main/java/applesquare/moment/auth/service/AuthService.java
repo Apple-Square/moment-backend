@@ -9,7 +9,7 @@ public interface AuthService {
     int MAX_PASSWORD_LENGTH=20;
 
     int PW_RESET_TOKEN_TTL_MINUTE=10;
-    String PW_RESET_URL="http://moment.com/reset-password";
+
 
     // 새로운 유저 생성 (회원가입)
     void createUser(UserCreateRequestDTO userCreateRequestDTO, String emailState);

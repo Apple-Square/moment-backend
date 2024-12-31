@@ -32,7 +32,7 @@ public class KakaoOAuthController {
     @Value("${moment.front.error.500.url}")
     private String moment500ErrorUrl;
 
-    private final String kakaoLoginUrl="https://kauth.kakao.com/oauth/authorize";
+    private final String KAKAO_LOGIN_URL="https://kauth.kakao.com/oauth/authorize";
 
 
     /**
@@ -45,7 +45,7 @@ public class KakaoOAuthController {
     @GetMapping("/login")
     public ResponseEntity<String> redirectToKakaoAuth(){
         // 카카오 로그인 화면으로 리다이렉트
-        String url = new StringBuilder(kakaoLoginUrl)
+        String url = new StringBuilder(KAKAO_LOGIN_URL)
                 .append("?client_id=").append(kakaoClientId)
                 .append("&redirect_uri=").append(kakaoOauthRedirectUri)
                 .append("&response_type=code")

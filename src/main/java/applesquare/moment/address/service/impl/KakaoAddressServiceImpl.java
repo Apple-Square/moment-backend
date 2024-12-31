@@ -20,7 +20,7 @@ public class KakaoAddressServiceImpl implements KakaoAddressService {
     private final RestTemplate restTemplate;
     @Value("${kakao.client.id}")
     private String kakaoClientId;
-    private final String kakaoAddressUrl="https://dapi.kakao.com/v2/local/search/address.json";
+    private final String KAKAO_ADDRESS_URL="https://dapi.kakao.com/v2/local/search/address.json";
 
 
     /**
@@ -36,7 +36,7 @@ public class KakaoAddressServiceImpl implements KakaoAddressService {
         Integer size = kakaoAddressSearchRequestDTO.getSize();
 
         // URL 생성
-        StringBuilder sb=new StringBuilder(kakaoAddressUrl).append("?query=").append(keyword);
+        StringBuilder sb=new StringBuilder(KAKAO_ADDRESS_URL).append("?query=").append(keyword);
         if (analyzeType!= null) sb.append("&analyze_type=").append(analyzeType);
         if (page != null) sb.append("&page=").append(page);
         if (size != null) sb.append("&size=").append(size);

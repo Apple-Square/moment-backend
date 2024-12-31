@@ -43,7 +43,7 @@ public class NaverOAuthController{
     @Value("${moment.front.error.500.url}")
     private String moment500ErrorUrl;
 
-    private final String naverLoginUrl="https://nid.naver.com/oauth2.0/authorize";
+    private final String NAVER_LOGIN_URL="https://nid.naver.com/oauth2.0/authorize";
     private final String NAVER_STATE_METADATA="naver-login-redirect";
 
 
@@ -67,7 +67,7 @@ public class NaverOAuthController{
         HttpHeaders headers=new HttpHeaders();
 
         // 네이버 로그인 화면으로 리다이렉트
-        String url=new StringBuilder(naverLoginUrl)
+        String url=new StringBuilder(NAVER_LOGIN_URL)
                 .append("?response_type=code")
                 .append("&client_id=").append(naverClientId)
                 .append("&redirect_uri=").append(naverOauthRedirectUri)
