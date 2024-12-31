@@ -20,7 +20,7 @@ public class KakaoLocationServiceImpl implements KakaoLocationService {
     private final RestTemplate restTemplate;
     @Value("${kakao.client.id}")
     private String kakaoClientId;
-    private final String kakaoLocationUrl="https://dapi.kakao.com/v2/local/search/keyword.json";
+    private final String KAKAO_LOCATION_URL="https://dapi.kakao.com/v2/local/search/keyword.json";
 
 
     /**
@@ -35,7 +35,7 @@ public class KakaoLocationServiceImpl implements KakaoLocationService {
         Integer size = kakaoLocationSearchRequestDTO.getSize();
 
         // URL 생성
-        StringBuilder sb=new StringBuilder(kakaoLocationUrl).append("?query=").append(keyword);
+        StringBuilder sb=new StringBuilder(KAKAO_LOCATION_URL).append("?query=").append(keyword);
         if (page != null) sb.append("&page=").append(page);
         if (size != null) sb.append("&size=").append(size);
         String url = sb.toString();

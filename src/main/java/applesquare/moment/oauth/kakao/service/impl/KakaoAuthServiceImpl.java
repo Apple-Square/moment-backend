@@ -27,8 +27,8 @@ public class KakaoAuthServiceImpl implements KakaoAuthService {
     private String kakaoClientId;
     @Value("${kakao.oauth.redirect-uri}")
     private String kakaoOauthRedirectUri;
-    private final String kakaoTokenUrl="https://kauth.kakao.com/oauth/token";
-    private final String kakaoUserInfoUrl="https://kapi.kakao.com/v2/user/me";
+    private final String KAKAO_TOKEN_URL="https://kauth.kakao.com/oauth/token";
+    private final String KAKAO_USER_INFO_URL="https://kapi.kakao.com/v2/user/me";
 
 
     /**
@@ -52,7 +52,7 @@ public class KakaoAuthServiceImpl implements KakaoAuthService {
         // HTTP 요청 보내기
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest=new HttpEntity<>(body, headers);
         ResponseEntity<Map> kakaoTokenResponse = restTemplate.exchange(
-                kakaoTokenUrl,
+                KAKAO_TOKEN_URL,
                 HttpMethod.POST,
                 kakaoTokenRequest,
                 Map.class);
@@ -85,7 +85,7 @@ public class KakaoAuthServiceImpl implements KakaoAuthService {
         // HTTP 요청 보내기
         HttpEntity<String> kakaoUserRequest = new HttpEntity<>(headers);
         ResponseEntity<KakaoUserInfoReadResponseDTO> kakaoUserResponse = restTemplate.exchange(
-                kakaoUserInfoUrl,
+                KAKAO_USER_INFO_URL,
                 HttpMethod.GET,
                 kakaoUserRequest,
                 KakaoUserInfoReadResponseDTO.class

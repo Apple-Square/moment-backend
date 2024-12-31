@@ -23,8 +23,8 @@ public class NaverAuthServiceImpl implements NaverAuthService {
     private String naverClientId;
     @Value("${naver.client.secret}")
     private String naverClientSecret;
-    private final String naverTokenUrl="https://nid.naver.com/oauth2.0/token";
-    private final String naverUserInfoUrl="https://openapi.naver.com/v1/nid/me";
+    private final String NAVER_TOKEN_URL="https://nid.naver.com/oauth2.0/token";
+    private final String NAVER_USER_INFO_URL="https://openapi.naver.com/v1/nid/me";
 
 
     /**
@@ -36,7 +36,7 @@ public class NaverAuthServiceImpl implements NaverAuthService {
     @Override
     public String getAccessToken(String code, String state){
         // URL 생성
-        String url=new StringBuilder(naverTokenUrl)
+        String url=new StringBuilder(NAVER_TOKEN_URL)
                 .append("?grant_type=authorization_code")
                 .append("&client_id=").append(naverClientId)
                 .append("&client_secret=").append(naverClientSecret)
@@ -85,7 +85,7 @@ public class NaverAuthServiceImpl implements NaverAuthService {
         headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
 
         // HTTP 요청 보내기
-        String url=naverUserInfoUrl;
+        String url=NAVER_USER_INFO_URL;
         HttpEntity<String> naverUserRequest=new HttpEntity<>(headers);
         ResponseEntity<NaverUserInfoReadResponseDTO> naverUserResponse=restTemplate.exchange(
                 url,
