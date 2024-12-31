@@ -20,8 +20,7 @@ public class KakaoAddressServiceImpl implements KakaoAddressService {
     private final RestTemplate restTemplate;
     @Value("${kakao.client.id}")
     private String kakaoClientId;
-    @Value("${kakao.address.url}")
-    private String kakaoAddressUrl;
+    private final String kakaoAddressUrl="https://dapi.kakao.com/v2/local/search/address.json";
 
 
     /**

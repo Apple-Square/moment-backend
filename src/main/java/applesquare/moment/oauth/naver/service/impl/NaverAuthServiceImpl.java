@@ -23,10 +23,8 @@ public class NaverAuthServiceImpl implements NaverAuthService {
     private String naverClientId;
     @Value("${naver.client.secret}")
     private String naverClientSecret;
-    @Value("${naver.token.url}")
-    private String naverTokenUrl;
-    @Value("${naver.user.info.url}")
-    private String naverUserInfoUrl;
+    private final String naverTokenUrl="https://nid.naver.com/oauth2.0/token";
+    private final String naverUserInfoUrl="https://openapi.naver.com/v1/nid/me";
 
 
     /**
