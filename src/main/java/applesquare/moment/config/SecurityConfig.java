@@ -11,6 +11,7 @@ import applesquare.moment.auth.service.TokenBlacklistService;
 import applesquare.moment.user.service.UserProfileService;
 import applesquare.moment.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,6 +46,8 @@ public class SecurityConfig {
     private final TokenBlacklistService tokenBlacklistService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    @Value("${moment.front.domain}")
+    private String momentFrontDomain;
 
 
     @Bean
@@ -58,7 +61,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource(){
         // 접근 허용할 도메인, 메서드, 헤더 설정
         CorsConfiguration configuration=new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Arrays.asList("https://www.applesquare.click"));  // 프론트 서버 도메인
+        configuration.setAllowedOriginPatterns(Arrays.asList(momentFrontDomain));    // 프론트 서버 도메인
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));

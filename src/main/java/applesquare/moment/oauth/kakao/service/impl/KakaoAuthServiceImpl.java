@@ -27,10 +27,8 @@ public class KakaoAuthServiceImpl implements KakaoAuthService {
     private String kakaoClientId;
     @Value("${kakao.oauth.redirect-uri}")
     private String kakaoOauthRedirectUri;
-    @Value("${kakao.token.url}")
-    private String kakaoTokenUrl;
-    @Value("${kakao.user.info.url}")
-    private String kakaoUserInfoUrl;
+    private final String kakaoTokenUrl="https://kauth.kakao.com/oauth/token";
+    private final String kakaoUserInfoUrl="https://kapi.kakao.com/v2/user/me";
 
 
     /**
