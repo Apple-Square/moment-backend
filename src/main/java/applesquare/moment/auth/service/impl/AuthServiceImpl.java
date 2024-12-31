@@ -38,7 +38,7 @@ public class AuthServiceImpl implements AuthService {
     private final EmailSendService emailSendService;
 
     @Value("${moment.front.reset-password}")
-    private final String PW_RESET_URL;
+    private String pwResetUrl;
 
 
     /**
@@ -57,14 +57,20 @@ public class AuthServiceImpl implements AuthService {
         if(userAccountRepository.existsByUsername(username)){
             throw new DuplicateDataException("이미 존재하는 아이디입니다. (id = "+username+")");
         }
-        if(userAccountRepository.existsByEmail(email)){
-            throw new DuplicateDataException("이미 사용 중인 이메일입니다. (email = "+email+")");
-        }
 
-        // 이메일 인증 상태 검사
-        String stateMetaData=stateService.getMetaData(emailState);
-        if(stateMetaData==null || !stateMetaData.equals(email)){
-            throw new EmailValidationException("인증 상태를 확인할 수 없습니다.");
+        // 이메일이 입력된 경우,
+        if(email!=null){
+            // 이메일 인증 상태 검사
+            String stateMetaData=stateService.getMetaData(emailState);
+            if(stateMetaData==null || !stateMetaData.equals(email)){
+                throw new EmailValidationException("이메일 인증 상태를 확인할 수 없습니다.");
+            }
+
+            // 중복 검사
+            if(userAccountRepository.existsByEmail(email)){
+                stateService.delete(emailState);
+                throw new DuplicateDataException("이미 사용 중인 이메일입니다. (email = "+email+")");
+            }
         }
 
         // 주소 유효성 검사 (실제로 존재하는 주소인지 검사)
@@ -105,7 +111,9 @@ public class AuthServiceImpl implements AuthService {
         userAccountRepository.save(userAccount);
 
         // 이메일 인증 상태 제거하기 (일회용)
-        stateService.delete(emailState);
+        if(email!=null){
+            stateService.delete(emailState);
+        }
     }
 
     /**
@@ -135,7 +143,7 @@ public class AuthServiceImpl implements AuthService {
                         "안녕하세요.<br/><br/>" +
                         "회원님의 아이디는 " + username + " 입니다.<br/><br/>" +
                         "혹시 비밀번호를 모르시겠다면, 아래 링크를 이용해서 초기화해주세요.<br/><br/>" +
-                        "<a href=\""+PW_RESET_URL+"?token=" + token + "\">비밀번호 재설정하러 가기</a>"
+                        "<a href=\""+pwResetUrl+"?token=" + token + "\">비밀번호 재설정하러 가기</a>"
                 )
                 .useHtml(true)
                 .build();

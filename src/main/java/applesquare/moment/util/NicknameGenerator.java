@@ -27,6 +27,6 @@ public class NicknameGenerator {
     public static String generateNickname(){
         String first=FIRST_PART[random.nextInt(FIRST_PART.length)];
         String second=SECOND_PART[random.nextInt(SECOND_PART.length)];
-        return first+"_"+second;
+        return first+" "+second;
     }
 }
