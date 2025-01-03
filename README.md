@@ -1,20 +1,10 @@
 # 🎞️ Moment
 
-
 ![image](https://github.com/user-attachments/assets/0d2f156e-7473-4ac0-a0db-eb541db2c553)
 
 <br/>
 
 일상의 **✨특별한 순간**을 공유하는 **🪄시각 매체 기반 SNS**
-
-<br/>
-
-## 🖥️ 백엔드 API 서버
-
-
-**⏱️ 개발 기간** : 2024년 8월 12일 ~ 2024년 9월 30일 **(개발중)**
-
-**🔗 프론트 엔드 Repository : https://github.com/Apple-Square/moment-frontend**
 
 <br/>
 
@@ -39,6 +29,12 @@
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
 ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
 
+**Deploy**
+
+![AWS](https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+
 **Collaboration**
 
 ![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
@@ -56,7 +52,11 @@ https://nickel-confidence-5de.notion.site/API-008726751e004642976ff983cf98c5ee
 ## ✅ 주요 기능
 
 ### 🗝️ JWT 인증
-![image](https://github.com/user-attachments/assets/0326b2ae-c418-46e1-9091-5eaf5d545377)
+![image](https://github.com/user-attachments/assets/cbb4b3e0-08c8-4cde-bc5b-3e98ac4b63d2)
+
+
+### 📧 이메일 인증
+![image](https://github.com/user-attachments/assets/da264a67-8c6e-4cb8-afbd-7eb5b0fcbf93)
 
 
 ### 🌐 소셜 로그인 (kakao, naver)
@@ -64,8 +64,7 @@ https://nickel-confidence-5de.notion.site/API-008726751e004642976ff983cf98c5ee
 
 
 ### 🎥 게시물 (쇼츠)
-![image](https://github.com/user-attachments/assets/8061a0b2-c856-4a7e-b446-65efe9807236)
-![image](https://github.com/user-attachments/assets/c88df675-5c4b-447d-83eb-a0282898e466)
+![image](https://github.com/user-attachments/assets/e46f3a1b-5838-4a75-81a2-75cc7e8ba913)
 
 
 ### 💬 댓글
@@ -99,12 +98,11 @@ https://nickel-confidence-5de.notion.site/API-008726751e004642976ff983cf98c5ee
 |<img src="https://github.com/user-attachments/assets/9856718a-1113-42f4-a9fd-4efebbcee36c" width="180">|<img src="https://github.com/user-attachments/assets/7033ddfe-9613-41ae-b7f1-55f8138d02cd" width="180">|<img src="https://github.com/user-attachments/assets/180c06ef-e55a-48c2-ab2a-fb01e2ee17ea" width="180">|
 |---|---|---|
 |[**조현아 (BE)**](https://github.com/tenius10)|[**최건우 (FE)**](https://github.com/rjsdn031)|[**최현준 (FE)**](https://github.com/Hyeonjun0527)|
-|▪️ **백엔드 API 개발**<br/>(인증, 소셜 로그인,피드, <br/>쇼츠, 댓글, 태그, 유저 <br/>정보, 팔로우, 위치 검색)|▪️ **피드**<br/>▪️ **모먼트(쇼츠)**<br/>▪️ **댓글**<br/>▪️ **UI/UX**|▪️ **인증**<br/>▪️ **회원 관리**<br/>▪️ **채팅 관리**<br/>▪️ **UI/UX**|
+|▪️ **백엔드 API 개발**<br/>(인증, 소셜 로그인, 피드, <br/>쇼츠, 댓글, 태그, 유저 <br/>정보, 팔로우, 위치 검색)|▪️ **피드**<br/>▪️ **모먼트(쇼츠)**<br/>▪️ **댓글**<br/>▪️ **UI/UX**|▪️ **인증**<br/>▪️ **회원 관리**<br/>▪️ **채팅 관리**<br/>▪️ **UI/UX**|
 
 <br/>
 
 ## 🚀 개발 중인 기능
-**📧 이메일 인증** <br/>
 **⚙️ 계정 관리** <br/>
 **🔔 실시간 알림 (WebSocket)** <br/>
 **💬 실시간 채팅 (WebSocket)** <br/>
