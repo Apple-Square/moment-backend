@@ -1,7 +1,7 @@
 package applesquare.moment.email.controller;
 
 import applesquare.moment.common.exception.ResponseMap;
-import applesquare.moment.common.service.StateService;
+import applesquare.moment.common.state.StateService;
 import applesquare.moment.email.dto.EmailCodeRequestDTO;
 import applesquare.moment.email.dto.EmailValidateRequestDTO;
 import applesquare.moment.email.service.EmailValidationService;
@@ -51,7 +51,7 @@ public class EmailValidationController {
      *
      * @param emailValidateRequestDTO 이메일 유효성 검사 요청 정보
      * @return  (status) 200,
-     *                    (body) 이메일 유효성 여부
+     *          (body) 이메일 유효성 여부
      */
     @PostMapping(value = "/code/validate", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void validateCode(@Valid @RequestBody EmailValidateRequestDTO emailValidateRequestDTO, HttpServletResponse response) throws IOException {

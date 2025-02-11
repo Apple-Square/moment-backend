@@ -1,5 +1,7 @@
 package applesquare.moment.location.service.impl;
 
+import applesquare.moment.common.url.UrlManager;
+import applesquare.moment.common.url.UrlPath;
 import applesquare.moment.location.dto.KakaoLocationSearchRequestDTO;
 import applesquare.moment.location.dto.KakaoLocationSearchResponseDTO;
 import applesquare.moment.location.service.KakaoLocationService;
@@ -17,10 +19,11 @@ import org.springframework.web.client.RestTemplate;
 @Transactional
 @RequiredArgsConstructor
 public class KakaoLocationServiceImpl implements KakaoLocationService {
+    private final UrlManager urlManager;
     private final RestTemplate restTemplate;
+
     @Value("${kakao.client.id}")
     private String kakaoClientId;
-    private final String KAKAO_LOCATION_URL="https://dapi.kakao.com/v2/local/search/keyword.json";
 
 
     /**
@@ -35,7 +38,8 @@ public class KakaoLocationServiceImpl implements KakaoLocationService {
         Integer size = kakaoLocationSearchRequestDTO.getSize();
 
         // URL 생성
-        StringBuilder sb=new StringBuilder(KAKAO_LOCATION_URL).append("?query=").append(keyword);
+        String kakaoLocationUrl=urlManager.getUrl(UrlPath.KAKAO_LOCATION_URL);
+        StringBuilder sb=new StringBuilder(kakaoLocationUrl).append("?query=").append(keyword);
         if (page != null) sb.append("&page=").append(page);
         if (size != null) sb.append("&size=").append(size);
         String url = sb.toString();

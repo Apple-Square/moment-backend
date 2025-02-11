@@ -1,6 +1,6 @@
-package applesquare.moment.common.service.impl;
+package applesquare.moment.common.state.impl;
 
-import applesquare.moment.common.service.StateService;
+import applesquare.moment.common.state.StateService;
 import applesquare.moment.redis.model.RedisKeyType;
 import applesquare.moment.redis.repository.RedisRepository;
 import lombok.RequiredArgsConstructor;

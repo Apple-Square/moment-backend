@@ -1,5 +1,7 @@
 package applesquare.moment.file.service.impl;
 
+import applesquare.moment.common.url.UrlManager;
+import applesquare.moment.common.url.UrlPath;
 import applesquare.moment.file.exception.FileTransferException;
 import applesquare.moment.file.model.StorageFile;
 import applesquare.moment.file.repository.StorageFileRepository;
@@ -29,13 +31,13 @@ public class FileServiceImpl implements FileService {
     private final String THUMBNAIL_FILE_PREFIX="thumb_";
     private final int THUMBNAIL_WIDTH_SIZE=500;  // 500px
     private final int THUMBNAIL_VIDEO_SEC=7;  // 7초
-    @Value("${applesquare.moment.file.upload-path}")
-    private String uploadDirectory;
-    @Value("${applesquare.moment.file.base-url}")
-    private String baseUrl;
 
+    private final UrlManager urlManager;
     private final CloudinaryService cloudinaryService;
     private final StorageFileRepository storageFileRepository;
+
+    @Value("${applesquare.moment.file.upload-path}")
+    private String uploadDirectory;
 
 
     /**
@@ -209,7 +211,7 @@ public class FileServiceImpl implements FileService {
      */
     @Override
     public String convertFilenameToUrl(String filename){
-        return baseUrl+"/"+filename;
+        return urlManager.getUrl(UrlPath.BACK_FILE_BASE_URL)+"/"+filename;
     }
 
     /**
@@ -220,7 +222,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public String convertUrlToFilename(String url){
         // filename 앞에 baseURL 제거
-        String prefix=baseUrl+"/";
+        String prefix=urlManager.getUrl(UrlPath.BACK_FILE_BASE_URL)+"/";
         if(url.startsWith(prefix)){
             String filename=url.substring(prefix.length());
 

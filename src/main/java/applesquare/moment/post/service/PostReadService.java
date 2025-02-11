@@ -1,7 +1,7 @@
 package applesquare.moment.post.service;
 
-import applesquare.moment.common.dto.PageRequestDTO;
-import applesquare.moment.common.dto.PageResponseDTO;
+import applesquare.moment.common.page.PageRequestDTO;
+import applesquare.moment.common.page.PageResponseDTO;
 import applesquare.moment.post.dto.PostDetailReadAllResponseDTO;
 import applesquare.moment.post.dto.PostThumbnailReadAllResponseDTO;
 
@@ -19,4 +19,6 @@ public interface PostReadService {
     // 특정 유저가 좋아요 누른 게시물 목록 조회
     PageResponseDTO<PostDetailReadAllResponseDTO> readLikedDetailAllByUser(String userId, PageRequestDTO pageRequestDTO);
     PageResponseDTO<PostThumbnailReadAllResponseDTO> readLikedThumbnailAllByUser(String userId, PageRequestDTO pageRequestDTO);
+
+    String readThumbnailImageUrl(Long postId);
 }

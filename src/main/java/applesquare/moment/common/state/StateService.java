@@ -1,4 +1,4 @@
-package applesquare.moment.common.service;
+package applesquare.moment.common.state;
 
 import java.util.concurrent.TimeUnit;
 

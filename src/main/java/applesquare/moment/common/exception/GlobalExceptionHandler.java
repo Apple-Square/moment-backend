@@ -4,6 +4,8 @@ import applesquare.moment.auth.exception.TokenException;
 import applesquare.moment.email.exception.EmailValidationException;
 import applesquare.moment.email.exception.MailSendException;
 import applesquare.moment.file.exception.FileTransferException;
+import applesquare.moment.sse.exception.SseEmitterNotFoundException;
+import applesquare.moment.sse.exception.SseSendException;
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolation;
@@ -41,6 +43,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String,Object>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e){
+        // 에러 로그 출력
+        e.printStackTrace();
+
         final List<String> errorMessages=new LinkedList<>();
 
         BindingResult bindingResult=e.getBindingResult();
@@ -61,6 +66,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Map<String,Object>> handleConstraintViolationException(ConstraintViolationException e){
+        // 에러 로그 출력
+        e.printStackTrace();
+
         final List<String> errorMessages=new LinkedList<>();
 
         Set<ConstraintViolation<?>> violations=e.getConstraintViolations();
@@ -83,6 +91,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(IllegalArgumentException e){
+        // 에러 로그 출력
+        e.printStackTrace();
+
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap.getMap());
@@ -95,6 +106,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MissingServletRequestPartException.class)
     public ResponseEntity<Map<String, Object>> handleMissingServletRequestPartException(MissingServletRequestPartException e){
+        // 에러 로그 출력
+        e.printStackTrace();
+
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap.getMap());
@@ -107,6 +121,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<Map<String, Object>> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e){
+        // 에러 로그 출력
+        e.printStackTrace();
+
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", "파일이 업로드 가능한 용량을 초과했습니다.");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap.getMap());
@@ -119,6 +136,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<Map<String, Object>> handleMissingServletRequestParameterException(MissingServletRequestParameterException e){
+        // 에러 로그 출력
+        e.printStackTrace();
+
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap.getMap());
@@ -135,6 +155,9 @@ public class GlobalExceptionHandler {
             MessagingException.class
     })
     public ResponseEntity<Map<String, Object>> handleMailException(Exception e){
+        // 에러 로그 출력
+        e.printStackTrace();
+
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap.getMap());
@@ -147,6 +170,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(TokenException.class)
     public ResponseEntity<Map<String, Object>> handleTokenException(TokenException e){
+        // 에러 로그 출력
+        e.printStackTrace();
+
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", e.getMessage());
         return ResponseEntity.status(e.getStatus()).body(responseMap.getMap());
@@ -159,6 +185,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(OAuth2AuthenticationException.class)
     public ResponseEntity<Map<String, Object>> handleOAuth2AuthenticationException(OAuth2AuthenticationException e){
+        // 에러 로그 출력
+        e.printStackTrace();
+
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", e.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMap.getMap());
@@ -171,6 +200,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Map<String, Object>> handleAccessDeniedException(AccessDeniedException e){
+        // 에러 로그 출력
+        e.printStackTrace();
+
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", e.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(responseMap.getMap());
@@ -183,6 +215,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<Map<String,Object>> handleNoHandlerFoundException(NoHandlerFoundException e){
+        // 에러 로그 출력
+        e.printStackTrace();
+
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", "요청하신 엔드 포인트를 찾을 수 없습니다. http 메소드와 경로를 다시 확인해주세요.");
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseMap.getMap());
@@ -198,9 +233,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             EntityNotFoundException.class,
             FileNotFoundException.class,
-            UsernameNotFoundException.class
+            UsernameNotFoundException.class,
+            SseEmitterNotFoundException.class
     })
     public ResponseEntity<Map<String,Object>> handleNotFoundException(Exception e){
+        // 에러 로그 출력
+        e.printStackTrace();
+
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseMap.getMap());
@@ -213,6 +252,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(DuplicateDataException.class)
     public ResponseEntity<Map<String, Object>> handleInvalidInputException(DuplicateDataException e){
+        // 에러 로그 출력
+        e.printStackTrace();
+
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", e.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(responseMap.getMap());
@@ -225,6 +267,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String,Object>> handleDataIntegrityViolationException(DataIntegrityViolationException e){
+        // 에러 로그 출력
+        e.printStackTrace();
+
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", "데이터 무결성을 위반했습니다.");
         return ResponseEntity.status(HttpStatus.CONFLICT).body(responseMap.getMap());
@@ -238,6 +283,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(StateExpiredException.class)
     public ResponseEntity<Map<String,Object>> handleStateExpiredException(StateExpiredException e){
+        // 에러 로그 출력
+        e.printStackTrace();
+
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", e.getMessage());
         return ResponseEntity.status(HttpStatus.GONE).body(responseMap.getMap());
@@ -250,8 +298,26 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(FileTransferException.class)
     public ResponseEntity<Map<String,Object>> handleFileTransferException(FileTransferException e){
+        // 에러 로그 출력
+        e.printStackTrace();
+
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", "파일 전송 중 오류가 발생했습니다.");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap.getMap());
+    }
+
+    /**
+     * SSE 전송 예외 처리
+     * @param e SseSendException
+     * @return 500 (Internal Server Error)
+     */
+    @ExceptionHandler(SseSendException.class)
+    public ResponseEntity<Map<String,Object>> handleSseSendException(SseSendException e){
+        // 에러 로그 출력
+        e.printStackTrace();
+
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", "SSE 전송에 실패했습니다.");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap.getMap());
     }
 
@@ -262,6 +328,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(DataAccessException.class)
     public ResponseEntity<Map<String,Object>> handleDataAccessException(DataAccessException e){
+        // 에러 로그 출력
+        e.printStackTrace();
+
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", "데이터에 접근할 수 없습니다.");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap.getMap());
@@ -272,7 +341,9 @@ public class GlobalExceptionHandler {
      * @param e Exception
      * @return 500 (Internal Server Error)
      */
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler({
+            Exception.class
+    })
     public ResponseEntity<Map<String,Object>> handleException(Exception e){
         // 에러 로그 출력
         e.printStackTrace();

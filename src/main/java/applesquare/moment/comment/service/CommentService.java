@@ -4,8 +4,8 @@ import applesquare.moment.comment.dto.CommentCreateRequestDTO;
 import applesquare.moment.comment.dto.CommentReadAllResponseDTO;
 import applesquare.moment.comment.dto.CommentUpdateRequestDTO;
 import applesquare.moment.comment.model.Comment;
-import applesquare.moment.common.dto.PageRequestDTO;
-import applesquare.moment.common.dto.PageResponseDTO;
+import applesquare.moment.common.page.PageRequestDTO;
+import applesquare.moment.common.page.PageResponseDTO;
 
 public interface CommentService {
     int MIN_CONTENT_LENGTH=1;

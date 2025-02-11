@@ -1,8 +1,8 @@
 package applesquare.moment.post.controller;
 
-import applesquare.moment.common.dto.PageRequestDTO;
-import applesquare.moment.common.dto.PageResponseDTO;
 import applesquare.moment.common.exception.ResponseMap;
+import applesquare.moment.common.page.PageRequestDTO;
+import applesquare.moment.common.page.PageResponseDTO;
 import applesquare.moment.post.dto.PostDetailReadAllResponseDTO;
 import applesquare.moment.post.dto.PostThumbnailReadAllResponseDTO;
 import applesquare.moment.post.service.PostSearchService;

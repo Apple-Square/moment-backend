@@ -3,6 +3,8 @@ package applesquare.moment.address.service.impl;
 import applesquare.moment.address.dto.KakaoAddressSearchRequestDTO;
 import applesquare.moment.address.dto.KakaoAddressSearchResponseDTO;
 import applesquare.moment.address.service.KakaoAddressService;
+import applesquare.moment.common.url.UrlManager;
+import applesquare.moment.common.url.UrlPath;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -17,10 +19,11 @@ import org.springframework.web.client.RestTemplate;
 @Transactional
 @RequiredArgsConstructor
 public class KakaoAddressServiceImpl implements KakaoAddressService {
+    private final UrlManager urlManager;
     private final RestTemplate restTemplate;
+
     @Value("${kakao.client.id}")
     private String kakaoClientId;
-    private final String KAKAO_ADDRESS_URL="https://dapi.kakao.com/v2/local/search/address.json";
 
 
     /**
@@ -36,7 +39,8 @@ public class KakaoAddressServiceImpl implements KakaoAddressService {
         Integer size = kakaoAddressSearchRequestDTO.getSize();
 
         // URL 생성
-        StringBuilder sb=new StringBuilder(KAKAO_ADDRESS_URL).append("?query=").append(keyword);
+        String kakaoAddressUrl=urlManager.getUrl(UrlPath.KAKAO_ADDRESS_URL);
+        StringBuilder sb=new StringBuilder(kakaoAddressUrl).append("?query=").append(keyword);
         if (analyzeType!= null) sb.append("&analyze_type=").append(analyzeType);
         if (page != null) sb.append("&page=").append(page);
         if (size != null) sb.append("&size=").append(size);

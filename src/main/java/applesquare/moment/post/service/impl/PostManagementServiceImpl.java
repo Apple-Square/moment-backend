@@ -3,10 +3,13 @@ package applesquare.moment.post.service.impl;
 import applesquare.moment.address.dto.AddressSearchResponseDTO;
 import applesquare.moment.address.service.AddressService;
 import applesquare.moment.comment.repository.CommentRepository;
-import applesquare.moment.common.service.SecurityService;
+import applesquare.moment.common.security.SecurityService;
 import applesquare.moment.file.model.StorageFile;
 import applesquare.moment.file.repository.StorageFileRepository;
 import applesquare.moment.file.service.FileService;
+import applesquare.moment.notification.dto.NotificationRequestDTO;
+import applesquare.moment.notification.model.NotificationType;
+import applesquare.moment.notification.service.NotificationSendService;
 import applesquare.moment.post.dto.PostCreateRequestDTO;
 import applesquare.moment.post.dto.PostUpdateRequestDTO;
 import applesquare.moment.post.model.Post;
@@ -43,6 +46,7 @@ public class PostManagementServiceImpl implements PostManagementService {
     private final FileService fileService;
     private final TagService tagService;
     private final AddressService addressService;
+    private final NotificationSendService notificationSendService;
 
 
     // 허용되는 MIME 타입 이미지 목록
@@ -95,7 +99,7 @@ public class PostManagementServiceImpl implements PostManagementService {
         String addressName=null;
         Double x=null;
         Double y=null;
-        if(address!=null){
+        if(address!=null && !address.isBlank()){
             AddressSearchResponseDTO addressSearchResponseDTO =addressService.searchAddress(address);
             if(addressSearchResponseDTO==null){
                 throw new IllegalArgumentException("존재하지 않는 주소입니다. 정확한 주소를 입력해주세요.");
@@ -123,7 +127,7 @@ public class PostManagementServiceImpl implements PostManagementService {
                 storageFiles.add(storageFile);
             }
 
-            // Post 엔티티 생성
+            // 게시물 엔티티 생성
             Post post=Post.builder()
                     .content(postCreateRequestDTO.getContent())
                     .viewCount(0)
@@ -135,8 +139,17 @@ public class PostManagementServiceImpl implements PostManagementService {
                     .tags(tags)
                     .build();
 
-            // DB 저장
+            // 게시물 엔티티 DB 저장
             Post result=postRepository.save(post);
+
+            // 피드 알림 전송
+            NotificationRequestDTO notificationRequestDTO=NotificationRequestDTO.builder()
+                    .type(NotificationType.FEED)
+                    .sender(writer)  // 송신자 ==  게시물 작성자
+                    .referenceId(result.getId().toString())  // 래퍼런스 ID ==  게시물 ID
+                    .build();
+
+            notificationSendService.notify(notificationRequestDTO);
 
             // 리소스 ID 반환
             return result.getId();

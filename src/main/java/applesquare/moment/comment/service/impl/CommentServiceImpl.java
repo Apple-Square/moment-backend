@@ -7,10 +7,13 @@ import applesquare.moment.comment.dto.CommentUpdateRequestDTO;
 import applesquare.moment.comment.model.Comment;
 import applesquare.moment.comment.repository.CommentRepository;
 import applesquare.moment.comment.service.CommentService;
-import applesquare.moment.common.dto.PageRequestDTO;
-import applesquare.moment.common.dto.PageResponseDTO;
-import applesquare.moment.common.service.SecurityService;
+import applesquare.moment.common.page.PageRequestDTO;
+import applesquare.moment.common.page.PageResponseDTO;
+import applesquare.moment.common.security.SecurityService;
 import applesquare.moment.like.repository.CommentLikeRepository;
+import applesquare.moment.notification.dto.NotificationRequestDTO;
+import applesquare.moment.notification.model.NotificationType;
+import applesquare.moment.notification.service.NotificationSendService;
 import applesquare.moment.post.model.Post;
 import applesquare.moment.post.repository.PostRepository;
 import applesquare.moment.user.dto.UserProfileReadResponseDTO;
@@ -41,6 +44,7 @@ public class CommentServiceImpl implements CommentService {
     private final UserInfoRepository userInfoRepository;
     private final SecurityService securityService;
     private final UserProfileService userProfileService;
+    private final NotificationSendService notificationSendService;
     private final ModelMapper modelMapper;
 
 
@@ -57,11 +61,11 @@ public class CommentServiceImpl implements CommentService {
         // 입력 형식 검사
 
         // 권한 검사
-        String userId= securityService.getUserId();
+        String myUserId= securityService.getUserId();
 
-        // 엔티티 생성
-        UserInfo writer=userInfoRepository.findById(userId)
-                .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 사용자입니다. (id = "+userId+")"));
+        // 댓글 엔티티 생성
+        UserInfo writer=userInfoRepository.findById(myUserId)
+                .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 사용자입니다. (id = "+myUserId+")"));
         Post post=postRepository.findById(postId)
                 .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 게시글입니다. (id = "+postId+")"));
         Comment comment=Comment.builder()
@@ -70,11 +74,21 @@ public class CommentServiceImpl implements CommentService {
                 .post(post)
                 .build();
 
-        // DB 저장
-        Comment result=commentRepository.save(comment);
+        // 댓글 엔티티 DB 저장
+        Comment newComment=commentRepository.save(comment);
+
+        // 댓글 알림 전송
+        NotificationRequestDTO notificationRequestDTO=NotificationRequestDTO.builder()
+                .type(NotificationType.COMMENT)
+                .sender(writer)  // 송신자 == 댓글 작성자
+                .receiverId(post.getWriter().getId())  // 수신자 == 게시물 작성자
+                .referenceId(postId.toString())  // 래퍼런스 ID == 게시물 ID
+                .build();
+
+        notificationSendService.notify(notificationRequestDTO);
 
         // 리소스 ID 반환
-        return result.getId();
+        return newComment.getId();
     }
 
     /**

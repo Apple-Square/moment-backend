@@ -1,8 +1,8 @@
 package applesquare.moment.user.service.impl;
 
-import applesquare.moment.common.dto.PageRequestDTO;
-import applesquare.moment.common.dto.PageResponseDTO;
-import applesquare.moment.common.service.SecurityService;
+import applesquare.moment.common.page.PageRequestDTO;
+import applesquare.moment.common.page.PageResponseDTO;
+import applesquare.moment.common.security.SecurityService;
 import applesquare.moment.file.model.StorageFile;
 import applesquare.moment.file.service.FileService;
 import applesquare.moment.user.dto.UserProfileReadResponseDTO;

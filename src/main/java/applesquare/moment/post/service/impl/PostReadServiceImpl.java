@@ -1,7 +1,7 @@
 package applesquare.moment.post.service.impl;
 
-import applesquare.moment.common.dto.PageRequestDTO;
-import applesquare.moment.common.dto.PageResponseDTO;
+import applesquare.moment.common.page.PageRequestDTO;
+import applesquare.moment.common.page.PageResponseDTO;
 import applesquare.moment.file.service.FileService;
 import applesquare.moment.post.dto.PostDetailReadAllResponseDTO;
 import applesquare.moment.post.dto.PostThumbnailReadAllResponseDTO;
@@ -290,5 +290,11 @@ public class PostReadServiceImpl implements PostReadService {
                 .content(postThumbnailReadAllResponseDTOS)
                 .hasNext(hasNext)
                 .build();
+    }
+
+    @Override
+    public String readThumbnailImageUrl(Long postId){
+        String thumbFilename= postRepository.findFirstFileById(postId);
+        return fileService.convertFilenameToUrl(thumbFilename);
     }
 }

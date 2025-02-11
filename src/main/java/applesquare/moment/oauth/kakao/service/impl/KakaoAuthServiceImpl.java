@@ -1,5 +1,7 @@
 package applesquare.moment.oauth.kakao.service.impl;
 
+import applesquare.moment.common.url.UrlManager;
+import applesquare.moment.common.url.UrlPath;
 import applesquare.moment.oauth.kakao.dto.KakaoUserInfoReadResponseDTO;
 import applesquare.moment.oauth.kakao.service.KakaoAuthService;
 import lombok.RequiredArgsConstructor;
@@ -22,13 +24,11 @@ import java.util.Map;
 @Transactional
 @RequiredArgsConstructor
 public class KakaoAuthServiceImpl implements KakaoAuthService {
+    private final UrlManager urlManager;
     private final RestTemplate restTemplate;
+
     @Value("${kakao.client.id}")
     private String kakaoClientId;
-    @Value("${kakao.oauth.redirect-uri}")
-    private String kakaoOauthRedirectUri;
-    private final String KAKAO_TOKEN_URL="https://kauth.kakao.com/oauth/token";
-    private final String KAKAO_USER_INFO_URL="https://kapi.kakao.com/v2/user/me";
 
 
     /**
@@ -46,13 +46,14 @@ public class KakaoAuthServiceImpl implements KakaoAuthService {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", kakaoClientId);
-        body.add("redirect_uri", kakaoOauthRedirectUri);
+        body.add("redirect_uri", urlManager.getUrl(UrlPath.KAKAO_LOGIN_REDIRECT_URI));
         body.add("code", code);
 
         // HTTP 요청 보내기
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest=new HttpEntity<>(body, headers);
+        String kakaoTokenUrl= urlManager.getUrl(UrlPath.KAKAO_TOKEN_URL);
         ResponseEntity<Map> kakaoTokenResponse = restTemplate.exchange(
-                KAKAO_TOKEN_URL,
+                kakaoTokenUrl,
                 HttpMethod.POST,
                 kakaoTokenRequest,
                 Map.class);
@@ -84,8 +85,9 @@ public class KakaoAuthServiceImpl implements KakaoAuthService {
 
         // HTTP 요청 보내기
         HttpEntity<String> kakaoUserRequest = new HttpEntity<>(headers);
+        String kakaoUserInfoUrl=urlManager.getUrl(UrlPath.KAKAO_USER_INFO_URL);
         ResponseEntity<KakaoUserInfoReadResponseDTO> kakaoUserResponse = restTemplate.exchange(
-                KAKAO_USER_INFO_URL,
+                kakaoUserInfoUrl,
                 HttpMethod.GET,
                 kakaoUserRequest,
                 KakaoUserInfoReadResponseDTO.class

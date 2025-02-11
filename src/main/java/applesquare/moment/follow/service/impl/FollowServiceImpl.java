@@ -1,15 +1,18 @@
 package applesquare.moment.follow.service.impl;
 
 import applesquare.moment.auth.exception.TokenException;
-import applesquare.moment.common.dto.PageRequestDTO;
-import applesquare.moment.common.dto.PageResponseDTO;
 import applesquare.moment.common.exception.DuplicateDataException;
-import applesquare.moment.common.service.SecurityService;
+import applesquare.moment.common.page.PageRequestDTO;
+import applesquare.moment.common.page.PageResponseDTO;
+import applesquare.moment.common.security.SecurityService;
 import applesquare.moment.file.service.FileService;
 import applesquare.moment.follow.dto.FollowReadAllResponseDTO;
 import applesquare.moment.follow.model.Follow;
 import applesquare.moment.follow.repository.FollowRepository;
 import applesquare.moment.follow.service.FollowService;
+import applesquare.moment.notification.dto.NotificationRequestDTO;
+import applesquare.moment.notification.model.NotificationType;
+import applesquare.moment.notification.service.NotificationSendService;
 import applesquare.moment.user.model.UserInfo;
 import applesquare.moment.user.repository.UserInfoRepository;
 import applesquare.moment.user.service.UserProfileService;
@@ -33,6 +36,7 @@ public class FollowServiceImpl implements FollowService {
     private final UserInfoRepository userInfoRepository;
     private final FileService fileService;
     private final SecurityService securityService;
+    private final NotificationSendService notificationSendService;
 
 
     /**
@@ -58,18 +62,28 @@ public class FollowServiceImpl implements FollowService {
                 .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 사용자입니다. (id = "+followeeId+")"));
 
         // 이미 팔로우한 상태인지 검사
-        if(followRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)){
+        if(followRepository.existsByFollower_IdAndFollowee_Id(followerId, followeeId)){
             throw new DuplicateDataException("이미 팔로우한 사용자입니다. (id = "+followeeId+")");
         }
 
-        // Follow 엔티티 생성
+        // 팔로우 엔티티 생성
         Follow follow=Follow.builder()
                 .follower(follower)
                 .followee(followee)
                 .build();
 
-        // DB 저장
+        // 팔로우 엔티티 DB 저장
         followRepository.save(follow);
+
+        // 팔로우 알림 전송
+        NotificationRequestDTO notificationRequestDTO=NotificationRequestDTO.builder()
+                .type(NotificationType.FOLLOW)
+                .sender(follower)  // 송신자 == 팔로우 누른 사람(follower)
+                .receiverId(followeeId)  // 수신자 == 팔로우 상대(followee)
+                .referenceId(followerId)  // 래퍼런스 ID == 팔로워 ID
+                .build();
+
+        notificationSendService.notify(notificationRequestDTO);
 
         // 팔로우한 사용자의 ID 반환
         return followeeId;
@@ -100,12 +114,12 @@ public class FollowServiceImpl implements FollowService {
         }
 
         // 이미 팔로우 취소한 상태인지 검사
-        if(!followRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)){
+        if(!followRepository.existsByFollower_IdAndFollowee_Id(followerId, followeeId)){
             throw new DuplicateDataException("이미 팔로우 취소한 사용자입니다. (id = "+followeeId+")");
         }
 
         // DB에서 Follow 엔티티 삭제
-        followRepository.deleteByFollowerIdAndFolloweeId(followerId, followeeId);
+        followRepository.deleteByFollower_IdAndFollowee_Id(followerId, followeeId);
 
         return followeeId;
     }

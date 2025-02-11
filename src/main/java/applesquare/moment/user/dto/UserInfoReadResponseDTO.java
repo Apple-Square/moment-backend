@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class UserInfoReadResponseDTO {
     private String id;
     private String nickname;
-    @JsonFormat(pattern="yyyy-MM-dd")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime regDate;  // 가입일
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birth;

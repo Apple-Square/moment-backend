@@ -13,7 +13,6 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Long>, CustomPostRepository {
     long countByWriterId(String userId);
 
-
     // 게시물 목록 조회 (커서 페이징)
     @EntityGraph(attributePaths = {"files"})
     @Query("SELECT p " +
@@ -158,4 +157,14 @@ public interface PostRepository extends JpaRepository<Post, Long>, CustomPostRep
     List<Post> findLikedMomentAllByUserId(@Param("userId") String userId,
                                           @Param("cursor") Long cursor,
                                           Pageable pageable);
+
+    // ====================================================================
+
+    // 게시물 썸네일 목록 조회 (커서 페이징)
+    @Query(value = "SELECT sf.filename " +
+            "FROM post p " +
+            "INNER JOIN post_files pf ON pf.post_id=p.id " +
+            "INNER JOIN storage_file sf ON pf.file_id=sf.id " +
+            "WHERE p.id=:postId AND pf.file_order=0 ", nativeQuery = true)
+    String findFirstFileById(@Param("postId") Long postId);
 }

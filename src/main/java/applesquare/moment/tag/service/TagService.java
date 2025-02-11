@@ -1,7 +1,7 @@
 package applesquare.moment.tag.service;
 
-import applesquare.moment.common.dto.PageRequestDTO;
-import applesquare.moment.common.dto.PageResponseDTO;
+import applesquare.moment.common.page.PageRequestDTO;
+import applesquare.moment.common.page.PageResponseDTO;
 import applesquare.moment.tag.dto.TagReadResponseDTO;
 import applesquare.moment.tag.model.Tag;
 

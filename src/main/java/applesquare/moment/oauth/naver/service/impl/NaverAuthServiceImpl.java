@@ -1,5 +1,7 @@
 package applesquare.moment.oauth.naver.service.impl;
 
+import applesquare.moment.common.url.UrlManager;
+import applesquare.moment.common.url.UrlPath;
 import applesquare.moment.oauth.naver.dto.NaverUserInfoReadResponseDTO;
 import applesquare.moment.oauth.naver.service.NaverAuthService;
 import lombok.RequiredArgsConstructor;
@@ -17,14 +19,13 @@ import java.util.Map;
 @Transactional
 @RequiredArgsConstructor
 public class NaverAuthServiceImpl implements NaverAuthService {
+    private final UrlManager urlManager;
     private final RestTemplate restTemplate;
 
     @Value("${naver.client.id}")
     private String naverClientId;
     @Value("${naver.client.secret}")
     private String naverClientSecret;
-    private final String NAVER_TOKEN_URL="https://nid.naver.com/oauth2.0/token";
-    private final String NAVER_USER_INFO_URL="https://openapi.naver.com/v1/nid/me";
 
 
     /**
@@ -36,7 +37,8 @@ public class NaverAuthServiceImpl implements NaverAuthService {
     @Override
     public String getAccessToken(String code, String state){
         // URL 생성
-        String url=new StringBuilder(NAVER_TOKEN_URL)
+        String naverTokenUrl=urlManager.getUrl(UrlPath.NAVER_TOKEN_URL);
+        String url=new StringBuilder(naverTokenUrl)
                 .append("?grant_type=authorization_code")
                 .append("&client_id=").append(naverClientId)
                 .append("&client_secret=").append(naverClientSecret)
@@ -85,10 +87,10 @@ public class NaverAuthServiceImpl implements NaverAuthService {
         headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
 
         // HTTP 요청 보내기
-        String url=NAVER_USER_INFO_URL;
+        String naverUserInfoUrl= urlManager.getUrl(UrlPath.NAVER_USER_INFO_URL);
         HttpEntity<String> naverUserRequest=new HttpEntity<>(headers);
         ResponseEntity<NaverUserInfoReadResponseDTO> naverUserResponse=restTemplate.exchange(
-                url,
+                naverUserInfoUrl,
                 HttpMethod.GET,
                 naverUserRequest,
                 NaverUserInfoReadResponseDTO.class

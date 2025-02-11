@@ -1,4 +1,4 @@
-package applesquare.moment.common.dto;
+package applesquare.moment.common.page;
 
 import lombok.*;
 

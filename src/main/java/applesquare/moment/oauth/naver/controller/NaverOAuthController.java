@@ -1,6 +1,8 @@
 package applesquare.moment.oauth.naver.controller;
 
-import applesquare.moment.common.service.StateService;
+import applesquare.moment.common.state.StateService;
+import applesquare.moment.common.url.UrlManager;
+import applesquare.moment.common.url.UrlPath;
 import applesquare.moment.oauth.service.OAuthService;
 import applesquare.moment.user.dto.UserProfileReadResponseDTO;
 import applesquare.moment.util.JwtUtil;
@@ -29,22 +31,16 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 @RequestMapping("/api/oauth/naver")
 public class NaverOAuthController{
+    private final String NAVER_STATE_METADATA="naver-login-redirect";
+
     private final OAuthService oAuthService;
     private final StateService stateService;
+    private final UrlManager urlManager;
     private final JwtUtil jwtUtil;
 
     // 네이버 로그인 환경 변수
     @Value("${naver.client.id}")
     private String naverClientId;
-    @Value("${naver.oauth.redirect-uri}")
-    private String naverOauthRedirectUri;
-    @Value("${moment.front.main.url}")
-    private String momentMainUrl;
-    @Value("${moment.front.error.500.url}")
-    private String moment500ErrorUrl;
-
-    private final String NAVER_LOGIN_URL="https://nid.naver.com/oauth2.0/authorize";
-    private final String NAVER_STATE_METADATA="naver-login-redirect";
 
 
     /**
@@ -63,14 +59,12 @@ public class NaverOAuthController{
         // Redis에 CSRF 방지 토큰 등록
         stateService.create(encodedState, NAVER_STATE_METADATA, 10, TimeUnit.MINUTES);
 
-        // HTTP Header 생성
-        HttpHeaders headers=new HttpHeaders();
-
         // 네이버 로그인 화면으로 리다이렉트
-        String url=new StringBuilder(NAVER_LOGIN_URL)
+        String naverLoginUrl=urlManager.getUrl(UrlPath.NAVER_LOGIN_URL);
+        String url=new StringBuilder(naverLoginUrl)
                 .append("?response_type=code")
                 .append("&client_id=").append(naverClientId)
-                .append("&redirect_uri=").append(naverOauthRedirectUri)
+                .append("&redirect_uri=").append(urlManager.getUrl(UrlPath.NAVER_LOGIN_REDIRECT_URI))
                 .append("&state=").append(encodedState)
                 .toString();
 
@@ -129,17 +123,19 @@ public class NaverOAuthController{
             headers.add(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
             // Location 설정
-            headers.add(HttpHeaders.LOCATION, momentMainUrl);
+            headers.add(HttpHeaders.LOCATION, urlManager.getUrl(UrlPath.FRONT_MAIN_PAGE));
 
             return ResponseEntity.status(HttpStatus.FOUND)
                     .headers(headers)
                     .build();
         } catch(Exception e){
+            e.printStackTrace();
+
             // 실패 했으면, 500 에러 페이지로 리다이렉트
 
             // Location 설정
             HttpHeaders headers=new HttpHeaders();
-            headers.add(HttpHeaders.LOCATION, moment500ErrorUrl);
+            headers.add(HttpHeaders.LOCATION, urlManager.getUrl(UrlPath.FRONT_ERROR_500_PAGE));
 
             return ResponseEntity.status(HttpStatus.FOUND)
                     .headers(headers)

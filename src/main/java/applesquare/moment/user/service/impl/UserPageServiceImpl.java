@@ -1,7 +1,7 @@
 package applesquare.moment.user.service.impl;
 
 import applesquare.moment.auth.exception.TokenException;
-import applesquare.moment.common.service.SecurityService;
+import applesquare.moment.common.security.SecurityService;
 import applesquare.moment.file.service.FileService;
 import applesquare.moment.follow.repository.FollowRepository;
 import applesquare.moment.post.repository.PostRepository;
@@ -52,8 +52,8 @@ public class UserPageServiceImpl implements UserPageService {
 
         // 게시글 수, 팔로워 수, 팔로잉 수 가져오기
         long postCount=postRepository.countByWriterId(userId);
-        long followerCount=followRepository.countByFolloweeId(userId);
-        long followingCount=followRepository.countByFollowerId(userId);
+        long followerCount=followRepository.countByFollowee_Id(userId);
+        long followingCount=followRepository.countByFollower_Id(userId);
 
         // 팔로우 눌렀는지 여부 가져오기
         boolean followed=false;
@@ -62,7 +62,7 @@ public class UserPageServiceImpl implements UserPageService {
             String myUserId=securityService.getUserId();
 
             // 로그인한 경우
-            followed=followRepository.existsByFollowerIdAndFolloweeId(myUserId, userId);
+            followed=followRepository.existsByFollower_IdAndFollowee_Id(myUserId, userId);
 
         }catch(TokenException e){
             // 로그인하지 않은 경우

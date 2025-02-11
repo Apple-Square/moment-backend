@@ -2,7 +2,7 @@ package applesquare.moment.user.service.impl;
 
 import applesquare.moment.address.dto.AddressSearchResponseDTO;
 import applesquare.moment.address.service.AddressService;
-import applesquare.moment.common.service.SecurityService;
+import applesquare.moment.common.security.SecurityService;
 import applesquare.moment.user.dto.UserInfoUpdateRequestDTO;
 import applesquare.moment.user.model.Gender;
 import applesquare.moment.user.model.UserInfo;

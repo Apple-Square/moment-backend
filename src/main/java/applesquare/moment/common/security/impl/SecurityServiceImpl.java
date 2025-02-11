@@ -1,9 +1,9 @@
-package applesquare.moment.common.service.impl;
+package applesquare.moment.common.security.impl;
 
 import applesquare.moment.auth.exception.TokenError;
 import applesquare.moment.auth.exception.TokenException;
 import applesquare.moment.auth.security.UserDetailsImpl;
-import applesquare.moment.common.service.SecurityService;
+import applesquare.moment.common.security.SecurityService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;

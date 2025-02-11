@@ -8,7 +8,7 @@ import applesquare.moment.auth.service.TokenBlacklistService;
 import applesquare.moment.common.exception.DuplicateDataException;
 import applesquare.moment.common.exception.ResponseMap;
 import applesquare.moment.common.exception.StateExpiredException;
-import applesquare.moment.common.service.StateService;
+import applesquare.moment.common.state.StateService;
 import applesquare.moment.email.service.EmailValidationService;
 import applesquare.moment.user.service.UserInfoService;
 import applesquare.moment.util.JwtUtil;

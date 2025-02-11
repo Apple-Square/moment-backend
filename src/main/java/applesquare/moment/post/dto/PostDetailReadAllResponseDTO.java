@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class PostDetailReadAllResponseDTO {
     private Long id;  // 게시글 ID
-    @JsonFormat(pattern="yyyy-MM-dd")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime regDate;  // 등록 시간
     private String content;  // 내용
     private UserProfileReadResponseDTO writer;  // 작성자 프로필

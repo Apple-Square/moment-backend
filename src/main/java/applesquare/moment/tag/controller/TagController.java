@@ -1,8 +1,8 @@
 package applesquare.moment.tag.controller;
 
-import applesquare.moment.common.dto.PageRequestDTO;
-import applesquare.moment.common.dto.PageResponseDTO;
 import applesquare.moment.common.exception.ResponseMap;
+import applesquare.moment.common.page.PageRequestDTO;
+import applesquare.moment.common.page.PageResponseDTO;
 import applesquare.moment.tag.dto.TagReadResponseDTO;
 import applesquare.moment.tag.service.TagService;
 import lombok.RequiredArgsConstructor;

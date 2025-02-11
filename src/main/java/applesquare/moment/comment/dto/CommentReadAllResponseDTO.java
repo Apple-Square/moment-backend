@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class CommentReadAllResponseDTO {
     private Long id;
     private String content;
-    @JsonFormat(pattern="yyyy-MM-dd")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime regDate;
     private UserProfileReadResponseDTO writer;
     private long likeCount;

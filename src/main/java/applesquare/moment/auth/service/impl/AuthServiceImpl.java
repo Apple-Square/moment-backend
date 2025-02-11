@@ -7,7 +7,9 @@ import applesquare.moment.auth.model.UserAccount;
 import applesquare.moment.auth.repository.UserAccountRepository;
 import applesquare.moment.auth.service.AuthService;
 import applesquare.moment.common.exception.DuplicateDataException;
-import applesquare.moment.common.service.StateService;
+import applesquare.moment.common.state.StateService;
+import applesquare.moment.common.url.UrlManager;
+import applesquare.moment.common.url.UrlPath;
 import applesquare.moment.email.dto.MailDTO;
 import applesquare.moment.email.exception.EmailValidationException;
 import applesquare.moment.email.service.EmailSendService;
@@ -17,7 +19,6 @@ import applesquare.moment.user.service.UserInfoService;
 import applesquare.moment.util.StringUtil;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,9 +37,7 @@ public class AuthServiceImpl implements AuthService {
     private final AddressService addressService;
     private final StateService stateService;
     private final EmailSendService emailSendService;
-
-    @Value("${moment.front.reset-password}")
-    private String pwResetUrl;
+    private final UrlManager urlManager;
 
 
     /**
@@ -135,6 +134,9 @@ public class AuthServiceImpl implements AuthService {
         String token= UUID.randomUUID().toString();
         stateService.create(token, username, PW_RESET_TOKEN_TTL_MINUTE, TimeUnit.MINUTES);
 
+        String frontResetPwUrl=urlManager.getUrl(UrlPath.FRONT_RESET_PASSWORD_PAGE);
+        String pwResetUrl= String.format("%s?token=%s",frontResetPwUrl, token);
+
         // 계정 복구 메일 전송
         MailDTO mailDTO=MailDTO.builder()
                 .toEmail(email)
@@ -143,7 +145,7 @@ public class AuthServiceImpl implements AuthService {
                         "안녕하세요.<br/><br/>" +
                         "회원님의 아이디는 " + username + " 입니다.<br/><br/>" +
                         "혹시 비밀번호를 모르시겠다면, 아래 링크를 이용해서 초기화해주세요.<br/><br/>" +
-                        "<a href=\""+pwResetUrl+"?token=" + token + "\">비밀번호 재설정하러 가기</a>"
+                        "<a href=\"" + pwResetUrl + "\">비밀번호 재설정하러 가기</a>"
                 )
                 .useHtml(true)
                 .build();
