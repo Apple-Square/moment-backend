@@ -88,7 +88,7 @@ public class NotificationController {
      *          (body) 알림 읽기 성공 메시지
      */
     @PatchMapping("/{userNotificationId}/view")
-    public ResponseEntity<Map<String, Object>> view(@PathVariable("userNotificationId") Long userNotificationId){
+    public ResponseEntity<Map<String, Object>> view(@PathVariable(name = "userNotificationId") Long userNotificationId){
         // 알림 읽음 처리
         notificationService.setAsRead(userNotificationId);
 
@@ -106,7 +106,7 @@ public class NotificationController {
      *          (body) 알림 삭제 성공 메시지
      */
     @DeleteMapping("/{userNotificationId}")
-    public ResponseEntity<Map<String, Object>> delete(@PathVariable Long userNotificationId){
+    public ResponseEntity<Map<String, Object>> delete(@PathVariable(name = "userNotificationId") Long userNotificationId){
         // 알림 삭제
         notificationService.delete(userNotificationId);
 

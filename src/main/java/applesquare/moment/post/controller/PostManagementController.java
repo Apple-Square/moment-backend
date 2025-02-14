@@ -70,7 +70,7 @@ public class PostManagementController {
      *                  수정된 게시글 ID
      */
     @PatchMapping(value = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Map<String, Object>> update(@PathVariable Long postId,
+    public ResponseEntity<Map<String, Object>> update(@PathVariable(name = "postId") Long postId,
                                                       @RequestParam(value = "content", required = false) String content,
                                                       @RequestParam(value = "urls", required = false) List<String> urls,
                                                       @RequestParam(value = "files", required = false) List<MultipartFile> files,
@@ -107,7 +107,7 @@ public class PostManagementController {
      *          (body) 게시글 삭제 성공 메세지
      */
     @DeleteMapping("{postId}")
-    public ResponseEntity<Map<String, Object>> delete(@PathVariable Long postId) throws IOException{
+    public ResponseEntity<Map<String, Object>> delete(@PathVariable(name = "postId") Long postId) throws IOException{
         // 게시글 삭제
         postManagementService.delete(postId);
 
@@ -119,7 +119,7 @@ public class PostManagementController {
     }
 
     @PatchMapping("/{postId}/view")
-    public ResponseEntity<Map<String, Object>> view(@PathVariable Long postId){
+    public ResponseEntity<Map<String, Object>> view(@PathVariable(name = "postId") Long postId){
         // 게시글 조회수 1 증가시키기
         long viewCount=postManagementService.incrementViewCount(postId, 1);
 

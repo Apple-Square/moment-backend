@@ -27,7 +27,7 @@ public class UserInfoController {
      *                  수정된 사용자의 ID
      */
     @PatchMapping(value = "/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> updateUserInfo(@PathVariable String userId,
+    public ResponseEntity<Map<String, Object>> updateUserInfo(@PathVariable(name = "userId") String userId,
                                                               @Valid @RequestBody UserInfoUpdateRequestDTO userInfoUpdateRequestDTO){
         // 사용자 정보 수정
         String result=userInfoService.updateUserInfo(userId, userInfoUpdateRequestDTO);

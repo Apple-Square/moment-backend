@@ -30,7 +30,7 @@ public class PostCommentController {
      *                  등록된 댓글 ID
      */
     @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> create(@PathVariable Long postId,
+    public ResponseEntity<Map<String, Object>> create(@PathVariable(name = "postId") Long postId,
                                                       @Valid @RequestBody CommentCreateRequestDTO commentCreateRequestDTO){
         // 댓글 등록
         Long result= commentService.create(postId, commentCreateRequestDTO);
@@ -53,7 +53,7 @@ public class PostCommentController {
      *                  댓글 목록 페이지
      */
     @GetMapping("")
-    public ResponseEntity<Map<String, Object>> readAll(@PathVariable Long postId,
+    public ResponseEntity<Map<String, Object>> readAll(@PathVariable(name = "postId") Long postId,
                                                        @RequestParam(value = "size", required = false, defaultValue = "10") int size,
                                                        @RequestParam(value = "cursor", required = false) String cursor){
         // 페이지 요청 설정

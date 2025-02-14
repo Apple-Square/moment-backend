@@ -28,7 +28,7 @@ public class UserPageController {
      *                  유저 페이지
      */
     @GetMapping("")
-    public ResponseEntity<Map<String, Object>> readUserPage(@PathVariable String userId){
+    public ResponseEntity<Map<String, Object>> readUserPage(@PathVariable(name = "userId") String userId){
         // 유저 페이지 조회
         UserPageReadResponseDTO userPageReadResponseDTO=userPageService.readUserPageById(userId);
 

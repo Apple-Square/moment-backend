@@ -28,7 +28,7 @@ public class FileController {
      * @throws IOException IOException
      */
     @GetMapping("/{filename}")
-    public ResponseEntity<Resource> read(@PathVariable String filename) throws IOException {
+    public ResponseEntity<Resource> read(@PathVariable(name = "filename") String filename) throws IOException {
         // 파일 조회
         Resource resource=fileService.read(filename);
 

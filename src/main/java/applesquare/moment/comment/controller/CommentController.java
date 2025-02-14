@@ -28,7 +28,7 @@ public class CommentController {
      *                  수정된 댓글 ID
      */
     @PatchMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> update(@PathVariable Long commentId,
+    public ResponseEntity<Map<String, Object>> update(@PathVariable(name = "commentId") Long commentId,
                                                       @Valid @RequestBody CommentUpdateRequestDTO commentUpdateRequestDTO){
         // 댓글 수정
         Long result=commentService.update(commentId, commentUpdateRequestDTO);
@@ -48,7 +48,7 @@ public class CommentController {
      *          (body)  댓글 삭제 성공 메세지
      */
     @DeleteMapping("")
-    public ResponseEntity<Map<String, Object>> delete(@PathVariable Long commentId){
+    public ResponseEntity<Map<String, Object>> delete(@PathVariable(name = "commentId") Long commentId){
         // 댓글 삭제
         commentService.delete(commentId);
 

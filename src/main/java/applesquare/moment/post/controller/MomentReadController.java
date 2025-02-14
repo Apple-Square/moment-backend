@@ -70,7 +70,7 @@ public class MomentReadController {
      *                  모먼트 목록
      */
     @GetMapping("/users/{userId}/posts/moments")
-    public ResponseEntity<Map<String, Object>> readAllByWriter(@PathVariable("userId") String userId,
+    public ResponseEntity<Map<String, Object>> readAllByWriter(@PathVariable(name = "userId") String userId,
                                                                @RequestParam(value = "type", required = false, defaultValue = "DETAIL") PostReadType type,
                                                                @RequestParam(value = "size", required = false, defaultValue = "10") int size,
                                                                @RequestParam(value = "cursor", required = false) String cursor){
@@ -115,7 +115,7 @@ public class MomentReadController {
      *                  모먼트 목록
      */
     @GetMapping("/users/{userId}/liked-posts/moments")
-    public ResponseEntity<Map<String, Object>> readLikedMomentAllByUser(@PathVariable("userId") String userId,
+    public ResponseEntity<Map<String, Object>> readLikedMomentAllByUser(@PathVariable(name = "userId") String userId,
                                                                         @RequestParam(value = "type", required = false, defaultValue = "DETAIL") PostReadType type,
                                                                         @RequestParam(value = "size", required = false, defaultValue = "10") int size,
                                                                         @RequestParam(value = "cursor", required = false) String cursor){

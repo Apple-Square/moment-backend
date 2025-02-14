@@ -47,7 +47,7 @@ public class UserProfileController {
      * @return 사진이 설정된 사용자의 ID
      */
     @PutMapping(value = "/{userId}/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Map<String, Object>> updateProfileImage(@PathVariable String userId,
+    public ResponseEntity<Map<String, Object>> updateProfileImage(@PathVariable(name = "userId") String userId,
                                                                   @RequestParam(value = "profileImage") MultipartFile profileImage) throws Exception{
         // 사용자 프로필 사진 설정
         String result=userProfileService.updateProfileImage(userId, profileImage);
@@ -67,7 +67,7 @@ public class UserProfileController {
      *          (body) 프로필 삭제 성공 메세지
      */
     @DeleteMapping(value = "/{userId}/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Map<String, Object>> deleteProfileImage(@PathVariable String userId) throws IOException {
+    public ResponseEntity<Map<String, Object>> deleteProfileImage(@PathVariable(name = "userId") String userId) throws IOException {
         // 사용자 프로필 사진 삭제
         userProfileService.deleteProfileImage(userId);
 

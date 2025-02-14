@@ -26,7 +26,7 @@ public class FollowController{
      *                  팔로우한 사용자 ID
      */
     @PostMapping("/follow")
-    public ResponseEntity<Map<String, Object>> follow(@PathVariable String userId){
+    public ResponseEntity<Map<String, Object>> follow(@PathVariable(name = "userId") String userId){
         // 사용자 팔로우
         String result= followService.follow(userId);
 
@@ -46,7 +46,7 @@ public class FollowController{
      *                  팔로우 취소한 사용자 ID
      */
     @DeleteMapping("/follow")
-    public ResponseEntity<Map<String, Object>> unfollow(@PathVariable String userId){
+    public ResponseEntity<Map<String, Object>> unfollow(@PathVariable(name = "userId") String userId){
         // 사용자 팔로우 취소
         String result=followService.unfollow(userId);
 
@@ -68,7 +68,7 @@ public class FollowController{
      *                  팔로워 목록
      */
     @GetMapping("/followers/search")
-    public ResponseEntity<Map<String, Object>> readFollowers(@PathVariable String userId,
+    public ResponseEntity<Map<String, Object>> readFollowers(@PathVariable(name = "userId") String userId,
                                                              @RequestParam(value = "size", required = false, defaultValue = "10") int size,
                                                              @RequestParam(value = "cursor", required = false) String cursor,
                                                              @RequestParam(value = "keyword", required = false) String keyword){
@@ -101,7 +101,7 @@ public class FollowController{
      *                  팔로잉 목록
      */
     @GetMapping("/followings/search")
-    public ResponseEntity<Map<String, Object>> readFollowings(@PathVariable String userId,
+    public ResponseEntity<Map<String, Object>> readFollowings(@PathVariable(name = "userId") String userId,
                                                               @RequestParam(value = "size", required = false, defaultValue = "10") int size,
                                                               @RequestParam(value = "cursor", required = false) String cursor,
                                                               @RequestParam(value = "keyword", required = false) String keyword){

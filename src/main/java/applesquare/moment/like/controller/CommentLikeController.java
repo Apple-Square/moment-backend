@@ -23,7 +23,7 @@ public class CommentLikeController {
      *                  좋아요 누른 댓글 ID
      */
     @PostMapping("")
-    public ResponseEntity<Map<String, Object>> like(@PathVariable Long commentId){
+    public ResponseEntity<Map<String, Object>> like(@PathVariable(name = "commentId") Long commentId){
         // 댓글 좋아요
         Long result=commentLikeService.like(commentId);
 
@@ -42,7 +42,7 @@ public class CommentLikeController {
      *          (body) 댓글 좋아요 취소 성공 메세지
      */
     @DeleteMapping("")
-    public ResponseEntity<Map<String, Object>> unlike(@PathVariable Long commentId){
+    public ResponseEntity<Map<String, Object>> unlike(@PathVariable(name = "commentId") Long commentId){
         // 댓글 좋아요 취소
         commentLikeService.unlike(commentId);
 

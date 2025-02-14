@@ -26,7 +26,7 @@ public class PostReadController {
      * @return 게시물 상세 정보
      */
     @GetMapping("/posts/{postId}")
-    public ResponseEntity<Map<String, Object>> readOne(@PathVariable Long postId){
+    public ResponseEntity<Map<String, Object>> readOne(@PathVariable(name = "postId") Long postId){
         PostDetailReadAllResponseDTO postDetailDTO=postReadService.read(postId);
 
         // 응답 객체 구성
@@ -91,7 +91,7 @@ public class PostReadController {
      *                  게시물 목록
      */
     @GetMapping("/users/{userId}/posts")
-    public ResponseEntity<Map<String, Object>> readAllByWriter(@PathVariable("userId") String userId,
+    public ResponseEntity<Map<String, Object>> readAllByWriter(@PathVariable(name = "userId") String userId,
                                                                @RequestParam(value = "type", required = false, defaultValue = "DETAIL") PostReadType type,
                                                                @RequestParam(value = "size", required = false, defaultValue = "10") int size,
                                                                @RequestParam(value = "cursor", required = false) String cursor){
@@ -136,7 +136,7 @@ public class PostReadController {
      *                  게시물 목록
      */
     @GetMapping("/users/{userId}/liked-posts")
-    public ResponseEntity<Map<String, Object>> readLikedPostAllByUser(@PathVariable("userId") String userId,
+    public ResponseEntity<Map<String, Object>> readLikedPostAllByUser(@PathVariable(name = "userId") String userId,
                                                                       @RequestParam(value = "type", required = false, defaultValue = "DETAIL") PostReadType type,
                                                                       @RequestParam(value = "size", required = false, defaultValue = "10") int size,
                                                                       @RequestParam(value = "cursor", required = false) String cursor){
