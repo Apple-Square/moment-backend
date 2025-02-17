@@ -21,6 +21,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.UUID;
 
 @Log4j2
@@ -178,6 +179,26 @@ public class FileServiceImpl implements FileService {
             // 파일이 이미 삭제된 경우 예외 던지기
             throw new FileNotFoundException("이미 삭제된 파일입니다. (filename = "+thumbFilename+")");
         }
+    }
+
+    /**
+     * 파일명 목록에 따라 저장소와 DB에서 파일 삭제
+     * @param filenames 파일명 목록
+     */
+    @Override
+    public void deleteByFilenames(List<String> filenames){
+        // 저장소에서 파일 삭제
+        for(String filename : filenames){
+            try{
+                delete(filename);
+            } catch (IOException e){
+                // TO DO : 삭제에 실패한 파일은 고아 리소스가 발생하지 않도록 DB나 로그 파일에 기록해둬야 한다.
+                log.error("파일 삭제 실패 : "+filename);
+            }
+        }
+
+        // DB에서 StorageFile 일괄 삭제
+        storageFileRepository.deleteByFilenames(filenames);
     }
 
     /**

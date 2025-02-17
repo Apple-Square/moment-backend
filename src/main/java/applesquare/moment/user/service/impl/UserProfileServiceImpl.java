@@ -12,7 +12,6 @@ import applesquare.moment.user.service.UserProfileService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.modelmapper.ModelMapper;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,8 +28,27 @@ public class UserProfileServiceImpl implements UserProfileService {
     private final UserInfoRepository userInfoRepository;
     private final FileService fileService;
     private final SecurityService securityService;
-    private final ModelMapper modelMapper;
 
+
+    /**
+     * UserInfo -> UserProfileReadResponseDTO
+     * @param userInfo UserInfo
+     * @return UserProfileReadResponseDTO
+     */
+    @Override
+    public UserProfileReadResponseDTO toUserProfileDTO(UserInfo userInfo){
+        // 프로필 사진 URL 가져오기
+        String profileName=(userInfo.getProfileImage()!=null)?
+                userInfo.getProfileImage().getFilename() : UserProfileService.DEFAULT_PROFILE_NAME;
+        String profileImageURL=fileService.convertFilenameToUrl(profileName);
+
+        // DTO 변환
+        return UserProfileReadResponseDTO.builder()
+                .id(userInfo.getId())
+                .nickname(userInfo.getNickname())
+                .profileImage(profileImageURL)
+                .build();
+    }
 
     /**
      * 나의 프로필 조회
@@ -57,19 +75,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         UserInfo userInfo=userInfoRepository.findById(userId)
                 .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 사용자입니다. (id = "+userId+")"));
 
-        // 프로필 사진 URL 가져오기
-        String profileName=(userInfo.getProfileImage()!=null)?
-                userInfo.getProfileImage().getFilename() : UserProfileService.DEFAULT_PROFILE_NAME;
-        String profileImageURL=fileService.convertFilenameToUrl(profileName);
-
-        // DTO 변환
-        UserProfileReadResponseDTO userProfileReadResponseDTO=modelMapper.map(userInfo, UserProfileReadResponseDTO.class);
-        userProfileReadResponseDTO=userProfileReadResponseDTO.toBuilder()
-                .profileImage(profileImageURL)
-                .build();
-
-        // DTO 반환
-        return userProfileReadResponseDTO;
+        return toUserProfileDTO(userInfo);
     }
 
     /**
@@ -210,17 +216,9 @@ public class UserProfileServiceImpl implements UserProfileService {
         }
 
         // DTO 변환
-        List<UserProfileReadResponseDTO> userProfileReadResponseDTOS=userInfos.stream().map((userInfo)->{
-            StorageFile profileImage=userInfo.getProfileImage();
-            String profileUrl = (profileImage != null)?
-                    fileService.convertFilenameToUrl(profileImage.getFilename())
-                    : UserProfileService.DEFAULT_PROFILE_NAME;
-            return UserProfileReadResponseDTO.builder()
-                    .id(userInfo.getId())
-                    .nickname(userInfo.getNickname())
-                    .profileImage(profileUrl)
-                    .build();
-        }).toList();
+        List<UserProfileReadResponseDTO> userProfileReadResponseDTOS=userInfos.stream()
+                .map((userInfo)-> toUserProfileDTO(userInfo))
+                .toList();
 
         return PageResponseDTO.<UserProfileReadResponseDTO>builder()
                 .content(userProfileReadResponseDTOS)

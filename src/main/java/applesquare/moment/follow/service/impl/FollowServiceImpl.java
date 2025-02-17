@@ -13,6 +13,7 @@ import applesquare.moment.follow.service.FollowService;
 import applesquare.moment.notification.dto.NotificationRequestDTO;
 import applesquare.moment.notification.model.NotificationType;
 import applesquare.moment.notification.service.NotificationSendService;
+import applesquare.moment.user.dto.UserProfileReadResponseDTO;
 import applesquare.moment.user.model.UserInfo;
 import applesquare.moment.user.repository.UserInfoRepository;
 import applesquare.moment.user.service.UserProfileService;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static applesquare.moment.follow.model.QFollow.follow;
 
@@ -36,6 +38,7 @@ public class FollowServiceImpl implements FollowService {
     private final UserInfoRepository userInfoRepository;
     private final FileService fileService;
     private final SecurityService securityService;
+    private final UserProfileService userProfileService;
     private final NotificationSendService notificationSendService;
 
 
@@ -260,5 +263,45 @@ public class FollowServiceImpl implements FollowService {
                 .build();
 
         return pageResponseDTO;
+    }
+
+    /**
+     * 특정 사용자와 상호 팔로우 관계에 있는 사용자 프로필 목록 검색
+     * @param userId 사용자 ID
+     * @param pageRequestDTO 페이지 요청 정보
+     * @return 상호 팔로우 상대의 프로필 목록 페이지
+     */
+    @Override
+    public PageResponseDTO<UserProfileReadResponseDTO> searchMutualFollowerByKeyword(String userId, PageRequestDTO pageRequestDTO){
+        // 다음 페이지 존재 여부를 확인하기 위해 (size + 1)
+        int pageSize=pageRequestDTO.getSize()+1;
+
+        String keyword=pageRequestDTO.getKeyword();
+
+        Long cursor=null;
+        if(pageRequestDTO.getCursor()!=null){
+            cursor=Long.parseLong(pageRequestDTO.getCursor());
+        }
+
+        // 상호 팔로우 상대 목록 검색
+        List<UserInfo> mutualFollowers=followRepository.searchMutualFollowers(userId, keyword, cursor, pageSize);
+
+        // hasNext 설정
+        boolean hasNext=false;
+        if(mutualFollowers.size()>pageRequestDTO.getSize()){
+            mutualFollowers.remove(mutualFollowers.size()-1);
+            hasNext=true;
+        }
+
+        // DTO 변환
+        List<UserProfileReadResponseDTO> mutualFollowerDTOs=mutualFollowers.stream()
+                .map((mutualFollower)-> userProfileService.toUserProfileDTO(mutualFollower))
+                .collect(Collectors.toList());
+
+        // DTO 반환
+        return PageResponseDTO.<UserProfileReadResponseDTO>builder()
+                .content(mutualFollowerDTOs)
+                .hasNext(hasNext)
+                .build();
     }
 }

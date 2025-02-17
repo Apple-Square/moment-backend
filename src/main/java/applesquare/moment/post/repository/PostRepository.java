@@ -1,5 +1,6 @@
 package applesquare.moment.post.repository;
 
+import applesquare.moment.file.model.StorageFile;
 import applesquare.moment.post.model.Post;
 import jakarta.persistence.Tuple;
 import org.springframework.data.domain.Pageable;
@@ -160,11 +161,19 @@ public interface PostRepository extends JpaRepository<Post, Long>, CustomPostRep
 
     // ====================================================================
 
-    // 게시물 썸네일 목록 조회 (커서 페이징)
+    // 게시물 ID 기반으로 썸네일 파일명 조회
     @Query(value = "SELECT sf.filename " +
             "FROM post p " +
             "INNER JOIN post_files pf ON pf.post_id=p.id " +
             "INNER JOIN storage_file sf ON pf.file_id=sf.id " +
             "WHERE p.id=:postId AND pf.file_order=0 ", nativeQuery = true)
-    String findFirstFileById(@Param("postId") Long postId);
+    String findFirstFilenameById(@Param("postId") Long postId);
+
+    // 게시물 ID 기반으로 썸네일 파일 조회
+    @Query(value = "SELECT sf " +
+            "FROM post p " +
+            "INNER JOIN post_files pf ON pf.post_id=p.id " +
+            "INNER JOIN storage_file sf ON pf.file_id=sf.id " +
+            "WHERE p.id=:postId AND pf.file_order=0 ", nativeQuery = true)
+    StorageFile findFirstFileById(@Param("postId") Long postId);
 }

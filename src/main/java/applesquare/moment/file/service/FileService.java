@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 
 
 public interface FileService {
@@ -53,6 +54,7 @@ public interface FileService {
     Resource read(String filename) throws FileNotFoundException;
     void delete(String filename) throws IOException;
     void deleteThumbnail(String filename) throws IOException;
+    void deleteByFilenames(List<String> filenames);
 
     String getResourceContentType(Resource resource) throws IOException;
 

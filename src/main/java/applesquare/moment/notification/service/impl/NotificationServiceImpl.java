@@ -3,7 +3,6 @@ package applesquare.moment.notification.service.impl;
 import applesquare.moment.common.page.PageRequestDTO;
 import applesquare.moment.common.page.PageResponseDTO;
 import applesquare.moment.common.security.SecurityService;
-import applesquare.moment.file.service.FileService;
 import applesquare.moment.notification.dto.NotificationLink;
 import applesquare.moment.notification.dto.NotificationLinkType;
 import applesquare.moment.notification.dto.NotificationReadResponseDTO;
@@ -39,8 +38,8 @@ import java.util.concurrent.CompletableFuture;
 public class NotificationServiceImpl implements NotificationService {
     private final UserNotificationRepository userNotificationRepository;
     private final NotificationRepository notificationRepository;
+    private final UserProfileService userProfileService;
     private final PostReadService postReadService;
-    private final FileService fileService;
     private final SecurityService securityService;
     private final ModelMapper modelMapper;
 
@@ -55,22 +54,13 @@ public class NotificationServiceImpl implements NotificationService {
         Notification notification= userNotification.getNotification();
         UserInfo sender=notification.getSender();
 
-        // 프로필 사진 URL 가져오기
-        String profileName=(sender.getProfileImage()!=null)?
-                sender.getProfileImage().getFilename() : UserProfileService.DEFAULT_PROFILE_NAME;
-        String profileImageURL=fileService.convertFilenameToUrl(profileName);
-
         // 송신자 프로필 구성
-        UserProfileReadResponseDTO senderProfileDTO=UserProfileReadResponseDTO.builder()
-                .id(sender.getId())
-                .nickname(sender.getNickname())
-                .profileImage(profileImageURL)
-                .build();
+        UserProfileReadResponseDTO senderProfileDTO=userProfileService.toUserProfileDTO(sender);
 
         // 알림과 연관된 링크 가져오기
         List<NotificationLink> notificationLinks=getNotificationLinks(notification);
 
-        // DTO 구성
+        // 알림 DTO 구성
         NotificationReadResponseDTO notificationDTO=modelMapper.map(notification, NotificationReadResponseDTO.class);
 
         return notificationDTO.toBuilder()

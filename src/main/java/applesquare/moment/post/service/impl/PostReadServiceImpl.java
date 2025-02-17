@@ -294,7 +294,7 @@ public class PostReadServiceImpl implements PostReadService {
 
     @Override
     public String readThumbnailImageUrl(Long postId){
-        String thumbFilename= postRepository.findFirstFileById(postId);
+        String thumbFilename= postRepository.findFirstFilenameById(postId);
         return fileService.convertFilenameToUrl(thumbFilename);
     }
 }
