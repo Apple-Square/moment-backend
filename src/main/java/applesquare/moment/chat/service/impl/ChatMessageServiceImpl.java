@@ -12,15 +12,20 @@ import applesquare.moment.chat.service.ChatMessageService;
 import applesquare.moment.chat.service.ChatRoomService;
 import applesquare.moment.common.page.PageRequestDTO;
 import applesquare.moment.common.page.PageResponseDTO;
+import applesquare.moment.file.model.FileAccessGroupType;
+import applesquare.moment.file.model.FileAccessPolicy;
 import applesquare.moment.file.model.MediaType;
 import applesquare.moment.file.model.StorageFile;
 import applesquare.moment.file.service.FileService;
 import applesquare.moment.post.model.Post;
 import applesquare.moment.post.repository.PostRepository;
 import applesquare.moment.user.dto.UserProfileReadResponseDTO;
+import applesquare.moment.user.model.UserInfo;
+import applesquare.moment.user.repository.UserInfoRepository;
 import applesquare.moment.user.service.UserProfileService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,17 +34,22 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Log4j2
 @Transactional
 @RequiredArgsConstructor
 public class ChatMessageServiceImpl implements ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
+    private final UserInfoRepository userInfoRepository;
     private final PostRepository postRepository;
     private final UserProfileService userProfileService;
     private final ChatRoomService chatRoomService;
@@ -156,7 +166,13 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                 .build();
     }
 
-    // 특정 채팅방에 메시지 생성 & 전송
+    /**
+     * 특정 채팅방에 메시지 생성 & 전송
+     * @param myUserId 나의 사용자 ID
+     * @param roomId 채팅방 ID
+     * @param chatMessageCreateRequestDTO 채팅 메시지 생성 요청 정보
+     * @return 전송한 메시지 정보
+     */
     @Override
     public ChatMessageReadResponseDTO createAndSend(String myUserId, Long roomId, ChatMessageCreateRequestDTO chatMessageCreateRequestDTO){
         // 송신자가 채팅방의 멤버인지 확인하기
@@ -266,5 +282,53 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
         // 채팅방 메시지 삭제하기 (ChatMessage)
         chatMessageRepository.deleteByChatRoom_Id(roomId);
+    }
+
+    /**
+     * 특정 채팅방에 파일 업로드
+     * @param myUserId 나의 사용자 ID
+     * @param roomId 채팅방 ID
+     * @param files 업로드할 파일 목록
+     * @return 업로드한 파일 목록
+     */
+    @Override
+    public List<StorageFile> uploadFiles(String myUserId, Long roomId, List<MultipartFile> files){
+        // 권한 검사 : 사용자가 해당 채팅방의 멤버가 맞는지 확인
+        if(!chatRoomService.isMember(roomId, myUserId)){
+            throw new AccessDeniedException("채팅방의 멤버만 파일을 업로드할 수 있습니다.");
+        }
+
+        // 채팅방에 파일 업로드하기
+        List<StorageFile> storageFiles=new LinkedList<>();
+        try {
+            // 나의 정보 찾기
+            UserInfo myUserInfo=userInfoRepository.findById(myUserId)
+                    .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 사용자입니다."));
+
+            // 저장소에 파일 목록 저장
+            for(MultipartFile file : files){
+                StorageFile storageFile = fileService.upload(file, myUserInfo, FileAccessPolicy.GROUP, FileAccessGroupType.CHAT, roomId.toString());
+                storageFiles.add(storageFile);
+            }
+
+            // 업로드된 파일 목록 반환
+            return storageFiles;
+
+        } catch (Exception exception){
+            // 파일을 업로드하던 도중 문제가 생긴다면, 저장소에 업로드한 파일을 삭제해야 한다.
+            log.error(exception.getMessage());
+            try{
+                // 저장소에 업로드한 파일 삭제
+                for(StorageFile storageFile : storageFiles){
+                    String uploadedFilename=storageFile.getFilename();
+                    fileService.delete(uploadedFilename);
+                }
+            } catch (IOException ioException){
+                // 만약 삭제하는 것도 실패했다면, 로그를 남긴다.
+                log.error(ioException.getMessage());
+            }
+
+            throw new RuntimeException("파일 업로드에 실패했습니다.");
+        }
     }
 }

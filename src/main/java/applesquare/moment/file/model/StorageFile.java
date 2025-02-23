@@ -33,10 +33,11 @@ public class StorageFile extends BaseEntity{
     @Enumerated(EnumType.STRING)
     @Column(name = "access_policy", nullable = false)
     private FileAccessPolicy accessPolicy; // 파일 접근 정책 (읽기 권한)
+    @Enumerated(EnumType.STRING)
     @Column(name = "group_type", nullable = true)
     private FileAccessGroupType groupType;  // 파일이 속한 그룹 유형
     @Column(name = "group_id", nullable = true)
-    private Long groupId; // 파일이 속한 그룹 ID
+    private String groupId; // 파일이 속한 그룹 ID
 
     /**
      * TO DO :

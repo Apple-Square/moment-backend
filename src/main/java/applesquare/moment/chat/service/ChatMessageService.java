@@ -4,6 +4,10 @@ import applesquare.moment.chat.dto.ChatMessageCreateRequestDTO;
 import applesquare.moment.chat.dto.ChatMessageReadResponseDTO;
 import applesquare.moment.common.page.PageRequestDTO;
 import applesquare.moment.common.page.PageResponseDTO;
+import applesquare.moment.file.model.StorageFile;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 public interface ChatMessageService {
     // 특정 채팅방의 메시지 목록 조회
@@ -17,4 +21,7 @@ public interface ChatMessageService {
 
     // 채팅방 ID 기반으로 채팅 메시지의 파일 정보 일괄 삭제
     void deleteBatchByRoomId(Long roomId);
+
+    // 특정 채팅방에 파일 업로드
+    List<StorageFile> uploadFiles(String myUserId, Long roomId, List<MultipartFile> files);
 }

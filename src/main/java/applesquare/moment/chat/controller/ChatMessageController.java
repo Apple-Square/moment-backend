@@ -7,13 +7,16 @@ import applesquare.moment.common.exception.ResponseMap;
 import applesquare.moment.common.page.PageRequestDTO;
 import applesquare.moment.common.page.PageResponseDTO;
 import applesquare.moment.common.security.SecurityService;
+import applesquare.moment.file.model.StorageFile;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -54,6 +57,31 @@ public class ChatMessageController {
         responseMap.put("hasNext", pageResponseDTO.isHasNext());
 
         return ResponseEntity.status(HttpStatus.OK).body(responseMap.getMap());
+    }
+
+    /**
+     * 특정 채팅방에 파일 업로드
+     * @param roomId 채팅방 ID
+     * @param files 업로드할 파일 목록
+     * @return  (status) 201,
+     *          (body)  업로드 성공 메시지,
+     *                  업로드된 파일 목록
+     */
+    @PostMapping(value = "/rooms/{roomId}/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Map<String, Object>> uploadFile(@PathVariable(name = "roomId") Long roomId,
+                                                                  @RequestParam("files") List<MultipartFile> files){
+        // 사용자 ID 추출
+        String myUserId=securityService.getUserId();
+
+        // 특정 채팅방에 파일 업로드
+        List<StorageFile> storageFiles=chatMessageService.uploadFiles(myUserId, roomId, files);
+
+        // 응답 생성
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", "채팅방에 파일을 업로드했습니다.");
+        responseMap.put("files", storageFiles);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseMap.getMap());
     }
 
     /**

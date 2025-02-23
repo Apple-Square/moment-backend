@@ -55,7 +55,7 @@ public class FileServiceImpl implements FileService {
      * @return 업로드한 파일명
      */
     @Override
-    public StorageFile upload(MultipartFile file, UserInfo writer, FileAccessPolicy accessPolicy) throws IOException{
+    public StorageFile upload(MultipartFile file, UserInfo writer, FileAccessPolicy accessPolicy, FileAccessGroupType groupType, String groupId) throws IOException{
         // file이 null이라면 예외 던지기
         if(file==null){
             throw new IllegalArgumentException("지원하지 않는 형식의 파일입니다. (type = null)");
@@ -81,6 +81,8 @@ public class FileServiceImpl implements FileService {
                 .fileSize(file.getSize())
                 .uploader(writer)
                 .accessPolicy(accessPolicy)
+                .groupType(groupType)
+                .groupId(groupId)
                 .build();
 
         try{
@@ -99,6 +101,11 @@ public class FileServiceImpl implements FileService {
         return storageFile;
     }
 
+    @Override
+    public StorageFile upload(MultipartFile file, UserInfo writer, FileAccessPolicy accessPolicy) throws IOException{
+        return upload(file, writer, accessPolicy, null, null);
+    }
+
     /**
      * 썸네일 파일을 저장소에 업로드
      * @param filename 업로드된 원본 파일 이름
@@ -106,11 +113,17 @@ public class FileServiceImpl implements FileService {
      * @return 업로드한 썸네일 파일명
      */
     @Override
-    public StorageFile uploadThumbnail(MultipartFile file, String filename, UserInfo writer, FileAccessPolicy accessPolicy) throws IOException {
-        if(FileService.isImage(file)) return uploadThumbnailImage(file, filename, writer, accessPolicy, THUMBNAIL_WIDTH_SIZE);
-        else if(FileService.isVideo(file)) return uploadThumbnailVideo(file, filename, writer, accessPolicy, THUMBNAIL_WIDTH_SIZE, THUMBNAIL_VIDEO_SEC);
+    public StorageFile uploadThumbnail(MultipartFile file, String filename, UserInfo writer, FileAccessPolicy accessPolicy, FileAccessGroupType groupType, String groupId) throws IOException {
+        if(FileService.isImage(file)) return uploadThumbnailImage(file, filename, writer, accessPolicy, groupType, groupId, THUMBNAIL_WIDTH_SIZE);
+        else if(FileService.isVideo(file)) return uploadThumbnailVideo(file, filename, writer, accessPolicy, groupType, groupId, THUMBNAIL_WIDTH_SIZE, THUMBNAIL_VIDEO_SEC);
         else throw new IllegalArgumentException("지원하지 않는 형식의 파일입니다. (type="+file.getContentType()+")");
     }
+
+    @Override
+    public StorageFile uploadThumbnail(MultipartFile file, String filename, UserInfo writer, FileAccessPolicy accessPolicy) throws IOException{
+        return uploadThumbnail(file, filename, writer, accessPolicy, null, null);
+    }
+
 
     /**
      * 파일 조회
@@ -146,10 +159,13 @@ public class FileServiceImpl implements FileService {
                 myUserId=securityService.getUserId();
                 FileAccessGroupType groupType=storageFile.getGroupType();
                 if(groupType==FileAccessGroupType.CHAT){
-                    Long chatRoomId=storageFile.getGroupId();
-                    if(!chatRoomService.isMember(chatRoomId, myUserId)){
-                        // 채팅방 멤버가 아닌 사람이 파일을 조회하려고 하면 거부
-                        throw new AccessDeniedException("채팅방 멤버만 접근할 수 있습니다.");
+                    String chatRoomIdStr=storageFile.getGroupId();
+                    if(chatRoomIdStr!=null){
+                        Long chatRoomId=Long.parseLong(chatRoomIdStr);
+                        if(!chatRoomService.isMember(chatRoomId, myUserId)){
+                            // 채팅방 멤버가 아닌 사람이 파일을 조회하려고 하면 거부
+                            throw new AccessDeniedException("채팅방 멤버만 접근할 수 있습니다.");
+                        }
                     }
                 }
                 break;
@@ -335,7 +351,7 @@ public class FileServiceImpl implements FileService {
         return Paths.get(uploadDirectory, filename);
     }
 
-    private StorageFile uploadThumbnailImage(MultipartFile originalImage, String filename, UserInfo writer, FileAccessPolicy accessPolicy, int width) throws IOException{
+    private StorageFile uploadThumbnailImage(MultipartFile originalImage, String filename, UserInfo writer, FileAccessPolicy accessPolicy, FileAccessGroupType groupType, String groupId, int width) throws IOException{
         // 파일 형식 검사
         if(originalImage==null || !FileService.isImage(originalImage)){
             throw new IllegalArgumentException("이미지 파일을 넣어주세요.");
@@ -373,6 +389,8 @@ public class FileServiceImpl implements FileService {
                 .fileSize(originalImage.getSize())
                 .uploader(writer)
                 .accessPolicy(accessPolicy)
+                .groupType(groupType)
+                .groupId(groupId)
                 .build();
 
         try{
@@ -400,7 +418,7 @@ public class FileServiceImpl implements FileService {
      * @param videoLength 동영상의 길이 (초 단위)
      * @throws IOException 입출력 오류가 발생한 경우
      */
-    private StorageFile uploadThumbnailVideo(MultipartFile originalVideo, String filename, UserInfo writer, FileAccessPolicy accessPolicy, int width, int videoLength) throws IOException {
+    private StorageFile uploadThumbnailVideo(MultipartFile originalVideo, String filename, UserInfo writer, FileAccessPolicy accessPolicy, FileAccessGroupType groupType, String groupId, int width, int videoLength) throws IOException {
         // 파일 형식 검사
         if (originalVideo == null || !FileService.isVideo(originalVideo)) {
             throw new IllegalArgumentException("동영상 파일을 넣어주세요.");
@@ -424,6 +442,8 @@ public class FileServiceImpl implements FileService {
                 .fileSize(originalVideo.getSize())
                 .uploader(writer)
                 .accessPolicy(accessPolicy)
+                .groupType(groupType)
+                .groupId(groupId)
                 .build();
 
         try{
