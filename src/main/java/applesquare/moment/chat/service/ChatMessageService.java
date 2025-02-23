@@ -19,9 +19,6 @@ public interface ChatMessageService {
     // 특정 메시지 읽기
     void setAsRead(String myUserId, Long messageId);
 
-    // 채팅방 ID 기반으로 채팅 메시지의 파일 정보 일괄 삭제
-    void deleteBatchByRoomId(Long roomId);
-
     // 특정 채팅방에 파일 업로드
     List<StorageFile> uploadFiles(String myUserId, Long roomId, List<MultipartFile> files);
 }

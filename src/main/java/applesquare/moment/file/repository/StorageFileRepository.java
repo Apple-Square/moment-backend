@@ -1,8 +1,8 @@
 package applesquare.moment.file.repository;
 
+import applesquare.moment.file.model.FileAccessGroupType;
 import applesquare.moment.file.model.StorageFile;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -24,7 +24,5 @@ public interface StorageFileRepository extends JpaRepository<StorageFile, Long> 
             "WHERE sf.filename IN :filenames")
     long sumFileSizeByFilenames(@Param("filenames") List<String> filenames);
 
-    @Modifying
-    @Query("DELETE FROM StorageFile sf WHERE sf.filename IN :filenames")
-    void deleteByFilenames(@Param("filenames") List<String> filenames);
+    void deleteByGroupTypeAndGroupId(FileAccessGroupType groupType, String groupId);
 }

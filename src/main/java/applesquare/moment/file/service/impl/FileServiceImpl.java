@@ -1,9 +1,8 @@
 package applesquare.moment.file.service.impl;
 
-import applesquare.moment.chat.service.ChatRoomService;
-import applesquare.moment.common.security.SecurityService;
 import applesquare.moment.common.url.UrlManager;
 import applesquare.moment.common.url.UrlPath;
+import applesquare.moment.file.StorageFileReadResponseDTO;
 import applesquare.moment.file.exception.FileTransferException;
 import applesquare.moment.file.model.FileAccessGroupType;
 import applesquare.moment.file.model.FileAccessPolicy;
@@ -16,10 +15,10 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.coobird.thumbnailator.Thumbnails;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,10 +39,9 @@ public class FileServiceImpl implements FileService {
     private final int THUMBNAIL_VIDEO_SEC=7;  // 7초
 
     private final UrlManager urlManager;
-    private final SecurityService securityService;
     private final CloudinaryService cloudinaryService;
-    private final ChatRoomService chatRoomService;
     private final StorageFileRepository storageFileRepository;
+    private final ModelMapper modelMapper;
 
     @Value("${applesquare.moment.file.upload-path}")
     private String uploadDirectory;
@@ -124,6 +122,27 @@ public class FileServiceImpl implements FileService {
         return uploadThumbnail(file, filename, writer, accessPolicy, null, null);
     }
 
+    /**
+     * 파일 정보 조회
+     * @param filename 파일명
+     * @return 파일 정보
+     */
+    @Override
+    public StorageFileReadResponseDTO readStorageFile(String filename){
+        // 파일명으로 StorageFile 가져오기
+        List<StorageFile> storageFiles=storageFileRepository.findByFilename(filename);
+        if(storageFiles.size()==0){
+            throw new EntityNotFoundException("존재하지 않는 파일입니다.");
+        }
+        StorageFile storageFile=storageFiles.get(0);
+
+        // DTO 변환
+        StorageFileReadResponseDTO storageFileDTO=modelMapper.map(storageFile, StorageFileReadResponseDTO.class);
+
+        return storageFileDTO.toBuilder()
+                .uploaderId(storageFile.getUploader().getId())
+                .build();
+    }
 
     /**
      * 파일 조회
@@ -132,45 +151,7 @@ public class FileServiceImpl implements FileService {
      * @throws FileNotFoundException 파일이 없는 경우 발생하는 예외
      */
     @Override
-    public Resource read(String filename) throws FileNotFoundException {
-        // 권한 검사
-        List<StorageFile> storageFiles=storageFileRepository.findByFilename(filename);
-        if(storageFiles.size()==0){
-            throw new EntityNotFoundException("존재하지 않는 파일입니다.");
-        }
-        StorageFile storageFile=storageFiles.get(0);
-
-        String myUserId;
-        FileAccessPolicy accessPolicy=storageFile.getAccessPolicy();
-        switch (accessPolicy){
-            case PUBLIC:    // 권한 검사할 필요 없음
-                break;
-            case AUTHENTICATED: // 로그인한 유저만 조회 가능
-                // 로그인 상태가 아닐 경우, getUserId()에서 에러 던짐
-                securityService.getUserId();
-                break;
-            case OWNER: // 업로더만 조회 가능
-                myUserId=securityService.getUserId();
-                if(!storageFile.getUploader().getId().equals(myUserId)) {
-                    throw new AccessDeniedException("파일의 업로더만 조회할 수 있습니다.");
-                }
-                break;
-            case GROUP: // 특정 그룹만 조회 가능
-                myUserId=securityService.getUserId();
-                FileAccessGroupType groupType=storageFile.getGroupType();
-                if(groupType==FileAccessGroupType.CHAT){
-                    String chatRoomIdStr=storageFile.getGroupId();
-                    if(chatRoomIdStr!=null){
-                        Long chatRoomId=Long.parseLong(chatRoomIdStr);
-                        if(!chatRoomService.isMember(chatRoomId, myUserId)){
-                            // 채팅방 멤버가 아닌 사람이 파일을 조회하려고 하면 거부
-                            throw new AccessDeniedException("채팅방 멤버만 접근할 수 있습니다.");
-                        }
-                    }
-                }
-                break;
-        }
-
+    public Resource readResource(String filename) throws FileNotFoundException {
         // 자원 찾기
         Path filePath=generateFilePath(filename);
         Resource resource=new FileSystemResource(filePath);
@@ -242,7 +223,7 @@ public class FileServiceImpl implements FileService {
     }
 
     /**
-     * 파일명 목록에 따라 저장소와 DB에서 파일 삭제
+     * 파일명 목록에 따라 저장소에서 파일 삭제
      * @param filenames 파일명 목록
      */
     @Override
@@ -256,9 +237,6 @@ public class FileServiceImpl implements FileService {
                 log.error("파일 삭제 실패 : "+filename);
             }
         }
-
-        // DB에서 StorageFile 일괄 삭제
-        storageFileRepository.deleteByFilenames(filenames);
     }
 
     /**

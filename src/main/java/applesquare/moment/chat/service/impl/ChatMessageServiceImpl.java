@@ -30,7 +30,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -256,32 +255,6 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                 .lastReadMessageId(messageId)
                 .build();
         chatRoomMemberRepository.save(newChatRoomMember);
-    }
-
-    /**
-     * 채팅방 ID 기반으로 채팅 메시지 일괄 삭제
-     * @param roomId 채팅방 ID
-     */
-    @Async("taskExecutor")
-    @Override
-    public void deleteBatchByRoomId(Long roomId){
-
-        // 채팅 메시지에 사용된 파일을 저장소와 DB에서 삭제하기
-        int batchSize=1000;
-        while(true){
-            // 채팅 메시지에서 사용된 파일명 목록 조회
-            Pageable pageable=PageRequest.of(0, batchSize);
-            List<String> chatMessageFilenames=chatMessageRepository.findFilenamesByChatRoomId(roomId, pageable);
-            if(chatMessageFilenames.size()==0){
-                break;
-            }
-
-            // 저장소, DB에서 파일 목록 삭제
-            fileService.deleteByFilenames(chatMessageFilenames);
-        }
-
-        // 채팅방 메시지 삭제하기 (ChatMessage)
-        chatMessageRepository.deleteByChatRoom_Id(roomId);
     }
 
     /**

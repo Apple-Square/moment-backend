@@ -1,5 +1,6 @@
 package applesquare.moment.file.service;
 
+import applesquare.moment.file.StorageFileReadResponseDTO;
 import applesquare.moment.file.model.FileAccessGroupType;
 import applesquare.moment.file.model.FileAccessPolicy;
 import applesquare.moment.file.model.MediaType;
@@ -55,7 +56,8 @@ public interface FileService {
     StorageFile upload(MultipartFile file, UserInfo writer, FileAccessPolicy accessPolicy) throws IOException;
     StorageFile uploadThumbnail(MultipartFile file, String filename, UserInfo writer, FileAccessPolicy accessPolicy, FileAccessGroupType groupType, String groupId) throws IOException;
     StorageFile uploadThumbnail(MultipartFile file, String filename, UserInfo writer, FileAccessPolicy accessPolicy) throws IOException;
-    Resource read(String filename) throws FileNotFoundException;
+    Resource readResource(String filename) throws FileNotFoundException;
+    StorageFileReadResponseDTO readStorageFile(String filename);
     void delete(String filename) throws IOException;
     void deleteThumbnail(String filename) throws IOException;
     void deleteByFilenames(List<String> filenames);

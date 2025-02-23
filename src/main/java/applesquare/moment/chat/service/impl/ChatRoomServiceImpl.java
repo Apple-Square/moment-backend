@@ -7,7 +7,7 @@ import applesquare.moment.chat.model.ChatRoomMember;
 import applesquare.moment.chat.model.ChatRoomType;
 import applesquare.moment.chat.repository.ChatRoomMemberRepository;
 import applesquare.moment.chat.repository.ChatRoomRepository;
-import applesquare.moment.chat.service.ChatMessageService;
+import applesquare.moment.chat.service.ChatMessageDeleteService;
 import applesquare.moment.chat.service.ChatRoomService;
 import applesquare.moment.common.exception.DuplicateDataException;
 import applesquare.moment.common.page.PageRequestDTO;
@@ -41,7 +41,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final UserInfoRepository userInfoRepository;
     private final FollowRepository followRepository;
-    private final ChatMessageService chatMessageService;
+    private final ChatMessageDeleteService chatMessageDeleteService;
     private final UserProfileService userProfileService;
     private final FileService fileService;
 
@@ -497,7 +497,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
      */
     private void deleteChatRoom(Long roomId){
         // 채팅 메시지 일괄 삭제 (ChatMessage)
-        chatMessageService.deleteBatchByRoomId(roomId);
+        chatMessageDeleteService.deleteBatchByRoomId(roomId);
 
         // 채팅방 삭제하기 (ChatRoom)
         chatRoomRepository.deleteById(roomId);
