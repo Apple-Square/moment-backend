@@ -23,6 +23,6 @@ public class ChatMessageReadResponseDTO {
     private String content;
     private List<String> fileUrls;
     private SharedPostReadResponseDTO sharedPost;
-    private int unreadCount;
+    private long unreadCount;
     private boolean isDeleted;
 }

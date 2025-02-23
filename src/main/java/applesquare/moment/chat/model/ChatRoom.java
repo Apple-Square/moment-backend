@@ -16,7 +16,7 @@ import java.util.Set;
 
 @Entity
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "chat_room")

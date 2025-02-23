@@ -52,7 +52,7 @@ public class ChatMessage extends BaseEntity {
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private Post sharedPost;    // 공유된 게시물
     @Column(name = "unread_count", nullable = false, updatable = true)
-    private int unreadCount;
+    private long unreadCount;
     @Builder.Default
     @Column(name = "is_deleted", nullable = false, updatable = true)
     private boolean isDeleted=false;
