@@ -16,6 +16,7 @@ import applesquare.moment.file.model.FileAccessGroupType;
 import applesquare.moment.file.model.FileAccessPolicy;
 import applesquare.moment.file.model.MediaType;
 import applesquare.moment.file.model.StorageFile;
+import applesquare.moment.file.repository.StorageFileRepository;
 import applesquare.moment.file.service.FileService;
 import applesquare.moment.post.model.Post;
 import applesquare.moment.post.repository.PostRepository;
@@ -36,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -48,6 +50,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
+    private final StorageFileRepository storageFileRepository;
     private final UserInfoRepository userInfoRepository;
     private final PostRepository postRepository;
     private final UserProfileService userProfileService;
@@ -183,14 +186,42 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         ChatRoom chatRoom=chatRoomRepository.findById(roomId)
                 .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 채팅방입니다."));
 
+        // 채팅방 인원 조회
         long chatRoomMemberCount=chatRoomMemberRepository.countByChatRoom_Id(roomId);
-        ChatMessage chatMessage=ChatMessage.builder()
-                .chatRoom(chatRoom)
-                .senderId(myUserId)
-                .type(ChatMessageType.TEXT)
-                .content(chatMessageCreateRequestDTO.getContent())
-                .unreadCount(chatRoomMemberCount)
-                .build();
+
+
+        List<StorageFile> storageFiles=new ArrayList<>();
+        ChatMessageType messageType=chatMessageCreateRequestDTO.getType();
+        ChatMessage chatMessage=switch (messageType){
+            case TEXT -> ChatMessage.builder()
+                    .chatRoom(chatRoom)
+                    .senderId(myUserId)
+                    .type(ChatMessageType.TEXT)
+                    .content(chatMessageCreateRequestDTO.getContent())
+                    .unreadCount(chatRoomMemberCount)
+                    .build();
+            case IMAGE, VIDEO-> {
+                List<Long> storageFileIds=chatMessageCreateRequestDTO.getFileIds();
+                if(storageFileIds.isEmpty()){
+                    throw new IllegalArgumentException("파일을 1개 이상 입력해주세요.");
+                }
+                storageFiles=storageFileRepository.findAllById(storageFileIds);
+                for(StorageFile storageFile:storageFiles){
+                    if(!storageFile.getUploader().getId().equals(myUserId)){
+                        throw new AccessDeniedException("해당 파일은 업로더만 메시지로 전송할 수 있습니다.");
+                    }
+                }
+                yield ChatMessage.builder()
+                        .chatRoom(chatRoom)
+                        .senderId(myUserId)
+                        .type(messageType)
+                        .files(storageFiles)
+                        .unreadCount(chatRoomMemberCount)
+                        .build();
+            }
+            // TO DO : 게시물 공유 기능 구현
+            case POST_SHARE -> new ChatMessage();
+        };
 
         // ChatMessage 엔티티 DB 저장
         ChatMessage savedChatMessage=chatMessageRepository.save(chatMessage);
@@ -202,7 +233,23 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         chatRoomRepository.save(newChatRoom);
 
         // 채팅 DTO 변환
-        ChatMessageReadResponseDTO chatMessageDTO=modelMapper.map(savedChatMessage, ChatMessageReadResponseDTO.class);
+        ChatMessageReadResponseDTO chatMessageDTO=switch (messageType){
+            case TEXT -> modelMapper.map(savedChatMessage, ChatMessageReadResponseDTO.class);
+            case IMAGE, VIDEO -> {
+                // 파일 URL 설정
+                List<String> fileUrls=storageFiles.stream()
+                        .map((storageFile)-> fileService.convertFilenameToUrl(storageFile.getFilename()))
+                        .toList();
+
+                // DTO 변환
+                yield modelMapper
+                        .map(savedChatMessage, ChatMessageReadResponseDTO.class)
+                        .toBuilder()
+                        .fileUrls(fileUrls)
+                        .build();
+            }
+            case POST_SHARE -> null;
+        };
 
         // 채팅 DTO 반환
         return chatMessageDTO;
@@ -265,7 +312,11 @@ public class ChatMessageServiceImpl implements ChatMessageService {
      * @return 업로드한 파일 목록
      */
     @Override
-    public List<StorageFile> uploadFiles(String myUserId, Long roomId, List<MultipartFile> files){
+    public List<Long> uploadFiles(String myUserId, Long roomId, List<MultipartFile> files){
+        if(files.isEmpty()){
+            throw new IllegalArgumentException("파일을 1개 이상 입력해주세요.");
+        }
+
         // 권한 검사 : 사용자가 해당 채팅방의 멤버가 맞는지 확인
         if(!chatRoomService.isMember(roomId, myUserId)){
             throw new AccessDeniedException("채팅방의 멤버만 파일을 업로드할 수 있습니다.");
@@ -284,8 +335,12 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                 storageFiles.add(storageFile);
             }
 
+            List<Long> storageFileIds=storageFiles.stream()
+                    .map((storageFile)-> storageFile.getId())
+                    .toList();
+
             // 업로드된 파일 목록 반환
-            return storageFiles;
+            return storageFileIds;
 
         } catch (Exception exception){
             // 파일을 업로드하던 도중 문제가 생긴다면, 저장소에 업로드한 파일을 삭제해야 한다.

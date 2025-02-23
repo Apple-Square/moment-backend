@@ -7,7 +7,6 @@ import applesquare.moment.common.exception.ResponseMap;
 import applesquare.moment.common.page.PageRequestDTO;
 import applesquare.moment.common.page.PageResponseDTO;
 import applesquare.moment.common.security.SecurityService;
-import applesquare.moment.file.model.StorageFile;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -74,12 +73,12 @@ public class ChatMessageController {
         String myUserId=securityService.getUserId();
 
         // 특정 채팅방에 파일 업로드
-        List<StorageFile> storageFiles=chatMessageService.uploadFiles(myUserId, roomId, files);
+        List<Long> uploadFileIds=chatMessageService.uploadFiles(myUserId, roomId, files);
 
         // 응답 생성
         ResponseMap responseMap=new ResponseMap();
         responseMap.put("message", "채팅방에 파일을 업로드했습니다.");
-        responseMap.put("files", storageFiles);
+        responseMap.put("fileIds", uploadFileIds);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseMap.getMap());
     }

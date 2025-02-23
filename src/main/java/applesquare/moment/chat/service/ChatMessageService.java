@@ -4,7 +4,6 @@ import applesquare.moment.chat.dto.ChatMessageCreateRequestDTO;
 import applesquare.moment.chat.dto.ChatMessageReadResponseDTO;
 import applesquare.moment.common.page.PageRequestDTO;
 import applesquare.moment.common.page.PageResponseDTO;
-import applesquare.moment.file.model.StorageFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -20,5 +19,5 @@ public interface ChatMessageService {
     void setAsRead(String myUserId, Long messageId);
 
     // 특정 채팅방에 파일 업로드
-    List<StorageFile> uploadFiles(String myUserId, Long roomId, List<MultipartFile> files);
+    List<Long> uploadFiles(String myUserId, Long roomId, List<MultipartFile> files);
 }
