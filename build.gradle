@@ -93,6 +93,9 @@ dependencies {
 
     // Email 전송
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // WebSocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket:3.3.2'
 }
 
 tasks.named('test') {

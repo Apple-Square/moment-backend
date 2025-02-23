@@ -156,7 +156,23 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     // 특정 채팅방에 메시지 생성 & 전송
     @Override
     public ChatMessageReadResponseDTO createAndSend(String myUserId, Long roomId, ChatMessageCreateRequestDTO chatMessageCreateRequestDTO){
-        // TO DO : 구현 예정
+        // 1. 수신자가 채팅방의 멤버인지 확인하기
+
+        // 2. ChatMessage 엔티티 생성하기
+        // 3. ChatRoom의 lastMessage 갱신하기 (이걸 해야 채팅방이 목록에서 위로 올라감)
+
+        // 4. 채팅방 멤버에게 해당 메시지와 알림 전송하기
+            // 4-1. 배지 알림 : 일단 무조건 전송 (채팅 배지 알림 & 채팅방 별 배지 알림)
+                // (채팅방에 들어와 있던 경우 -> 표시 X. 무시하기)
+                // (채팅 화면 바깥에 있던 경우 -> 채팅 배지 알림 표시, 채팅방 별 배지 알림 무시)
+                // (채팅바 목록을 보고 있던 경우 -> 채팅 배지 알림 무시, 채팅방 별 배지 알림 표시)
+                        // (새로운 메시지가 온 채팅방을 목록의 제일 위로 이동)
+            // 4-2. 팝업 알림 : 일단 무조건 전송
+                // (채팅방에 들어와 있던 경우 -> 채팅방 목록 맨 밑에 추가해서 새로 온 알림 실시간 표시)
+                // (채팅 화면 바깥에 있던 경우 -> 팝업 알림으로 위에 보여주기)
+                // (채팅방 목록을 보고 있던 경우 -> 팝업 표시 X)
+            // 4-3. 메시지 : 채팅방에 들어오면 자동으로 DB에서 조회됨.
+
         return null;
     }
 
