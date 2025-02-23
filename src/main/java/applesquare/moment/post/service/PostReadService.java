@@ -20,5 +20,5 @@ public interface PostReadService {
     PageResponseDTO<PostDetailReadAllResponseDTO> readLikedDetailAllByUser(String userId, PageRequestDTO pageRequestDTO);
     PageResponseDTO<PostThumbnailReadAllResponseDTO> readLikedThumbnailAllByUser(String userId, PageRequestDTO pageRequestDTO);
 
-    String readThumbnailImageUrl(Long postId);
+    String readThumbnailFileUrl(Long postId);
 }

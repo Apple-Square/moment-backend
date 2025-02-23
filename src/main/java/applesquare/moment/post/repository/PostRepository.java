@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long>, CustomPostRepository {
     long countByWriterId(String userId);
@@ -167,7 +168,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, CustomPostRep
             "INNER JOIN post_files pf ON pf.post_id=p.id " +
             "INNER JOIN storage_file sf ON pf.file_id=sf.id " +
             "WHERE p.id=:postId AND pf.file_order=0 ", nativeQuery = true)
-    String findFirstFilenameById(@Param("postId") Long postId);
+    Optional<String> findFirstFilenameById(@Param("postId") Long postId);
 
     // 게시물 ID 기반으로 썸네일 파일 조회
     @Query(value = "SELECT sf " +
@@ -176,4 +177,14 @@ public interface PostRepository extends JpaRepository<Post, Long>, CustomPostRep
             "INNER JOIN storage_file sf ON pf.file_id=sf.id " +
             "WHERE p.id=:postId AND pf.file_order=0 ", nativeQuery = true)
     StorageFile findFirstFileById(@Param("postId") Long postId);
+
+    // ====================================================================
+
+    // 게시물 ID 기반으로 게시물의 contentType 조회
+    @Query(value = "SELECT sf.contentType " +
+            "FROM post p " +
+            "INNER JOIN post_files pf ON pf.post_id=p.id " +
+            "INNER JOIN storage_file sf ON pf.file_id=sf.id " +
+            "WHERE p.id=:postId AND pf.file_order=0 ", nativeQuery = true)
+    Optional<String> findContentTypeByPostId(@Param("postId") Long postId);
 }

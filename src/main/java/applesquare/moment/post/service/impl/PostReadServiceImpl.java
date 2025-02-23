@@ -293,8 +293,9 @@ public class PostReadServiceImpl implements PostReadService {
     }
 
     @Override
-    public String readThumbnailImageUrl(Long postId){
-        String thumbFilename= postRepository.findFirstFilenameById(postId);
+    public String readThumbnailFileUrl(Long postId){
+        String thumbFilename= postRepository.findFirstFilenameById(postId)
+                .orElseThrow(()-> new EntityNotFoundException("게시물의 첫번째 파일을 불러올 수 없습니다."));
         return fileService.convertFilenameToUrl(thumbFilename);
     }
 }

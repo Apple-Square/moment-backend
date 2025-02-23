@@ -165,7 +165,7 @@ public class NotificationServiceImpl implements NotificationService {
                 return List.of();
             case FEED:
                 // 게시물 썸네일 링크 생성
-                String postThumbnailUrl=postReadService.readThumbnailImageUrl(notification.getReferenceIdAsLong());
+                String postThumbnailUrl=postReadService.readThumbnailFileUrl(notification.getReferenceIdAsLong());
                 NotificationLink feedThumbnailLink=NotificationLink.builder()
                         .type(NotificationLinkType.THUMBNAIL)
                         .link(postThumbnailUrl)

@@ -118,6 +118,13 @@ public class PostManagementController {
         return ResponseEntity.status(HttpStatus.OK).body(responseMap.getMap());
     }
 
+    /**
+     * 게시글 조회수 증가 API
+     * @param postId 게시글 ID
+     * @return  (status) 200,
+     *          (body)  조회수 증가 성공 메시지,
+     *                  증가된 조회수
+     */
     @PatchMapping("/{postId}/view")
     public ResponseEntity<Map<String, Object>> view(@PathVariable(name = "postId") Long postId){
         // 게시글 조회수 1 증가시키기

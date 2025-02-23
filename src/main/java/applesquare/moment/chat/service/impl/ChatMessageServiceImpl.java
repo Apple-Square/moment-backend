@@ -20,6 +20,7 @@ import applesquare.moment.file.repository.StorageFileRepository;
 import applesquare.moment.file.service.FileService;
 import applesquare.moment.post.model.Post;
 import applesquare.moment.post.repository.PostRepository;
+import applesquare.moment.post.service.PostReadService;
 import applesquare.moment.user.dto.UserProfileReadResponseDTO;
 import applesquare.moment.user.model.UserInfo;
 import applesquare.moment.user.repository.UserInfoRepository;
@@ -56,6 +57,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     private final UserProfileService userProfileService;
     private final ChatRoomService chatRoomService;
     private final FileService fileService;
+    private final PostReadService postReadService;
     private final ModelMapper modelMapper;
 
 
@@ -189,8 +191,10 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         // 채팅방 인원 조회
         long chatRoomMemberCount=chatRoomMemberRepository.countByChatRoom_Id(roomId);
 
-
+        Long postId=null;
+        Post sharedPost=null;
         List<StorageFile> storageFiles=new ArrayList<>();
+
         ChatMessageType messageType=chatMessageCreateRequestDTO.getType();
         ChatMessage chatMessage=switch (messageType){
             case TEXT -> ChatMessage.builder()
@@ -220,7 +224,21 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                         .build();
             }
             // TO DO : 게시물 공유 기능 구현
-            case POST_SHARE -> new ChatMessage();
+            case POST_SHARE -> {
+                postId=chatMessageCreateRequestDTO.getPostShareId();
+                if(postId==null){
+                    throw new IllegalArgumentException("공유할 게시물 ID를 입력해주세요.");
+                }
+                sharedPost=postRepository.findById(postId)
+                        .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 게시물입니다."));
+                yield ChatMessage.builder()
+                        .chatRoom(chatRoom)
+                        .senderId(myUserId)
+                        .type(messageType)
+                        .sharedPost(sharedPost)
+                        .unreadCount(chatRoomMemberCount)
+                        .build();
+            }
         };
 
         // ChatMessage 엔티티 DB 저장
@@ -248,7 +266,45 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                         .fileUrls(fileUrls)
                         .build();
             }
-            case POST_SHARE -> null;
+            case POST_SHARE -> {
+                SharedPostReadResponseDTO sharedPostDTO=null;
+                if(sharedPost!=null){
+                    // 게시물의 미디어 타입 가져오기
+                    String contentType= postRepository.findContentTypeByPostId(postId)
+                            .orElseThrow(()-> new RuntimeException("게시물의 contentType 조회에 실패했습니다."));
+                    MediaType mediaType=FileService.convertContentTypeToMediaType(contentType);
+
+                    // 게시물 작성자 프로필 가져오기
+                    UserProfileReadResponseDTO writerProfileDTO=userProfileService.readProfileById(sharedPost.getWriter().getId());
+
+                    // 게시물 썸네일 URL 가져오기
+                    String thumbFileUrl= postReadService.readThumbnailFileUrl(postId);
+
+                    if(mediaType==MediaType.IMAGE){
+                        sharedPostDTO=SharedImagePostReadResponseDTO.builder()
+                                .id(sharedPost.getId())
+                                .writer(writerProfileDTO)
+                                .mediaType(mediaType)
+                                .thumbnailUrl(thumbFileUrl)
+                                .content(sharedPost.getContent())
+                                .build();
+                    }
+                    else if(mediaType==MediaType.VIDEO){
+                        sharedPostDTO=SharedVideoPostReadResponseDTO.builder()
+                                .id(sharedPost.getId())
+                                .writer(writerProfileDTO)
+                                .mediaType(mediaType)
+                                .thumbnailUrl(thumbFileUrl)
+                                .build();
+                    }
+                }
+
+                yield modelMapper
+                        .map(savedChatMessage, ChatMessageReadResponseDTO.class)
+                        .toBuilder()
+                        .sharedPost(sharedPostDTO)
+                        .build();
+            }
         };
 
         // 채팅 DTO 반환
