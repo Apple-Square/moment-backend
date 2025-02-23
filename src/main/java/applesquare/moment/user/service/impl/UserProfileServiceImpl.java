@@ -3,6 +3,7 @@ package applesquare.moment.user.service.impl;
 import applesquare.moment.common.page.PageRequestDTO;
 import applesquare.moment.common.page.PageResponseDTO;
 import applesquare.moment.common.security.SecurityService;
+import applesquare.moment.file.model.FileAccessPolicy;
 import applesquare.moment.file.model.StorageFile;
 import applesquare.moment.file.service.FileService;
 import applesquare.moment.user.dto.UserProfileReadResponseDTO;
@@ -107,7 +108,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         StorageFile newProfileImage=null;
         try{
             // 저장소에 새로운 프로필 사진 업로드
-            newProfileImage=fileService.upload(profileImage, oldUserInfo);
+            newProfileImage=fileService.upload(profileImage, oldUserInfo, FileAccessPolicy.PUBLIC);
 
             // 새로운 UserInfo 엔티티 생성
             UserInfo newUserInfo=oldUserInfo.toBuilder()

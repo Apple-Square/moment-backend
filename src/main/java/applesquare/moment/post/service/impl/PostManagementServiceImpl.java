@@ -4,6 +4,7 @@ import applesquare.moment.address.dto.AddressSearchResponseDTO;
 import applesquare.moment.address.service.AddressService;
 import applesquare.moment.comment.repository.CommentRepository;
 import applesquare.moment.common.security.SecurityService;
+import applesquare.moment.file.model.FileAccessPolicy;
 import applesquare.moment.file.model.StorageFile;
 import applesquare.moment.file.repository.StorageFileRepository;
 import applesquare.moment.file.service.FileService;
@@ -116,11 +117,11 @@ public class PostManagementServiceImpl implements PostManagementService {
                 MultipartFile file=files.get(i);
 
                 // 저장소에 파일 저장
-                StorageFile storageFile=fileService.upload(file, writer);
+                StorageFile storageFile=fileService.upload(file, writer, FileAccessPolicy.PUBLIC);
 
                 // 첫번째 파일이면, 저장소에 썸네일 파일 저장
                 if(i==0){
-                    fileService.uploadThumbnail(file, storageFile.getFilename(), writer);
+                    fileService.uploadThumbnail(file, storageFile.getFilename(), writer, FileAccessPolicy.PUBLIC);
                 }
 
                 // StorageFile 엔티티 생성
@@ -286,12 +287,12 @@ public class PostManagementServiceImpl implements PostManagementService {
                     MultipartFile file=files.get(i);
 
                     // 저장소에 새로운 파일 저장
-                    StorageFile storageFile=fileService.upload(file, oldWriter);
+                    StorageFile storageFile=fileService.upload(file, oldWriter, FileAccessPolicy.PUBLIC);
 
                     // 기존 파일이 모두 삭제되고 새로운 파일이 첫번째 파일이 되었다면,
                     if(i==0 && (urls==null || urls.size()==0)){
                         // 저장소에 썸네일 파일 업로드
-                        fileService.uploadThumbnail(file, storageFile.getFilename(), oldWriter);
+                        fileService.uploadThumbnail(file, storageFile.getFilename(), oldWriter, FileAccessPolicy.PUBLIC);
 
                         // 기존 썸네일 파일명 가져오기 (게시글 수정 작업이 성공한 후에 삭제)
                         if(oldStorageFiles.size()>0){

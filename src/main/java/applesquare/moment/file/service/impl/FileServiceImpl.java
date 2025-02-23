@@ -1,19 +1,25 @@
 package applesquare.moment.file.service.impl;
 
+import applesquare.moment.chat.service.ChatRoomService;
+import applesquare.moment.common.security.SecurityService;
 import applesquare.moment.common.url.UrlManager;
 import applesquare.moment.common.url.UrlPath;
 import applesquare.moment.file.exception.FileTransferException;
+import applesquare.moment.file.model.FileAccessGroupType;
+import applesquare.moment.file.model.FileAccessPolicy;
 import applesquare.moment.file.model.StorageFile;
 import applesquare.moment.file.repository.StorageFileRepository;
 import applesquare.moment.file.service.CloudinaryService;
 import applesquare.moment.file.service.FileService;
 import applesquare.moment.user.model.UserInfo;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,7 +40,9 @@ public class FileServiceImpl implements FileService {
     private final int THUMBNAIL_VIDEO_SEC=7;  // 7초
 
     private final UrlManager urlManager;
+    private final SecurityService securityService;
     private final CloudinaryService cloudinaryService;
+    private final ChatRoomService chatRoomService;
     private final StorageFileRepository storageFileRepository;
 
     @Value("${applesquare.moment.file.upload-path}")
@@ -47,7 +55,7 @@ public class FileServiceImpl implements FileService {
      * @return 업로드한 파일명
      */
     @Override
-    public StorageFile upload(MultipartFile file, UserInfo writer) throws IOException{
+    public StorageFile upload(MultipartFile file, UserInfo writer, FileAccessPolicy accessPolicy) throws IOException{
         // file이 null이라면 예외 던지기
         if(file==null){
             throw new IllegalArgumentException("지원하지 않는 형식의 파일입니다. (type = null)");
@@ -72,6 +80,7 @@ public class FileServiceImpl implements FileService {
                 .contentType(file.getContentType())
                 .fileSize(file.getSize())
                 .uploader(writer)
+                .accessPolicy(accessPolicy)
                 .build();
 
         try{
@@ -97,9 +106,9 @@ public class FileServiceImpl implements FileService {
      * @return 업로드한 썸네일 파일명
      */
     @Override
-    public StorageFile uploadThumbnail(MultipartFile file, String filename, UserInfo writer) throws IOException {
-        if(FileService.isImage(file)) return uploadThumbnailImage(file, filename, writer, THUMBNAIL_WIDTH_SIZE);
-        else if(FileService.isVideo(file)) return uploadThumbnailVideo(file, filename, writer, THUMBNAIL_WIDTH_SIZE, THUMBNAIL_VIDEO_SEC);
+    public StorageFile uploadThumbnail(MultipartFile file, String filename, UserInfo writer, FileAccessPolicy accessPolicy) throws IOException {
+        if(FileService.isImage(file)) return uploadThumbnailImage(file, filename, writer, accessPolicy, THUMBNAIL_WIDTH_SIZE);
+        else if(FileService.isVideo(file)) return uploadThumbnailVideo(file, filename, writer, accessPolicy, THUMBNAIL_WIDTH_SIZE, THUMBNAIL_VIDEO_SEC);
         else throw new IllegalArgumentException("지원하지 않는 형식의 파일입니다. (type="+file.getContentType()+")");
     }
 
@@ -111,6 +120,41 @@ public class FileServiceImpl implements FileService {
      */
     @Override
     public Resource read(String filename) throws FileNotFoundException {
+        // 권한 검사
+        List<StorageFile> storageFiles=storageFileRepository.findByFilename(filename);
+        if(storageFiles.size()==0){
+            throw new EntityNotFoundException("존재하지 않는 파일입니다.");
+        }
+        StorageFile storageFile=storageFiles.get(0);
+
+        String myUserId;
+        FileAccessPolicy accessPolicy=storageFile.getAccessPolicy();
+        switch (accessPolicy){
+            case PUBLIC:    // 권한 검사할 필요 없음
+                break;
+            case AUTHENTICATED: // 로그인한 유저만 조회 가능
+                // 로그인 상태가 아닐 경우, getUserId()에서 에러 던짐
+                securityService.getUserId();
+                break;
+            case OWNER: // 업로더만 조회 가능
+                myUserId=securityService.getUserId();
+                if(!storageFile.getUploader().getId().equals(myUserId)) {
+                    throw new AccessDeniedException("파일의 업로더만 조회할 수 있습니다.");
+                }
+                break;
+            case GROUP: // 특정 그룹만 조회 가능
+                myUserId=securityService.getUserId();
+                FileAccessGroupType groupType=storageFile.getGroupType();
+                if(groupType==FileAccessGroupType.CHAT){
+                    Long chatRoomId=storageFile.getGroupId();
+                    if(!chatRoomService.isMember(chatRoomId, myUserId)){
+                        // 채팅방 멤버가 아닌 사람이 파일을 조회하려고 하면 거부
+                        throw new AccessDeniedException("채팅방 멤버만 접근할 수 있습니다.");
+                    }
+                }
+                break;
+        }
+
         // 자원 찾기
         Path filePath=generateFilePath(filename);
         Resource resource=new FileSystemResource(filePath);
@@ -291,7 +335,7 @@ public class FileServiceImpl implements FileService {
         return Paths.get(uploadDirectory, filename);
     }
 
-    private StorageFile uploadThumbnailImage(MultipartFile originalImage, String filename, UserInfo writer, int width) throws IOException{
+    private StorageFile uploadThumbnailImage(MultipartFile originalImage, String filename, UserInfo writer, FileAccessPolicy accessPolicy, int width) throws IOException{
         // 파일 형식 검사
         if(originalImage==null || !FileService.isImage(originalImage)){
             throw new IllegalArgumentException("이미지 파일을 넣어주세요.");
@@ -328,6 +372,7 @@ public class FileServiceImpl implements FileService {
                 .contentType(originalImage.getContentType())
                 .fileSize(originalImage.getSize())
                 .uploader(writer)
+                .accessPolicy(accessPolicy)
                 .build();
 
         try{
@@ -355,7 +400,7 @@ public class FileServiceImpl implements FileService {
      * @param videoLength 동영상의 길이 (초 단위)
      * @throws IOException 입출력 오류가 발생한 경우
      */
-    private StorageFile uploadThumbnailVideo(MultipartFile originalVideo, String filename, UserInfo writer, int width, int videoLength) throws IOException {
+    private StorageFile uploadThumbnailVideo(MultipartFile originalVideo, String filename, UserInfo writer, FileAccessPolicy accessPolicy, int width, int videoLength) throws IOException {
         // 파일 형식 검사
         if (originalVideo == null || !FileService.isVideo(originalVideo)) {
             throw new IllegalArgumentException("동영상 파일을 넣어주세요.");
@@ -378,6 +423,7 @@ public class FileServiceImpl implements FileService {
                 .contentType(originalVideo.getContentType())
                 .fileSize(originalVideo.getSize())
                 .uploader(writer)
+                .accessPolicy(accessPolicy)
                 .build();
 
         try{

@@ -1,5 +1,6 @@
 package applesquare.moment.file.service;
 
+import applesquare.moment.file.model.FileAccessPolicy;
 import applesquare.moment.file.model.MediaType;
 import applesquare.moment.file.model.StorageFile;
 import applesquare.moment.user.model.UserInfo;
@@ -49,8 +50,8 @@ public interface FileService {
     }
 
 
-    StorageFile upload(MultipartFile file, UserInfo writer) throws IOException;
-    StorageFile uploadThumbnail(MultipartFile file, String filename, UserInfo writer) throws IOException;
+    StorageFile upload(MultipartFile file, UserInfo writer, FileAccessPolicy accessPolicy) throws IOException;
+    StorageFile uploadThumbnail(MultipartFile file, String filename, UserInfo writer, FileAccessPolicy accessPolicy) throws IOException;
     Resource read(String filename) throws FileNotFoundException;
     void delete(String filename) throws IOException;
     void deleteThumbnail(String filename) throws IOException;

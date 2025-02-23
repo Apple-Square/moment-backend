@@ -30,4 +30,19 @@ public class StorageFile extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "uploader_id", nullable = false, updatable = false)
     private UserInfo uploader;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "access_policy", nullable = false)
+    private FileAccessPolicy accessPolicy; // 파일 접근 정책 (읽기 권한)
+    @Column(name = "group_type", nullable = true)
+    private FileAccessGroupType groupType;  // 파일이 속한 그룹 유형
+    @Column(name = "group_id", nullable = true)
+    private Long groupId; // 파일이 속한 그룹 ID
+
+    /**
+     * TO DO :
+     * 사실 확장성 좋게 하려면 파일 별로 (동작, 권한 수준)을 저장한 별도의 테이블을 구성해야 한다.
+     * (ex. 3번 파일 - read - public)
+     * 하지만, 앞으로 write 혹은 그 이외의 동작에 권한 수준을 설정할 일이 없는 토이 프로젝트이기 때문에
+     * 파일 접근 권한을 간단하게 구현했습니다.
+     */
 }
