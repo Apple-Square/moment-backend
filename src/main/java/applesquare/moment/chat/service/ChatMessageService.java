@@ -20,4 +20,7 @@ public interface ChatMessageService {
 
     // 특정 채팅방에 파일 업로드
     List<Long> uploadFiles(String myUserId, Long roomId, List<MultipartFile> files);
+    
+    // 미확인 채팅 메시지 개수 조회
+    long countUnreadMessages(String userId);
 }

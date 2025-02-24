@@ -431,4 +431,15 @@ public class ChatMessageServiceImpl implements ChatMessageService {
             throw new RuntimeException("파일 업로드에 실패했습니다.");
         }
     }
+
+
+    /**
+     * 미확인 채팅 메시지 개수 조회
+     * @param userId 사용자 ID
+     * @return 미확인 채티 메시지 개수
+     */
+    @Override
+    public long countUnreadMessages(String userId){
+        return chatMessageRepository.countUnreadMessagesByUserId(userId);
+    }
 }
