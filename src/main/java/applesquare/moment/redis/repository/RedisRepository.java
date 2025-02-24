@@ -9,5 +9,5 @@ public interface RedisRepository {
     boolean exists(RedisKeyType keyType, String key);
     Object get(RedisKeyType keyType, String key);
     void delete(RedisKeyType keyType, String key);
-    boolean extendTTL(RedisKeyType keyType, String key, long ttl, TimeUnit unit);
+    boolean setTTL(RedisKeyType keyType, String key, long ttl, TimeUnit unit);
 }

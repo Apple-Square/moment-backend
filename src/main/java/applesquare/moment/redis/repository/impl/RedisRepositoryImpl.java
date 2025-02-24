@@ -42,8 +42,10 @@ public class RedisRepositoryImpl implements RedisRepository {
      */
     @Override
     public boolean exists(RedisKeyType keyType, String key) {
-        return redisTemplate.hasKey(getKey(keyType, key));
+        Boolean result = redisTemplate.hasKey(getKey(keyType, key));
+        return Boolean.TRUE.equals(result);
     }
+
 
     /**
      * Redis에서 특정 키의 값 추출
@@ -78,7 +80,7 @@ public class RedisRepositoryImpl implements RedisRepository {
      * @return 연장 성공 여부 (키가 존재하지 않으면, 실패)
      */
     @Override
-    public boolean extendTTL(RedisKeyType keyType, String key, long ttl, TimeUnit unit){
+    public boolean setTTL(RedisKeyType keyType, String key, long ttl, TimeUnit unit){
         // 만료기한 연장
         if(exists(keyType, key)){
             // 키가 존재한다면, TTL 연장
