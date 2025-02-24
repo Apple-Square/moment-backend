@@ -1,5 +1,6 @@
 package applesquare.moment.notification.service.impl;
 
+import applesquare.moment.chat.repository.ChatMessageRepository;
 import applesquare.moment.notification.dto.NotificationRequestDTO;
 import applesquare.moment.notification.model.NotificationType;
 import applesquare.moment.notification.model.UserNotification;
@@ -22,6 +23,8 @@ public class NotificationSendServiceImpl implements NotificationSendService {
     private final NotificationStrategyRegistry notificationStrategyRegistry;
     private final NotificationService notificationService;
     private final NotificationSender notificationSender;
+    private final ChatMessageRepository chatMessageRepository;
+
 
     /**
      * 수신자에게 전달할 알림 생성 후 전송
@@ -45,9 +48,13 @@ public class NotificationSendServiceImpl implements NotificationSendService {
      */
     @Async("taskExecutor")
     public void resendMissedNotifications(String receiverId, Long lastEventId){
-        // 배지 알림 갱신
+        // 일반 배지 알림 갱신
         long badgeCount=notificationService.countUnreadNotifications(receiverId);  // 미확인 알림 개수 조회
         notificationSender.sendBadge(receiverId, badgeCount);
+
+        // 채팅 배지 알림 갱신
+        long chatBadgeCount=chatMessageRepository.countUnreadMessagesByUserId(receiverId);
+        notificationSender.sendChatBadge(receiverId, chatBadgeCount);
 
         // 손실된 알림 목록 조회
         List<UserNotification> missedNotifications=notificationService.readMissedAll(receiverId, lastEventId);

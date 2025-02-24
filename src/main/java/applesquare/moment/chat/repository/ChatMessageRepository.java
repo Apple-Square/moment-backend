@@ -49,4 +49,13 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
             "JOIN cm.files f " +
             "WHERE cm.chatRoom.id=:roomId")
     List<String> findFilenamesByChatRoomId(@Param("roomId") Long roomId, Pageable pageable);
+
+    // 특정 사용자가 속한 모든 채팅방의 미확인 채팅 메시지 개수 조회
+    @Query("SELECT COUNT(m) " +
+            "FROM ChatRoomMember crm " +
+                "JOIN ChatMessage m " +
+            "WHERE crm.user.id = :userId " +
+                "AND m.chatRoom = crm.chatRoom " +
+                "AND (crm.lastReadMessageId IS NULL OR m.id > crm.lastReadMessageId)")
+    long countUnreadMessagesByUserId(@Param("userId") String userId);
 }

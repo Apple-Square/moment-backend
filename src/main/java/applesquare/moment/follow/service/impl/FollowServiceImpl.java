@@ -79,7 +79,7 @@ public class FollowServiceImpl implements FollowService {
         followRepository.save(follow);
 
         // 팔로우 알림 전송
-        NotificationRequestDTO notificationRequestDTO=NotificationRequestDTO.builder()
+        NotificationRequestDTO<Void> notificationRequestDTO=NotificationRequestDTO.<Void>builder()
                 .type(NotificationType.FOLLOW)
                 .sender(follower)  // 송신자 == 팔로우 누른 사람(follower)
                 .receiverId(followeeId)  // 수신자 == 팔로우 상대(followee)

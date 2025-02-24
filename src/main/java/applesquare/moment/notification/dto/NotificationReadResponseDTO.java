@@ -24,7 +24,9 @@ public class NotificationReadResponseDTO {
     private String content;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime regDate;
-    private boolean isRead;
+    @Builder.Default
+    private boolean isRead=false;
     private String referenceId;
-    private List<NotificationLink> links;
+    @Builder.Default
+    private List<NotificationLink> links=List.of();
 }

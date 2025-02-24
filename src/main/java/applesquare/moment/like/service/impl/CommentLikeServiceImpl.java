@@ -73,7 +73,7 @@ public class CommentLikeServiceImpl implements CommentLikeService {
         UserInfo sender=userInfoRepository.findById(myUserId)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 사용자입니다. (id = "+myUserId+")"));
 
-        NotificationRequestDTO notificationRequestDTO=NotificationRequestDTO.builder()
+        NotificationRequestDTO<Void> notificationRequestDTO=NotificationRequestDTO.<Void>builder()
                 .type(NotificationType.COMMENT_LIKE)
                 .sender(sender)  // 송신자 == 좋아요 누른 사람
                 .receiverId(comment.getWriter().getId())  // 수신자 == 댓글 작성자

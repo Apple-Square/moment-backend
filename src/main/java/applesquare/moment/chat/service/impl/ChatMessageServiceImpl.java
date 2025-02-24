@@ -18,6 +18,9 @@ import applesquare.moment.file.model.MediaType;
 import applesquare.moment.file.model.StorageFile;
 import applesquare.moment.file.repository.StorageFileRepository;
 import applesquare.moment.file.service.FileService;
+import applesquare.moment.notification.dto.NotificationRequestDTO;
+import applesquare.moment.notification.model.NotificationType;
+import applesquare.moment.notification.service.NotificationSendService;
 import applesquare.moment.post.model.Post;
 import applesquare.moment.post.repository.PostRepository;
 import applesquare.moment.post.service.PostReadService;
@@ -58,6 +61,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     private final ChatRoomService chatRoomService;
     private final FileService fileService;
     private final PostReadService postReadService;
+    private final NotificationSendService notificationSendService;
     private final ModelMapper modelMapper;
 
 
@@ -184,13 +188,14 @@ public class ChatMessageServiceImpl implements ChatMessageService {
             throw new AccessDeniedException("채팅방의 멤버만 메시지를 전송할 수 있습니다.");
         }
 
-        // ChatMessage 엔티티 생성하기
+        // 채팅방 정보 가져오기
         ChatRoom chatRoom=chatRoomRepository.findById(roomId)
                 .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 채팅방입니다."));
 
         // 채팅방 인원 조회
         long chatRoomMemberCount=chatRoomMemberRepository.countByChatRoom_Id(roomId);
 
+        // ChatMessage 엔티티 생성하기
         Long postId=null;
         Post sharedPost=null;
         List<StorageFile> storageFiles=new ArrayList<>();
@@ -223,7 +228,6 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                         .unreadCount(chatRoomMemberCount)
                         .build();
             }
-            // TO DO : 게시물 공유 기능 구현
             case POST_SHARE -> {
                 postId=chatMessageCreateRequestDTO.getPostShareId();
                 if(postId==null){
@@ -306,6 +310,18 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                         .build();
             }
         };
+
+        // 채팅방 멤버들에게 채팅 알림 전송
+        UserInfo myUserInfo=userInfoRepository.findById(myUserId)
+                .orElseThrow(()-> new EntityNotFoundException("존재하지 않는 사용자입니다."));
+        NotificationRequestDTO<ChatMessage> notificationRequestDTO=NotificationRequestDTO.<ChatMessage>builder()
+                .type(NotificationType.CHAT)
+                .sender(myUserInfo)  // 송신자 == 채팅 메시지 보낸 사람
+                .referenceId(roomId.toString())  // 래퍼런스 ID == 채팅방 ID
+                .referenceObject(savedChatMessage)  // 래퍼런스 객체 == 채팅 메시지
+                .build();
+
+        notificationSendService.notify(notificationRequestDTO);
 
         // 채팅 DTO 반환
         return chatMessageDTO;

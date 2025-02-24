@@ -78,7 +78,7 @@ public class CommentServiceImpl implements CommentService {
         Comment newComment=commentRepository.save(comment);
 
         // 댓글 알림 전송
-        NotificationRequestDTO notificationRequestDTO=NotificationRequestDTO.builder()
+        NotificationRequestDTO<Void> notificationRequestDTO=NotificationRequestDTO.<Void>builder()
                 .type(NotificationType.COMMENT)
                 .sender(writer)  // 송신자 == 댓글 작성자
                 .receiverId(post.getWriter().getId())  // 수신자 == 게시물 작성자

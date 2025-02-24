@@ -144,7 +144,7 @@ public class PostManagementServiceImpl implements PostManagementService {
             Post result=postRepository.save(post);
 
             // 피드 알림 전송
-            NotificationRequestDTO notificationRequestDTO=NotificationRequestDTO.builder()
+            NotificationRequestDTO<Void> notificationRequestDTO=NotificationRequestDTO.<Void>builder()
                     .type(NotificationType.FEED)
                     .sender(writer)  // 송신자 ==  게시물 작성자
                     .referenceId(result.getId().toString())  // 래퍼런스 ID ==  게시물 ID
