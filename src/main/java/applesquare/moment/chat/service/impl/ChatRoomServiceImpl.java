@@ -19,6 +19,7 @@ import applesquare.moment.user.model.UserInfo;
 import applesquare.moment.user.repository.UserInfoRepository;
 import applesquare.moment.user.service.UserProfileService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,10 +28,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -70,6 +68,16 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         if(chatRooms.size()>pageRequestDTO.getSize()){
             chatRooms.remove(chatRooms.size()-1);
             hasNext=true;
+        }
+
+        // 채팅방 알림 수신 여부 조회
+        List<Long> roomIds=chatRooms.stream()
+                .map(chatRoom -> chatRoom.getId())
+                .toList();
+        List<Tuple> notificationEnabledList=chatRoomMemberRepository.findNotificationEnabledByChatRoomIdsAndUserId(myUserId, roomIds);
+        Map<Long, Boolean> roomNotificationEnabledMap=new HashMap<>();
+        for(Tuple tuple : notificationEnabledList){
+            roomNotificationEnabledMap.put((Long) tuple.get("chatRoomId"), (Boolean) tuple.get("enabled"));
         }
 
         // DTO 변환
@@ -118,6 +126,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                             .memberCount(memberCount)
                             .memberProfileImageUrls(memberProfileImageUrls)
                             .lastMessage(lastMessageThumbnailDTO)
+                            .notificationEnabled(roomNotificationEnabledMap.getOrDefault(chatRoom.getId(), false))
                             .build();
                 }).toList();
 
@@ -206,6 +215,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         ChatRoomReadResponseDTO chatRoomDTO=ChatRoomReadResponseDTO.builder()
                 .id(savedChatRoom.getId())
                 .memberProfiles(memberProfiles)
+                .notificationEnabled(true)
                 .build();
 
         // DTO 반환
@@ -295,6 +305,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         ChatRoomReadResponseDTO chatRoomDTO=ChatRoomReadResponseDTO.builder()
                 .id(savedChatRoom.getId())
                 .memberProfiles(memberProfiles)
+                .notificationEnabled(true)
                 .build();
 
         // DTO 반환
@@ -320,9 +331,17 @@ public class ChatRoomServiceImpl implements ChatRoomService {
             List<UserProfileReadResponseDTO> memberProfiles=chatRoomMembers.stream()
                     .map((chatRoomMember) -> userProfileService.toUserProfileDTO(chatRoomMember.getUser()))
                     .collect(Collectors.toList());
+
+            // 나의 멤버 정보 추출하기
+            ChatRoomMember myMemberInfo=chatRoomMembers.stream()
+                    .filter(chatRoomMember -> chatRoomMember.getUser().getId().equals(myUserId))
+                    .findFirst()
+                    .orElseThrow(()-> new EntityNotFoundException("나의 멤버 정보를 확인할 수 없습니다."));
+
             privateRoomDTO=ChatRoomReadResponseDTO.builder()
                     .id(chatRoom.getId())
                     .memberProfiles(memberProfiles)
+                    .notificationEnabled(myMemberInfo.isNotificationEnabled())
                     .build();
         }
 
@@ -352,9 +371,16 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .map((chatRoomMember)->userProfileService.toUserProfileDTO(chatRoomMember.getUser()))
                 .collect(Collectors.toList());
 
+        List<Tuple> notificationEnabledList=chatRoomMemberRepository.findNotificationEnabledByChatRoomIdsAndUserId(myUserId, List.of(roomId));
+        if(notificationEnabledList.isEmpty()){
+            throw new EntityNotFoundException("나의 멤버 정보를 확인할 수 없습니다.");
+        }
+        boolean notificationEnabled= (boolean) notificationEnabledList.get(0).get("enabled");
+
         ChatRoomReadResponseDTO chatRoomDTO=ChatRoomReadResponseDTO.builder()
                 .id(chatRoom.getId())
                 .memberProfiles(memberProfiles)
+                .notificationEnabled(notificationEnabled)
                 .build();
 
         // DTO 반환
@@ -405,6 +431,32 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .content(memberProfileDTOs)
                 .hasNext(hasNext)
                 .build();
+    }
+
+    /**
+     * 채팅방 알림 수신 여부 설정
+     * @param myUserId 사용자 ID
+     * @param roomId 채팅방 ID
+     * @param enabled 알림 활성화 여부
+     */
+    @Override
+    public void setNotificationEnabled(String myUserId, Long roomId, boolean enabled){
+        // 권한 검사 : 채팅방 멤버인지 확인
+        if(!isMember(roomId, myUserId)){
+            throw new AccessDeniedException("해당 채팅방에 속해있지 않습니다.");
+        }
+
+        // ChatRoomMember 가져오기
+        ChatRoomMember chatRoomMember=chatRoomMemberRepository.findByChatRoom_IdAndUser_Id(roomId, myUserId)
+                .orElseThrow(()-> new EntityNotFoundException("채팅방에 존재하지 않는 멤버입니다."));
+
+        // 채팅방 알림 활성화 여부 설정
+        ChatRoomMember newChatRoomMember=chatRoomMember.toBuilder()
+                .notificationEnabled(enabled)
+                .build();
+
+        // 변경사항을 DB에 저장
+        chatRoomMemberRepository.save(newChatRoomMember);
     }
 
     /**

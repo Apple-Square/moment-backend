@@ -1,6 +1,7 @@
 package applesquare.moment.chat.repository;
 
 import applesquare.moment.chat.model.ChatRoomMember;
+import jakarta.persistence.Tuple;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,4 +25,13 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
                                          @Param("roomId") Long roomId,
                                          @Param("cursor") Long cursor,
                                          Pageable pageable);
+
+    // 내가 속해있는 특정 채팅방 목록에서 알림 수신 여부 조회
+    @Query("SELECT cm.chatRoom.id AS chatRoomId, " +
+                "cm.notificationEnabled AS enabled " +
+            "FROM ChatRoomMember cm " +
+            "WHERE cm.chatRoom.id IN :roomIds " +
+                "AND cm.user.id = :userId")
+    List<Tuple> findNotificationEnabledByChatRoomIdsAndUserId(@Param("userId") String userId,
+                                                              @Param("roomIds") List<Long> roomIds);
 }

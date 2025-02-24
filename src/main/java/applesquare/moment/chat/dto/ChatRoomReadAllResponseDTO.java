@@ -16,4 +16,5 @@ public class ChatRoomReadAllResponseDTO {
     private long memberCount;  // 멤버 인원 수
     private List<String> memberProfileImageUrls;   // 멤버 프로필 이미지 URL 목록 (최대 4개까지만)
     private ChatRoomMessageThumbnailDTO lastMessage;  // 가장 최근 메시지
+    private boolean notificationEnabled;    // 알림 수신 여부
 }

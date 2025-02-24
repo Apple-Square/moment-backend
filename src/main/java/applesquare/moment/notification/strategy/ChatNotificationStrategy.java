@@ -1,11 +1,11 @@
 package applesquare.moment.notification.strategy;
 
 import applesquare.moment.chat.model.ChatMessage;
+import applesquare.moment.chat.model.ChatRoomMember;
 import applesquare.moment.chat.repository.ChatMessageRepository;
+import applesquare.moment.chat.repository.ChatRoomMemberRepository;
 import applesquare.moment.chat.service.ChatMemberActiveService;
 import applesquare.moment.chat.service.ChatRoomService;
-import applesquare.moment.common.page.PageRequestDTO;
-import applesquare.moment.common.page.PageResponseDTO;
 import applesquare.moment.notification.dto.NotificationReadResponseDTO;
 import applesquare.moment.notification.dto.NotificationRequestDTO;
 import applesquare.moment.notification.model.NotificationType;
@@ -15,6 +15,8 @@ import applesquare.moment.user.dto.UserProfileReadResponseDTO;
 import applesquare.moment.user.model.UserInfo;
 import applesquare.moment.user.service.UserProfileService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -25,7 +27,7 @@ import java.util.List;
 public class ChatNotificationStrategy implements NotificationStrategy<ChatMessage>{
     private final NotificationSender notificationSender;
     private final ChatMessageRepository chatMessageRepository;
-    private final ChatRoomService chatRoomService;
+    private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final ChatMemberActiveService chatMemberActiveService;
     private final UserProfileService userProfileService;
 
@@ -53,28 +55,32 @@ public class ChatNotificationStrategy implements NotificationStrategy<ChatMessag
         ChatMessage chatMessage=notificationRequestDTO.getReferenceObject();
 
         // 채팅방 멤버 목록 조회
-        PageRequestDTO pageRequetDTO=PageRequestDTO.builder()
-                .cursor(null)
-                .size(ChatRoomService.MAX_MEMBER_COUNT)
-                .build();
-        PageResponseDTO<UserProfileReadResponseDTO> memberPage=chatRoomService.readMemberProfileAllByRoomId(senderId, chatRoomId, pageRequetDTO);
-        List<UserProfileReadResponseDTO> memberProfiles=memberPage.getContent().stream()
-                .filter((memberProfile)-> !memberProfile.getId().equals(senderId))
+        Pageable pageable= PageRequest.of(0, ChatRoomService.MAX_MEMBER_COUNT);
+        List<ChatRoomMember> chatRoomMembers=chatRoomMemberRepository.findAllByRoomId(senderId, chatRoomId, null, pageable);
+        chatRoomMembers=chatRoomMembers.stream()
+                .filter(chatRoomMember -> !chatRoomMember.getUser().getId().equals(senderId))
                 .toList();
 
         // 채팅방의 각 멤버 별로 알림 전송
-        for(UserProfileReadResponseDTO memberProfile: memberProfiles){
-            // TO DO : 채팅방에 대한 알림 수신 여부 확인 (on/off)
+        for(ChatRoomMember chatRoomMember: chatRoomMembers){
+            // 멤버의 사용자 ID 가져오기
+            String memberUserId=chatRoomMember.getUser().getId();
 
-            // 채팅방 활성화 여부 확인
-            if(chatMemberActiveService.isActiveMember(memberProfile.getId(), chatRoomId)){
+            // 채팅방 알림 수신 여부 확인
+            if(!chatRoomMember.isNotificationEnabled()){
+                // 알림 수신이 꺼져있다면, 채팅 알림을 전송하지 않는다.
+                continue;
+            }
+
+            // 채팅방 멤버 활성화 여부 확인
+            if(chatMemberActiveService.isActiveMember(memberUserId, chatRoomId)){
                 // 만약 해당 멤버가 채팅방 화면을 보고 있는 상태(=활성화 상태)라면,
                 // 이 멤버한테는 채팅 알림을 전송하지 않는다.
                 continue;
             }
 
             // 본인이 속한 채팅방의 전체에서 미확인 메시지 개수 총합 조회
-            long badgeCount=chatMessageRepository.countUnreadMessagesByUserId(memberProfile.getId());
+            long badgeCount=chatMessageRepository.countUnreadMessagesByUserId(memberUserId);
 
             // 전달할 알림 DTO 생성
             String content=switch (chatMessage.getType()){
@@ -93,10 +99,10 @@ public class ChatNotificationStrategy implements NotificationStrategy<ChatMessag
                     .build();
 
             // 배지 알림 전송
-            notificationSender.sendChatBadge(memberProfile.getId(), badgeCount);
+            notificationSender.sendChatBadge(memberUserId, badgeCount);
 
             // 팝업 알림 전송
-            notificationSender.sendPopup(memberProfile.getId(), notificationDTO);
+            notificationSender.sendPopup(memberUserId, notificationDTO);
         }
     }
 

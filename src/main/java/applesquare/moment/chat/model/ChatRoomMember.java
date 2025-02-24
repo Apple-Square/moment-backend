@@ -26,4 +26,7 @@ public class ChatRoomMember {
     private UserInfo user;
     @Column(name = "last_read_message_id", nullable = true, updatable = true)
     private Long lastReadMessageId; // 가장 최근에 읽은 메시지의 ID
+    @Builder.Default
+    @Column(name = "notification_enabled", nullable = false, updatable = true)
+    private boolean notificationEnabled = true;
 }

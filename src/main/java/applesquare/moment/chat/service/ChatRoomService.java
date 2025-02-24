@@ -35,6 +35,9 @@ public interface ChatRoomService {
     // 멤버 ID를 기반으로 1:1 채팅방 조회
     ChatRoomReadResponseDTO readPrivateRoomByMemberId(String myUserId, String otherUserId);
 
+    // 채팅방 알림 수신 여부 설정
+    void setNotificationEnabled(String myUserId, Long roomId, boolean enabled);
+
     // 채팅방 초대
     List<UserProfileReadResponseDTO> invite(String myUserId, Long roomId, ChatRoomInviteRequestDTO chatRoomInviteRequestDTO);
     // 채팅방 나가기

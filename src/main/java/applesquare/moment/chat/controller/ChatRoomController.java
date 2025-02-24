@@ -176,6 +176,29 @@ public class ChatRoomController {
     }
 
     /**
+     * 채팅방 알림 수신 설정 API
+     * @param roomId 채팅방 ID
+     * @param enabled 알림 수신 여부
+     * @return  (status) 200,
+     *          (body) 설정 성공 메시지
+     */
+    @PatchMapping(value = "/{roomId}/notifications", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> setNotificationEnabled(@PathVariable(name = "roomId") Long roomId,
+                                                                      @RequestBody Boolean enabled){
+        // 사용자 ID 추출
+        String myUserId=securityService.getUserId();
+
+        // 채팅방 알림 활성화 여부 설정
+        chatRoomService.setNotificationEnabled(myUserId, roomId, enabled);
+
+        // 응답 생성
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", "채팅방 알림 "+ (enabled? "활성화" : "비활성화") +"에 성공했습니다.");
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseMap.getMap());
+    }
+
+    /**
      * 채팅방 초대 API
      * @param roomId 채팅방 ID
      * @param chatRoomInviteRequestDTO 채팅방 초대 요청 정보
