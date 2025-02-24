@@ -116,4 +116,26 @@ public class NotificationController {
 
         return ResponseEntity.status(HttpStatus.OK).body(responseMap.getMap());
     }
+
+    /**
+     * 미확인 알림 개수 조회 API
+     * @return  (status) 200,
+     *          (body)  조회 성공 메시지,
+     *                  미확인 알림 개수
+     */
+    @GetMapping("/unread-count")
+    public ResponseEntity<Map<String, Object>> readUnreadCount(){
+        // 사용자 ID 추출
+        String userId=securityService.getUserId();
+
+        // 미확인 알림 개수 조회
+        long unreadCount=notificationService.countUnreadNotifications(userId);
+
+        // 응답 생성
+        ResponseMap responseMap=new ResponseMap();
+        responseMap.put("message", "미확인 알림 개수 조회에 성공했습니다.");
+        responseMap.put("unreadCount", unreadCount);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseMap.getMap());
+    }
 }
