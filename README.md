@@ -8,6 +8,18 @@
 
 <br/>
 
+## 🍎 팀원 소개
+|<img src="https://github.com/user-attachments/assets/9856718a-1113-42f4-a9fd-4efebbcee36c" width="180">|<img src="https://github.com/user-attachments/assets/7033ddfe-9613-41ae-b7f1-55f8138d02cd" width="180">|<img src="https://github.com/user-attachments/assets/180c06ef-e55a-48c2-ab2a-fb01e2ee17ea" width="180">|
+|---|---|---|
+|[**조현아 (BE)**](https://github.com/tenius10)|[**최건우 (FE)**](https://github.com/rjsdn031)|[**최현준 (FE)**](https://github.com/Hyeonjun0527)|
+|▪️ **백엔드 개발**<br/>(인증, 소셜 로그인, 피드, <br/>쇼츠, 댓글, 태그, 유저 <br/>정보, 팔로우, 위치 검색,<br/>실시간 알림, 채팅, CI/CD)|▪️ **피드**<br/>▪️ **모먼트(쇼츠)**<br/>▪️ **댓글**<br/>▪️ **UI/UX**|▪️ **인증**<br/>▪️ **회원 관리**<br/>▪️ **채팅 관리**<br/>▪️ **UI/UX**|
+
+<br/>
+
+## 🛠️ 백엔드 아키텍처
+![image](https://github.com/user-attachments/assets/a18cf69f-c32d-4aae-973c-751adc4384c6)
+
+
 ## 🛠️ 기술 스택
 
 **Language**
@@ -24,9 +36,6 @@
 ![Querydsl](https://img.shields.io/badge/Querydsl-00599C?style=for-the-badge&logo=apachemaven&logoColor=white)
 ![SSE](https://img.shields.io/badge/SSE-FF6D00?style=for-the-badge&logo=googlenearby&logoColor=white)
 ![WebSocket](https://img.shields.io/badge/WebSocket-0088CC?style=for-the-badge&logo=socket.io&logoColor=white)
-
-
-
 
 **Database**
 
@@ -53,7 +62,7 @@ https://nickel-confidence-5de.notion.site/API-008726751e004642976ff983cf98c5ee
 
 <br/>
 
-## ✅ 주요 기능
+## 📖 주요 기능
 
 ### 🗝️ 인증 (JWT)
 - 회원가입
@@ -110,10 +119,4 @@ https://nickel-confidence-5de.notion.site/API-008726751e004642976ff983cf98c5ee
 
 <br/>
 
-## 🍎 사과는 애플 | 팀원 소개
-|<img src="https://github.com/user-attachments/assets/9856718a-1113-42f4-a9fd-4efebbcee36c" width="180">|<img src="https://github.com/user-attachments/assets/7033ddfe-9613-41ae-b7f1-55f8138d02cd" width="180">|<img src="https://github.com/user-attachments/assets/180c06ef-e55a-48c2-ab2a-fb01e2ee17ea" width="180">|
-|---|---|---|
-|[**조현아 (BE)**](https://github.com/tenius10)|[**최건우 (FE)**](https://github.com/rjsdn031)|[**최현준 (FE)**](https://github.com/Hyeonjun0527)|
-|▪️ **백엔드 개발**<br/>(인증, 소셜 로그인, 피드, <br/>쇼츠, 댓글, 태그, 유저 <br/>정보, 팔로우, 위치 검색,<br/>실시간 알림, 채팅, CI/CD)|▪️ **피드**<br/>▪️ **모먼트(쇼츠)**<br/>▪️ **댓글**<br/>▪️ **UI/UX**|▪️ **인증**<br/>▪️ **회원 관리**<br/>▪️ **채팅 관리**<br/>▪️ **UI/UX**|
 
-<br/>
