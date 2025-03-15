@@ -45,7 +45,6 @@
 ![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)
 ![Notion](https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=notion&logoColor=white)
 ![Figma](https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white)
-![Untitled](https://github.com/user-attachments/assets/db3afb8d-459f-4634-b2e2-ed7b4adacb44)
 
 <br/>
 
@@ -56,47 +55,59 @@ https://nickel-confidence-5de.notion.site/API-008726751e004642976ff983cf98c5ee
 
 ## ✅ 주요 기능
 
-### 🗝️ JWT 인증
-![image](https://github.com/user-attachments/assets/cbb4b3e0-08c8-4cde-bc5b-3e98ac4b63d2)
-
-
-### 📧 이메일 인증
-![image](https://github.com/user-attachments/assets/da264a67-8c6e-4cb8-afbd-7eb5b0fcbf93)
-
+### 🗝️ 인증 (JWT)
+- 회원가입
+- 로그인
+- 토큰 재발급
+- 로그아웃
+- 계정 복구
+- PW 재설정
+- 토큰 블랙리스트
+- 이메일 인증
 
 ### 🌐 소셜 로그인 (kakao, naver)
-![image](https://github.com/user-attachments/assets/4a205b52-dc6c-4f15-a6c7-b87acb563397)
-
+- 카카오 로그인
+- 네이버 로그인
 
 ### 🎥 게시물 (쇼츠)
-![image](https://github.com/user-attachments/assets/e46f3a1b-5838-4a75-81a2-75cc7e8ba913)
+- 게시물 CRUD
+- 이미지/비디오 파일 첨부
+- 조회수
+- 좋아요
+- 댓글
+- 해시태그
+- 주소 첨부
+- 키워드 기반 검색
 
+### 🏷️ 해시태그
+- 실시간 인기 태그 조회
 
-### 💬 댓글
-![image](https://github.com/user-attachments/assets/9598e3f3-50cd-42c7-91ce-7e05a5c84f92)
+### 👤 유저 관리
+- 유저 프로필 관리
+- 유저 페이지 조회
+- 팔로우
 
+### 🔔 실시간 알림 (SSE)
+- 알림 이벤트 구독
+- 알림 목록 조회
+- 알림 읽음 처리
 
-### 🏷️ 해시 태그
-![image](https://github.com/user-attachments/assets/230cb8f0-fb69-40d4-8262-dc9e50e44bca)
+### 💬 실시간 채팅 (WebSocket, Stomp)
+- 채팅방 CRUD (1:1, 그룹 채팅)
+- 채팅방 멤버 조회
+- 채팅방 구독
+- 채팅방 멤버 활성화/비활성화
+- 채팅방 초대
+- 채팅방 나가기
+- 채팅방 알림 설정
+- 채팅 메세지 전송 (일반 텍스트, 이미지/비디오, 게시물 공유)
 
-
-### 👤 유저 정보 관리
-![image](https://github.com/user-attachments/assets/3480da58-9dad-4821-9b29-574b48f70e9a)
-
-
-### 🤝 팔로우
-![image](https://github.com/user-attachments/assets/d915da8e-5e4d-42ca-94de-b5a238560e0d)
-
-
-### 🗺️ 위치 기반 검색
-![image](https://github.com/user-attachments/assets/dd4687a9-1760-4388-b49e-ab99f282dcce)
 
 <br/>
 
 ## ⚙️ ERD
-<img src="https://github.com/user-attachments/assets/4e867cd0-e854-42fc-8b1f-9917bcc8007d" width="900">
+![Untitled](https://github.com/user-attachments/assets/db3afb8d-459f-4634-b2e2-ed7b4adacb44)
 
-<br/>
 <br/>
 
 ## 🍎 사과는 애플 | 팀원 소개
@@ -106,14 +117,3 @@ https://nickel-confidence-5de.notion.site/API-008726751e004642976ff983cf98c5ee
 |▪️ **백엔드 개발**<br/>(인증, 소셜 로그인, 피드, <br/>쇼츠, 댓글, 태그, 유저 <br/>정보, 팔로우, 위치 검색,<br/>실시간 알림, 채팅, CI/CD)|▪️ **피드**<br/>▪️ **모먼트(쇼츠)**<br/>▪️ **댓글**<br/>▪️ **UI/UX**|▪️ **인증**<br/>▪️ **회원 관리**<br/>▪️ **채팅 관리**<br/>▪️ **UI/UX**|
 
 <br/>
-
-## 🚀 개발 중인 기능
-**⚙️ 계정 관리** <br/>
-**🔔 실시간 알림 (WebSocket)** <br/>
-**💬 실시간 채팅 (WebSocket)** <br/>
-**📈 피드 시스템** <br/>
-
-<br/>
-
-
-
